@@ -31,4 +31,37 @@ build/
 Thumbs.db
 
 # macOS
+# Java
+target/
+*.class
+*.jar
+*.war
+
+# Maven
+.settings/
+.project
+.classpath
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# React / Node
+node_modules/
+build/
+
+# Logs
+*.log
+
+# Variables de entorno
+.env
+.env.local
+
+# Windows
+Thumbs.db
+
+# macOS
 .DS_Store
