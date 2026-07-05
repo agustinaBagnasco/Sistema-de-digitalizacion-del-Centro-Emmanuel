@@ -1,0 +1,80 @@
+/* ==========================================
+   Centro Emmanuel - Variables Globales
+   ========================================== */
+
+:root {
+
+  /* ===== Colores principales ===== */
+  --color-primary: #02A5B2;
+  --color-primary-dark: #018994;
+  --color-primary-light: #E6F7F9;
+
+  /* ===== Fondos ===== */
+  --color-background: #F3F3F4;
+  --color-surface: #FFFFFF;
+  --color-sidebar: #FFFFFF;
+  --color-navbar: #FFFFFF;
+
+  /* ===== Textos ===== */
+  --color-text: #212121;
+  --color-text-secondary: #707070;
+  --color-text-light: #9E9E9E;
+
+  /* ===== Bordes ===== */
+  --color-border: #E5E7EB;
+
+  /* ===== Estados ===== */
+  --color-success: #3b9a8f;
+  --color-warning: #dfbd82;
+  --color-danger: #f98b89;
+  --color-info: #6ab8f7;
+
+  /* ===== Sombras ===== */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.10);
+
+  /* ===== Bordes ===== */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* ===== Espaciado ===== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* ===== Layout ===== */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 80px;
+  --navbar-height: 64px;
+  --container-padding: 24px;
+
+  /* ===== Tipografía ===== */
+  --font-family: "Open Sans", sans-serif;
+
+  --font-xs: .75rem;
+  --font-sm: .875rem;
+  --font-md: 1rem;
+  --font-lg: 1.25rem;
+  --font-xl: 1.75rem;
+  --font-2xl: 2.2rem;
+
+  --font-light: 300;
+  --font-normal: 400;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ===== Animaciones ===== */
+  --transition: all .25s ease;
+}
+
+/* ===== Breakpoints ===== */
+/*
+Mobile   : 0 - 767
+Tablet   : 768 - 1023
+Desktop  : 1024+
+*/
