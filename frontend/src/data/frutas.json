@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "nombre": "Ciruela"
+    },
+    {
+        "id": 2,
+        "nombre": "Damasco"
+    },
+    {
+        "id": 3,
+        "nombre": "Durazno"
+    },
+    {
+        "id": 4,
+        "nombre": "Higo"
+    },
+    {
+        "id": 5,
+        "nombre": "Manzana"
+    },
+    {
+        "id": 6,
+        "nombre": "Naranja"
+    }
+]

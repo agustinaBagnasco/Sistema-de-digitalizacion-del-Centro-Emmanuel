@@ -1,0 +1,89 @@
+.area-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    height:180px;
+    padding:28px;
+
+    border-radius:18px;
+
+    text-decoration:none;
+    color:#222;
+
+    background:color-mix(in srgb, var(--color) 10%, white);
+
+    border:1px solid color-mix(in srgb, var(--color) 25%, white);
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+    transition:.25s;
+}
+
+.area-card:hover{
+    transform:translateY(-5px);
+
+    box-shadow:0 12px 28px rgba(0,0,0,.12);
+}
+
+.area-header{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.area-header h2{
+    margin:0;
+    font: size 1.5rem;
+    font-weight:700;
+}
+
+.area-icon{
+    width:50px;
+    height:50px;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:color-mix(in srgb, var(--color) 15%, white);
+
+    color:var(--color);
+
+    font-size:32px;
+}
+
+.area-card hr{
+    width:100%;
+    border:none;
+    border-top:1px solid rgba(0,0,0,.08);
+}
+
+.area-button{
+
+    align-self:flex-end;
+
+    width:46px;
+    height:46px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:var(--color);
+
+    color:white;
+
+    font-size:34px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.area-button:hover{
+    transform:scale(1.08);
+}

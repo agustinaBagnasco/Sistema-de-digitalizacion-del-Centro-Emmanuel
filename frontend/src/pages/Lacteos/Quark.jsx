@@ -1,27 +1,22 @@
 import { useState } from "react";
-import cultivos from "../data/cultivos.json";
-import Card from "../components/ui/Card";
-import Select from "../components/ui/Select";
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
-import Textarea from "../components/ui/Textarea";
-import FormField from '../components/ui/FormField'
+import Card from "../../components/ui/Card";
+import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Textarea from "../../components/ui/Textarea";
+import FormField from '../../components/ui/FormField'
 
-export default function Huerta() {
+export default function Quark() {
   const [form, setForm] = useState({
     fecha: "",
-    cultivo: "",
-    cantidad: "",
+    litrosLeche: "",
+    cantFrascos: "",
+    tiempoElaboracion: "",
     comentario: "",
   });
 
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
-
-  const opcionesCultivos = cultivos.map(cultivo => ({
-    value: cultivo.id,
-    label: cultivo.nombre,
-  }));
 
   function handleChange(e) {
     setForm({
@@ -37,8 +32,9 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
-      cantidad: "",
+      litrosLeche: "",
+      cantFrascos: "",
+      tiempoElaboracion: "",
       comentario: "",
     });
   }
@@ -55,8 +51,9 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
-      cantidad: "",
+      litrosLeche: "",
+      cantFrascos: "",
+      tiempoElaboracion: "",
       comentario: "",
     });
   }
@@ -72,7 +69,7 @@ export default function Huerta() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de Cultivos">
+      <Card title="Registro de elaboracion de queso quark">
         <form onSubmit={guardar} className="formulario">
 
           <label>Fecha</label>
@@ -84,28 +81,43 @@ export default function Huerta() {
             required
           />
           <br />
-          <label>Cultivo</label>
-          <Select
-            name="cultivo"
-            value={form.cultivo}
-            onChange={handleChange}
-            options={opcionesCultivos}
-            placeholder="Seleccione un cultivo"
-          />
-          <br />
 
-          <label>Cantidad</label>
+          <label>Leche</label>
           <Input
             type="number"
-            name="cantidad"
-            value={form.cantidad}
+            name="litrosLeche"
+            value={form.litrosLeche}
             onChange={handleChange}
             required
           />
           <br />
+
+          <label>Cantidad de Frascos</label>
+          <Input
+            type="number"
+            name="cantFrascos"
+            value={form.cantFrascos}
+            onChange={handleChange}
+            required
+          />
+          <br />
+
+
+          <label>Tiempo de elaboracion</label>
+          <Input
+            type="number"
+            name="tiempoElaboracion"
+            value={form.tiempoElaboracion}
+            onChange={handleChange}
+            required
+          />
+
+          <br />
           <label>Comentario</label>
           <Textarea
-
+            name="comentario"
+            value={form.comentario}
+            onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
           <br />
@@ -126,8 +138,9 @@ export default function Huerta() {
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Cultivo</th>
-                <th>Cantidad</th>
+                <th>Leche</th>
+                <th>Cantidad de Frascos</th>
+                <th>Tiempo de elaboracion</th>
                 <th>Comentario</th>
               </tr>
             </thead>
@@ -136,8 +149,9 @@ export default function Huerta() {
               {registros.map((r, i) => (
                 <tr key={i}>
                   <td>{r.fecha}</td>
-                  <td>{opcionesCultivos.find(o => String(o.value) === String(r.cultivo))?.label}</td>
-                  <td>{r.cantidad}</td>
+                  <td>{r.litrosLeche}</td>
+                  <td>{r.cantFrascos}</td>
+                  <td>{r.tiempoElaboracion}</td>
                   <td>{r.comentario}</td>
                   <td>
                     <div className="table-actions">
@@ -166,6 +180,7 @@ export default function Huerta() {
 
   );
 }
+
 
 
 

@@ -58,3 +58,7 @@ img{
 ul{
     list-style:none;
 }
+
+p{
+    line-height:1.5;
+}

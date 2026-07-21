@@ -1,26 +1,27 @@
 import { useState } from "react";
-import cultivos from "../data/cultivos.json";
-import Card from "../components/ui/Card";
-import Select from "../components/ui/Select";
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
-import Textarea from "../components/ui/Textarea";
-import FormField from '../components/ui/FormField'
+import granos from "../../data/granos.json";
+import Card from "../../components/ui/Card";
+import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Textarea from "../../components/ui/Textarea";
+import FormField from '../../components/ui/FormField'
 
-export default function Huerta() {
+export default function Molienda() {
   const [form, setForm] = useState({
     fecha: "",
-    cultivo: "",
-    cantidad: "",
+    grano: "",
+    tiempoElaboracion: "",
+    kgsEnvasados: "",
     comentario: "",
   });
 
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesCultivos = cultivos.map(cultivo => ({
-    value: cultivo.id,
-    label: cultivo.nombre,
+  const opcionesGranos = granos.map(grano => ({
+    value: grano.id,
+    label: grano.nombre,
   }));
 
   function handleChange(e) {
@@ -37,8 +38,9 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
-      cantidad: "",
+      grano: "",
+      tiempoElaboracion: "",
+      kgsEnvasados: "",
       comentario: "",
     });
   }
@@ -55,8 +57,9 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
-      cantidad: "",
+      grano: "",
+      tiempoElaboracion: "",
+      kgsEnvasados: "",
       comentario: "",
     });
   }
@@ -72,7 +75,7 @@ export default function Huerta() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de Cultivos">
+      <Card title="Registro de molienda">
         <form onSubmit={guardar} className="formulario">
 
           <label>Fecha</label>
@@ -84,28 +87,41 @@ export default function Huerta() {
             required
           />
           <br />
-          <label>Cultivo</label>
+          <label>Grano</label>
           <Select
-            name="cultivo"
-            value={form.cultivo}
+            name="grano"
+            value={form.grano}
             onChange={handleChange}
-            options={opcionesCultivos}
-            placeholder="Seleccione un cultivo"
+            options={opcionesGranos}
+            placeholder="Seleccione tipo de grano"
           />
           <br />
 
-          <label>Cantidad</label>
+          <label>Tiempo de elaboracion</label>
           <Input
             type="number"
-            name="cantidad"
-            value={form.cantidad}
+            name="tiempoElaboracion"
+            value={form.tiempoElaboracion}
             onChange={handleChange}
             required
           />
           <br />
+
+          <label>Kgs envasados</label>
+          <Input
+            type="number"
+            name="kgsEnvasados"
+            value={form.kgsEnvasados}
+            onChange={handleChange}
+            required
+          />
+          <br />
+          <br />
           <label>Comentario</label>
           <Textarea
-
+            name="comentario"
+            value={form.comentario}
+            onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
           <br />
@@ -120,14 +136,14 @@ export default function Huerta() {
         <br />
         <hr />
 
-
         <div className="table-container">
           <table className="table">
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Cultivo</th>
-                <th>Cantidad</th>
+                <th>Grano</th>
+                <th>Tiempo de elaboracion</th>
+                <th>Kgs envasados</th>
                 <th>Comentario</th>
               </tr>
             </thead>
@@ -136,8 +152,9 @@ export default function Huerta() {
               {registros.map((r, i) => (
                 <tr key={i}>
                   <td>{r.fecha}</td>
-                  <td>{opcionesCultivos.find(o => String(o.value) === String(r.cultivo))?.label}</td>
-                  <td>{r.cantidad}</td>
+                  <td>{opcionesGranos.find(o => String(o.value) === String(r.grano))?.label}</td>
+                  <td>{r.tiempoElaboracion}</td>
+                  <td>{r.kgsEnvasados}</td>
                   <td>{r.comentario}</td>
                   <td>
                     <div className="table-actions">
