@@ -1,26 +1,26 @@
 import { useState } from "react";
-import cultivos from "../data/cultivos.json";
-import Card from "../components/ui/Card";
-import Select from "../components/ui/Select";
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
-import Textarea from "../components/ui/Textarea";
-import FormField from '../components/ui/FormField'
+import quesos from "../../data/quesos.json";
+import Card from "../../components/ui/Card";
+import Select from "../../components/ui/Select";
+import Input from "../../components/ui/Input";
+import Button from "../../components/ui/Button";
+import Textarea from "../../components/ui/Textarea";
+import FormField from '../../components/ui/FormField'
 
-export default function Huerta() {
+export default function Quesos() {
   const [form, setForm] = useState({
     fecha: "",
-    cultivo: "",
     cantidad: "",
+    queso: "",
     comentario: "",
   });
 
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesCultivos = cultivos.map(cultivo => ({
-    value: cultivo.id,
-    label: cultivo.nombre,
+  const opcionesQuesos = quesos.map(queso => ({
+    value: queso.id,
+    label: queso.nombre,
   }));
 
   function handleChange(e) {
@@ -37,8 +37,8 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
       cantidad: "",
+      queso: "",
       comentario: "",
     });
   }
@@ -55,8 +55,8 @@ export default function Huerta() {
 
     setForm({
       fecha: "",
-      cultivo: "",
       cantidad: "",
+      queso: "",
       comentario: "",
     });
   }
@@ -72,7 +72,7 @@ export default function Huerta() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de Cultivos">
+      <Card title="Registro de elaboracion de quesos">
         <form onSubmit={guardar} className="formulario">
 
           <label>Fecha</label>
@@ -84,13 +84,13 @@ export default function Huerta() {
             required
           />
           <br />
-          <label>Cultivo</label>
+          <label>Tipo de queso</label>
           <Select
-            name="cultivo"
-            value={form.cultivo}
+            name="queso"
+            value={form.queso}
             onChange={handleChange}
-            options={opcionesCultivos}
-            placeholder="Seleccione un cultivo"
+            options={opcionesQuesos}
+            placeholder="Seleccione un tipo de queso"
           />
           <br />
 
@@ -105,7 +105,9 @@ export default function Huerta() {
           <br />
           <label>Comentario</label>
           <Textarea
-
+            name="comentario"
+            value={form.comentario}
+            onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
           <br />
@@ -126,8 +128,8 @@ export default function Huerta() {
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Cultivo</th>
                 <th>Cantidad</th>
+                <th>Tipo de queso</th>
                 <th>Comentario</th>
               </tr>
             </thead>
@@ -136,9 +138,9 @@ export default function Huerta() {
               {registros.map((r, i) => (
                 <tr key={i}>
                   <td>{r.fecha}</td>
-                  <td>{opcionesCultivos.find(o => String(o.value) === String(r.cultivo))?.label}</td>
                   <td>{r.cantidad}</td>
-                  <td>{r.comentario}</td>
+                  <td>{opcionesQuesos.find(o => String(o.value) === String(r.queso))?.label}</td>
+                  <td>{r.comentario}</td>Q
                   <td>
                     <div className="table-actions">
                       <Button
