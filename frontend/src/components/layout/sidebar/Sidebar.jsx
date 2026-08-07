@@ -17,65 +17,73 @@ export default function Sidebar({ open, onClose }) {
       <aside className={`sidebar ${open ? "open" : ""}`}>
 
         <div className="sidebar-header">
-          <img
-            src={logo}
-            alt="Centro Emmanuel"
-            className="sidebar-logo"
-          />
+          <NavLink
+            to="/"
+            onClick={onClose}
+            className="logo-link"
+          >
+            <img
+              src={logo}
+              alt="Centro Emmanuel"
+              className="sidebar-logo"
+            />
+          </NavLink>
+ 
+
           <p>Sistema de Gestión</p>
         </div>
 
-<nav>
-  {menuItems.map((item, index) => (
-    <div key={index}>
+        <nav>
+          {menuItems.map((item, index) => (
+            <div key={index}>
 
-      {item.children ? (
-        <>
-          <button
-            className="menu-item submenu-button"
-            onClick={() =>
-              setOpenMenu(openMenu === index ? null : index)
-            }
-          >
-            <span>{item.label}</span>
-            <span>{openMenu === index ? "▾" : "▸"}</span>
-          </button>
+              {item.children ? (
+                <>
+                  <button
+                    className="menu-item submenu-button"
+                    onClick={() =>
+                      setOpenMenu(openMenu === index ? null : index)
+                    }
+                  >
+                    <span>{item.label}</span>
+                    <span>{openMenu === index ? "▾" : "▸"}</span>
+                  </button>
 
-          {openMenu === index && (
-            <div className="submenu">
-              {item.children.map((sub) => (
+                  {openMenu === index && (
+                    <div className="submenu">
+                      {item.children.map((sub) => (
+                        <NavLink
+                          key={sub.path}
+                          to={sub.path}
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            isActive
+                              ? "submenu-item active"
+                              : "submenu-item"
+                          }
+                        >
+                          {sub.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
                 <NavLink
-                  key={sub.path}
-                  to={sub.path}
+                  to={item.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    isActive
-                      ? "submenu-item active"
-                      : "submenu-item"
+                    isActive ? "menu-item active" : "menu-item"
                   }
                 >
-                  {sub.label}
+                  {item.label}
                 </NavLink>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <NavLink
-          to={item.path}
-          onClick={onClose}
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-        >
-          {item.label}
-        </NavLink>
-      )}
+              )}
 
-    </div>
-  ))}
-</nav>
-        </aside>
+            </div>
+          ))}
+        </nav>
+      </aside>
     </>
   );
 }

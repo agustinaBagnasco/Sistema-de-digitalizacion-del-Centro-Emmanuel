@@ -1,6 +1,5 @@
 export const menuItems = [
-  { label: "Inicio", path: "/" },
-  { label: "Alimentos Procesados", 
+  { label: "Alimentos Procesados",
     children: [
       { label: "Mermeladas", path: "/alimentos-procesados/mermeladas" },
       { label: "Moliendas", path: "/alimentos-procesados/molienda" }
@@ -14,9 +13,14 @@ export const menuItems = [
       { label: "Quark", path: "/lacteos/quark" }
     ]
   },
-  { label: "Huerta", path: "/huerta" },
+  { label: "Huerta", 
+    children: [
+      { label: "Cosecha", path: "/huerta/cosecha" }
+    ]
+  },
   { label: "Administración", 
     children: [
+      { label: "Usuarios", path: "/administracion/usuarios" },
       { label: "Ventas", path: "/administracion/Ventas" },
       { label: "Producción", path: "/administracion/Produccion" },
       { label: "Mano de obra", path: "/administracion/ManoDeObra" },

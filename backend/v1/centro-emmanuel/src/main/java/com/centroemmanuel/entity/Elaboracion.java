@@ -1,33 +1,61 @@
 package com.centroemmanuel.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "elaboracion")
 public class Elaboracion {
-    private int idElaboracion;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_elaboracion")
+    private Integer idElaboracion;
+
+    @ManyToOne
+    @JoinColumn(name = "id_producto")
     private Producto productoElaborado;
+
+    @Column(name = "cantidad_producida")
     private double cantidadProducida;
+
+    @Column(name = "fecha_produccion")
     private LocalDate fechaProduccion;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
+
+    @Column(length = 500)
     private String observaciones;
-    private List<DetalleElaboracion> detalles;
 
-    public Elaboracion(){this.detalles = new ArrayList<>();}
+    @OneToMany(mappedBy = "elaboracion",
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<DetalleElaboracion> detalles = new ArrayList<>();
 
-    public Elaboracion(int pIdElaboracion, Producto pPorductoElaborado, double pCantidadProducida, Usuario pUsuario, String pObservaciones){
-        this.idElaboracion = pIdElaboracion;
-        this.productoElaborado = pPorductoElaborado;
-        this.cantidadProducida = pCantidadProducida;
+    public Elaboracion(){}
+
+    public Elaboracion(Integer idElaboracion,
+                       Producto productoElaborado,
+                       double cantidadProducida,
+                       Usuario usuario,
+                       String observaciones){
+
+        this.idElaboracion = idElaboracion;
+        this.productoElaborado = productoElaborado;
+        this.cantidadProducida = cantidadProducida;
         this.fechaProduccion = LocalDate.now();
-        this.usuario = pUsuario;
-        this.observaciones = pObservaciones;
-        this.detalles = new ArrayList<>();
+        this.usuario = usuario;
+        this.observaciones = observaciones;
     }
 
-    public void RegistrarElaboracion(){}
-    public void CalcularCosto(){}
-    
+    public void registrarElaboracion(){}
+
+    public void calcularCosto(){}
+
     //region Getters y Setters
     public int getIdElaboracion(){return idElaboracion;}
     public void setIdElaboracion(int pIdElaboracion){this.idElaboracion = pIdElaboracion;}

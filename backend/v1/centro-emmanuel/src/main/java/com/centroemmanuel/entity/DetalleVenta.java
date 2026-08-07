@@ -1,21 +1,44 @@
 package com.centroemmanuel.entity;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "detalle_venta")
 public class DetalleVenta {
-    private int idDetalleVenta;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_detalle_venta")
+    private Integer idDetalleVenta;
+
+    @ManyToOne
+    @JoinColumn(name = "id_venta")
+    private Venta venta;
+
+    @ManyToOne
+    @JoinColumn(name = "id_producto")
     private Producto productoVendido;
+
+    @Column(name = "cantidad")
     private double cantidadDV;
+
+    @Column(name = "precio_unitario", precision = 10, scale = 2)
     private BigDecimal precioUnitario;
+
+    @Column(precision = 10, scale = 2)
     private BigDecimal subtotal;
 
     public DetalleVenta(){}
 
-    public DetalleVenta(int pIdDetalleElaboracion, Producto pProductoVendido, double pCantidadProducida, BigDecimal pPrecioUnitario){
-        this.idDetalleVenta = pIdDetalleElaboracion;
-        this.productoVendido = pProductoVendido;
-        this.cantidadDV = pCantidadProducida;
-        this.precioUnitario = pPrecioUnitario;
+    public DetalleVenta(Integer idDetalleVenta,
+                        Producto productoVendido,
+                        double cantidadDV,
+                        BigDecimal precioUnitario){
+        this.idDetalleVenta = idDetalleVenta;
+        this.productoVendido = productoVendido;
+        this.cantidadDV = cantidadDV;
+        this.precioUnitario = precioUnitario;
     }
 
     //region Getters y Setters

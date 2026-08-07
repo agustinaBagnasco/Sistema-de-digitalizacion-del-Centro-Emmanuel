@@ -1,47 +1,107 @@
 package com.centroemmanuel.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "movimiento_stock")
 public class MovimientoStock {
-    private int idMovStock;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mov_stock")
+    private Integer idMovStock;
+
+    @ManyToOne
+    @JoinColumn(name = "id_producto", nullable = false)
     private Producto productoMov;
+
+    @Column(name = "cantidad_mov", nullable = false)
     private double cantidadMov;
+
+    @Column(name = "tipo_mov", length = 20, nullable = false)
     private String tipoMov;
+
+    @Column(name = "fecha_mov", nullable = false)
     private LocalDate fechaMov;
+
+    @Column(name = "motivo_mov", length = 255)
     private String motivoMov;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    public MovimientoStock(){}
-
-    public MovimientoStock(int pIdMovStock, Producto pProductoMov, double pCantidadMov, String pTipoMov, String pMotivoMov, Usuario pUsuario){
-        this.idMovStock = pIdMovStock;
-        this.productoMov = pProductoMov;
-        this.cantidadMov = pCantidadMov;
-        this.tipoMov = pMotivoMov;
-        this.fechaMov = LocalDate.now();
-        this.motivoMov = pMotivoMov;
-        this.usuario = pUsuario;
+    public MovimientoStock() {
     }
 
-    //region Getters y Setters
-    public int getIdMovStock(){return idMovStock;}
-    public void setIdMovStock(int pIdMovStock){this.idMovStock = pIdMovStock;}
+    public MovimientoStock(Integer idMovStock,
+                           Producto productoMov,
+                           double cantidadMov,
+                           String tipoMov,
+                           String motivoMov,
+                           Usuario usuario) {
 
-    public Producto getProdructoMov(){return productoMov;}
-    public void setProductoMov(Producto prProductoMov){this.productoMov = prProductoMov;}
+        this.idMovStock = idMovStock;
+        this.productoMov = productoMov;
+        this.cantidadMov = cantidadMov;
+        this.tipoMov = tipoMov; // Corregido
+        this.fechaMov = LocalDate.now();
+        this.motivoMov = motivoMov;
+        this.usuario = usuario;
+    }
 
-    public double getCantidadMov(){return cantidadMov;}
-    public void setCantidadMov(double pCantidadMov){this.cantidadMov = pCantidadMov;}
+    // Getters y Setters
 
-    public String getTipoMov(){return tipoMov;}
-    public void setTipoMov(String pTipoMov){this.tipoMov = pTipoMov;}
+    public Integer getIdMovStock() {
+        return idMovStock;
+    }
 
-    public LocalDate getFechaMov(){return fechaMov;}
+    public void setIdMovStock(Integer idMovStock) {
+        this.idMovStock = idMovStock;
+    }
 
-    public String getMotivoMov(){return motivoMov;}
-    public void setMotivoMov(String pMotivoMov){this.motivoMov = pMotivoMov;}
+    public Producto getProductoMov() {
+        return productoMov;
+    }
 
-    public Usuario getUsuario(){return usuario;}
-    public void setUsuario(Usuario pUsuario){this.usuario = pUsuario;}
-    //endregion
+    public void setProductoMov(Producto productoMov) {
+        this.productoMov = productoMov;
+    }
+
+    public double getCantidadMov() {
+        return cantidadMov;
+    }
+
+    public void setCantidadMov(double cantidadMov) {
+        this.cantidadMov = cantidadMov;
+    }
+
+    public String getTipoMov() {
+        return tipoMov;
+    }
+
+    public void setTipoMov(String tipoMov) {
+        this.tipoMov = tipoMov;
+    }
+
+    public LocalDate getFechaMov() {
+        return fechaMov;
+    }
+
+    public String getMotivoMov() {
+        return motivoMov;
+    }
+
+    public void setMotivoMov(String motivoMov) {
+        this.motivoMov = motivoMov;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }

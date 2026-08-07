@@ -1,42 +1,90 @@
 package com.centroemmanuel.entity;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "venta")
 public class Venta {
-    private int idVenta;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_venta")
+    private Integer idVenta;
+
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
+
+    @Column(name = "fecha_venta", nullable = false)
     private LocalDate fechaVenta;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
-    private List<DetalleVenta> detalles;
 
-    public Venta(){}
+    @OneToMany(
+            mappedBy = "venta",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
-    public Venta(int pIdVenta, BigDecimal pTotal, Usuario pUsuario, List<DetalleVenta> pDetalle){
-        this.idVenta = pIdVenta;
-        this.total = pTotal;
-        this.fechaVenta = LocalDate.now();
-        this.usuario = pUsuario;
-        this.detalles = new ArrayList<>();
+    public Venta() {
     }
 
-    public void RegistrarVenta(){}
+    public Venta(Integer idVenta,
+                 BigDecimal total,
+                 Usuario usuario,
+                 List<DetalleVenta> detalles) {
 
-    //region Getters y Setters
-    public int getIdVenta(){return idVenta;}
-    public void setIdVenta(int pIdVenta){this.idVenta = pIdVenta;}
+        this.idVenta = idVenta;
+        this.total = total;
+        this.fechaVenta = LocalDate.now();
+        this.usuario = usuario;
+        this.detalles = detalles;
+    }
 
-    public BigDecimal getTotal(){return total;}
-    public void setTotal(BigDecimal pTotal){this.total = pTotal;}
+    public void registrarVenta() {
+    }
 
-    public LocalDate getFechaVenta(){return fechaVenta;}
+    // Getters y Setters
 
-    public Usuario getUsuario(){return usuario;}
-    public void setUsuario(Usuario pUsuario){this.usuario = pUsuario;}
+    public Integer getIdVenta() {
+        return idVenta;
+    }
 
-    public List<DetalleVenta> getDetalleVenta(){return detalles;}
-    public void setDetalleVenta(List<DetalleVenta> pDetalles){this.detalles = pDetalles;}
-    //endregion
+    public void setIdVenta(Integer idVenta) {
+        this.idVenta = idVenta;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public LocalDate getFechaVenta() {
+        return fechaVenta;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<DetalleVenta> getDetalleVenta() {
+        return detalles;
+    }
+
+    public void setDetalleVenta(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
+    }
 }

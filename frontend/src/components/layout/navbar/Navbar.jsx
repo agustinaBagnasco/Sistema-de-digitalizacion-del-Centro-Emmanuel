@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Menu, ChevronDown, User, KeyRound, LogOut } from "lucide-react";
 import logo from "../../../assets/cemm.png";
 import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar({ onMenuClick }) {
   const fecha = new Intl.DateTimeFormat("es-UY", {
@@ -10,8 +11,8 @@ export default function Navbar({ onMenuClick }) {
     year: "numeric",
   }).format(new Date());
 
-  // Más adelante este valor vendrá del login
-  const usuario = "Administrador";
+  const nombre = localStorage.getItem("usuario") || "Invitado";
+
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -29,7 +30,13 @@ export default function Navbar({ onMenuClick }) {
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const navigate = useNavigate();
 
+  const cerrarSesion = () => {
+    localStorage.removeItem("usuario");
+
+    navigate("/login", { replace: true });
+  };
 
 
   return (
@@ -61,29 +68,22 @@ export default function Navbar({ onMenuClick }) {
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <div className="user-avatar">
-                {usuario.charAt(0)}
+                {nombre.charAt(0)}
               </div>
 
-              <span>{usuario}</span>
+              <span>{nombre}</span>
 
               <ChevronDown size={18} />
             </button>
 
             {menuOpen && (
               <div className="user-menu">
-
-                <button>
-                  <KeyRound size={18} />
-                  Cambiar contraseña
-                </button>
-
                 <hr />
 
-                <button className="logout">
+                <button className="logout" onClick={cerrarSesion}>
                   <LogOut size={18} />
                   Cerrar sesión
                 </button>
-
               </div>
             )}
 
