@@ -40,7 +40,6 @@ public class Rol {
 @JsonIgnore
 private List<Usuario> usuarios = new ArrayList<>();
 
-
     public Rol(){}
 
 

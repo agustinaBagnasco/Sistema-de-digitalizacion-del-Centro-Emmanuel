@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+//import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "usuario")
@@ -48,7 +48,7 @@ public class Usuario {
         joinColumns = @JoinColumn(name = "id_usuario"),
         inverseJoinColumns = @JoinColumn(name = "id_rol")
     )
-    @JsonManagedReference
+    //@JsonManagedReference
     private List<Rol> roles = new ArrayList<>();
 
 

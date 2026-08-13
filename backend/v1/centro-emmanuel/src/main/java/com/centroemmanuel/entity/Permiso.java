@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "permiso")
 public class Permiso {
@@ -26,6 +28,7 @@ public class Permiso {
 
     // Relación Permiso - Rol
     @ManyToMany(mappedBy = "permisos")
+    @JsonIgnore
     private List<Rol> roles = new ArrayList<>();
 
 

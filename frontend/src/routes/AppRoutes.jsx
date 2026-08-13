@@ -20,6 +20,7 @@ import Molienda from "../pages/Alimentos-procesados/Molienda";
 
 import Usuarios from "../pages/administracion/Usuarios";
 import Login from "../pages/Login";
+import Roles from "../pages/administracion/Roles";
 
 export default function AppRoutes() {
 
@@ -51,6 +52,7 @@ export default function AppRoutes() {
 
 
                 <Route path="/administracion/usuarios" element={<Usuarios />} />
+                <Route path="/administracion/usuarios/roles" element={<Roles />} />
                 <Route path="/administracion/produccion" element={<Produccion />} />
                 <Route path="/administracion/ManoDeObra" element={<ManoDeObra />} />
                 <Route path="/administracion/StockDeProductos" element={<StockProductos />} />
