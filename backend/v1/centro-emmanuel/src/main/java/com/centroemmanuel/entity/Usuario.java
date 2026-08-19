@@ -1,4 +1,10 @@
 package com.centroemmanuel.entity;
+import java.util.ArrayList;
+import java.util.List;
+import com.centroemmanuel.enums.Rol;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +15,15 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "usuario")
 public class Usuario {
+<<<<<<< HEAD
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
+=======
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+>>>>>>> ffa1c60 (Login y Registro de usuario)
     private int idUsuario;
 
 
@@ -38,6 +49,7 @@ public class Usuario {
 
     @Column(name = "activo")
     private boolean activo;
+<<<<<<< HEAD
 
 
     // Un usuario puede tener varios roles
@@ -51,9 +63,14 @@ public class Usuario {
     //@JsonManagedReference
     private List<Rol> roles = new ArrayList<>();
 
+=======
+    private Rol rol;
+    private List<Permiso> permisos;
+>>>>>>> ffa1c60 (Login y Registro de usuario)
 
-    public Usuario(){}
+    public Usuario(){this.permisos = new ArrayList<>();}
 
+<<<<<<< HEAD
 
     public Usuario(int pIdUsuario, 
                    String pNombreUsuario, 
@@ -64,12 +81,20 @@ public class Usuario {
                    Boolean pActivo){
 
         this.idUsuario = pIdUsuario;
+=======
+    public Usuario(String pNombreUsuario, String pNombre, String pApellido, String pClave, String pEmail, Rol pRrol) {
+>>>>>>> ffa1c60 (Login y Registro de usuario)
         this.nombreUsuario = pNombreUsuario;
         this.nombre = pNombre;
         this.apellido = pApellido;
         this.clave = pClave;
         this.email = pEmail;
+<<<<<<< HEAD
         this.activo = pActivo;
+=======
+        this.rol = pRrol;
+        this.permisos = new ArrayList<>();
+>>>>>>> ffa1c60 (Login y Registro de usuario)
     }
 
 
@@ -89,6 +114,7 @@ public class Usuario {
     }
 
 
+<<<<<<< HEAD
     public String getNombreUsuario(){
         return nombreUsuario;
     }
@@ -151,3 +177,18 @@ public class Usuario {
         this.roles = roles;
     }
 }
+=======
+    public String getEmail(){return email;}
+    public void setEmail(String pEmail){this.email = pEmail;}
+    
+    public boolean isActivo(){return activo;}
+    public void setActivo(boolean pActivo){this.activo = pActivo;}
+    
+    public Rol getRol(){return rol;}
+    public void setRol(Rol pRol){this.rol = pRol;}
+
+    public List<Permiso> getPermisos(){return permisos;}
+    public void setPermisos(List<Permiso> pPermisos){this.permisos = pPermisos;}
+    //endregion
+}
+>>>>>>> ffa1c60 (Login y Registro de usuario)
