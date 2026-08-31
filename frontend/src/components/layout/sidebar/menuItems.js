@@ -24,9 +24,8 @@ export const menuItems = [
       { label: "Ventas", path: "/administracion/Ventas" },
       { label: "Producción", path: "/administracion/Produccion" },
       { label: "Mano de obra", path: "/administracion/ManoDeObra" },
-      { label: "Stock de productos", path: "/administracion/StockDeProductos" },
-      { label: "Stock de insumos", path: "/administracion/StockDeInsumos" },
-      { label: "Configuración", path: "/administracion/Configuracion" }
+      {label: "Insumos", path: "/administracion/Insumos" },
+      { label: "Stocks", path: "/administracion/Stocks" }
     ]
   }
 ];

@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "nombre": "Lacteos"
+    },
+    {
+        "id": 2,
+        "nombre": "Elaborados"
+    },
+    {
+        "id": 3,
+        "nombre": "Cosechados"
+    },
+    {
+        "id": 4,
+        "nombre": "Harinas"
+    }
+]

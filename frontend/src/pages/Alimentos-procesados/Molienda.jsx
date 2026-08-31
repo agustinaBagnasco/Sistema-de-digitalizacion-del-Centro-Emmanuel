@@ -75,9 +75,9 @@ export default function Molienda() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de molienda">
-        <form onSubmit={guardar} className="formulario">
-
+      <Card title="· REGISTRO DE MOLIENDA ·">
+        <form onSubmit={guardar} className="form-field columns-2">
+<div className="input-group">
           <label>Fecha</label>
           <Input
             type="date"
@@ -86,7 +86,8 @@ export default function Molienda() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
           <label>Grano</label>
           <Select
             name="grano"
@@ -95,7 +96,8 @@ export default function Molienda() {
             options={opcionesGranos}
             placeholder="Seleccione tipo de grano"
           />
-          <br />
+          </div>
+          <div className="input-group">
 
           <label>Tiempo de elaboracion</label>
           <Input
@@ -105,7 +107,8 @@ export default function Molienda() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
 
           <label>Kgs envasados</label>
           <Input
@@ -115,8 +118,9 @@ export default function Molienda() {
             onChange={handleChange}
             required
           />
-          <br />
-          <br />
+          </div>
+          <div className="input-group">
+          
           <label>Comentario</label>
           <Textarea
             name="comentario"
@@ -124,14 +128,14 @@ export default function Molienda() {
             onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
-          <br />
-
+          </div>
+    <div className="form-button-container">
           <Button
             type={"submit"}
             className={`btn btn-${"primary"}`}>
             Guardar
           </Button>
-
+     </div>
         </form>
         <br />
         <hr />

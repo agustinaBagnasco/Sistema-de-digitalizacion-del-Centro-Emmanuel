@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { menuItems } from "./menuItems";
 import "./Sidebar.css";
-import logo from "../../../assets/cemm.png";
+import logo from "../../../assets/logoCe.png";
 import { useState } from "react";
 
 

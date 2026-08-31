@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu, ChevronDown, User, KeyRound, LogOut } from "lucide-react";
-import logo from "../../../assets/cemm.png";
+import logo from "../../../assets/logoCe.png";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 

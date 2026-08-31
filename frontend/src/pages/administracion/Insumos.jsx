@@ -1,20 +1,24 @@
 import React from 'react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
+import FormField from '../../components/ui/FormField'
 
-function ManoDeObra() {
+function Insumos() {
   return (
     <div className="pagina">
-      <Card title="· MANO DE OBRA ·">
+      <Card title="· INSUMOS ·">
         <form className="form-field columns-1">
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Producto</th>
-                  <th>Operario</th>
-                  <th>Horas Trabajadas</th>
-                  <th>Fecha de elaboracion</th>
+                  <th>Insumo</th>
+                  <th>Entradas</th>
+                  <th>Salidas</th>
+                  <th>Stock actual</th>
+                  <th>Minimo</th>
+                  <th>Estado</th>
+                  <th>Ver movimientos</th>
                 </tr>
               </thead>
             </table>
@@ -32,4 +36,4 @@ function ManoDeObra() {
   )
 }
 
-export default ManoDeObra
+export default Insumos

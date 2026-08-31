@@ -23,24 +23,48 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody LoginRequest request) {
 
-        Optional<Usuario> usuario = usuarioRepository.findByNombreUsuario(request.getNombreUsuario());
+        Optional<Usuario> usuario =
+                usuarioRepository.findByNombreUsuario(
+                        request.getNombreUsuario()
+                );
 
         if (usuario.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(false, "Usuario o contraseña incorrectos.", null));
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        new LoginResponse(
+                            false,
+                            "Usuario o contraseña incorrectos.",
+                            null,
+                            null
+                        )
+                    );
         }
 
-        if (!usuario.get().getClave().equals(request.getClave())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponse(false, "Usuario o contraseña incorrectos.", null));
+        if (!usuario.get().getClave()
+                .equals(request.getClave())) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        new LoginResponse(
+                            false,
+                            "Usuario o contraseña incorrectos.",
+                            null,
+                            null
+                        )
+                    );
         }
 
         return ResponseEntity.ok(
                 new LoginResponse(
                         true,
                         "Inicio de sesión correcto.",
+                        usuario.get().getIdUsuario(),
                         usuario.get().getNombre()
                 )
         );

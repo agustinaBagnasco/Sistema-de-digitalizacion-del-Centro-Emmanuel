@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import cultivos from "../data/cultivos.json";
 import Card from "../components/ui/Card";
 import Select from "../components/ui/Select";
 import Input from "../components/ui/Input";
@@ -16,22 +15,50 @@ export default function Huerta() {
     comentario: "",
   });
 
+  const [productos, setProductos] = useState([]);
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesCultivos = cultivos.map(cultivo => ({
-    value: cultivo.id,
-    label: cultivo.nombre,
-  }));
+
+  // ==========================================
+  // OPCIONES PARA EL SELECT DE PRODUCTOS
+  // ==========================================
+
+  const opcionesProductos = productos
+    .filter(producto => producto.activo)
+    .map(producto => ({
+      value: producto.idProducto,
+      label: producto.nombreProducto,
+    }));
 
 
-  // ==============================
-  // CARGAR COSECHAS
-  // ==============================
+  // ==========================================
+  // CARGAR PRODUCTOS Y COSECHAS
+  // ==========================================
 
   useEffect(() => {
+    cargarProductos();
     cargarCosechas();
   }, []);
+
+
+  async function cargarProductos() {
+
+    try {
+
+      const respuesta = await api.get("/productos");
+
+      setProductos(respuesta.data);
+
+    } catch (error) {
+
+      console.error(
+        "Error al cargar productos:",
+        error
+      );
+
+    }
+  }
 
 
   async function cargarCosechas() {
@@ -44,16 +71,18 @@ export default function Huerta() {
 
     } catch (error) {
 
-      console.error("Error al cargar las cosechas:", error);
+      console.error(
+        "Error al cargar las cosechas:",
+        error
+      );
 
     }
-
   }
 
 
-  // ==============================
+  // ==========================================
   // CAMBIAR CAMPOS
-  // ==============================
+  // ==========================================
 
   function handleChange(e) {
 
@@ -65,9 +94,9 @@ export default function Huerta() {
   }
 
 
-  // ==============================
+  // ==========================================
   // GUARDAR / ACTUALIZAR
-  // ==============================
+  // ==========================================
 
   async function guardar(e) {
 
@@ -75,15 +104,50 @@ export default function Huerta() {
 
     try {
 
+      // Usuario que inició sesión
+      const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+      );
+
+
+      if (!usuario || !usuario.idUsuario) {
+
+        alert(
+          "No se pudo identificar al usuario."
+        );
+
+        return;
+      }
+
+
       const datos = {
+
         fechaCosecha: form.fecha,
-        cantidadCosecha: Number(form.cantidad),
+
+        cantidadCosecha: Number(
+          form.cantidad
+        ),
+
         observaciones: form.comentario,
 
         productoCosecha: {
-          idProducto: Number(form.cultivo)
+          idProducto: Number(
+            form.cultivo
+          )
+        },
+
+        usuario: {
+          idUsuario: Number(
+            usuario.idUsuario
+          )
         }
       };
+
+
+      console.log(
+        "Datos enviados:",
+        datos
+      );
 
 
       if (editando !== null) {
@@ -103,69 +167,90 @@ export default function Huerta() {
       }
 
 
+      // Volvemos a cargar las cosechas
       await cargarCosechas();
 
       limpiarFormulario();
 
     } catch (error) {
 
-      console.error("Error al guardar la cosecha:", error);
+      console.error(
+        "Error al guardar la cosecha:",
+        error
+      );
 
     }
-
   }
 
 
-  // ==============================
+  // ==========================================
   // EDITAR
-  // ==============================
+  // ==========================================
 
   function editarRegistro(registro) {
 
     setForm({
-      fecha: registro.fechaCosecha || "",
-      cultivo: registro.productoCosecha?.idProducto || "",
-      cantidad: registro.cantidadCosecha || "",
-      comentario: registro.observaciones || "",
+
+      fecha:
+        registro.fechaCosecha || "",
+
+      cultivo:
+        registro.productoCosecha?.idProducto || "",
+
+      cantidad:
+        registro.cantidadCosecha || "",
+
+      comentario:
+        registro.observaciones || "",
+
     });
 
-    setEditando(registro.idCosecha);
+    setEditando(
+      registro.idCosecha
+    );
 
   }
 
 
-  // ==============================
+  // ==========================================
   // ELIMINAR
-  // ==============================
+  // ==========================================
 
   async function eliminarRegistro(id) {
 
     try {
 
-      await api.delete(`/cosechas/${id}`);
+      await api.delete(
+        `/cosechas/${id}`
+      );
 
       await cargarCosechas();
 
     } catch (error) {
 
-      console.error("Error al eliminar la cosecha:", error);
+      console.error(
+        "Error al eliminar la cosecha:",
+        error
+      );
 
     }
 
   }
 
 
-  // ==============================
+  // ==========================================
   // LIMPIAR FORMULARIO
-  // ==============================
+  // ==========================================
 
   function limpiarFormulario() {
 
     setForm({
+
       fecha: "",
       cultivo: "",
       cantidad: "",
       comentario: "",
+
     });
 
     setEditando(null);
@@ -173,81 +258,90 @@ export default function Huerta() {
   }
 
 
+  // ==========================================
+  // HTML
+  // ==========================================
+
   return (
 
     <div className="pagina">
 
-      <Card title="Registro de Cultivos">
+      <Card title=" · REGISTRO DE CULTIVOS ·">
 
         <form
           onSubmit={guardar}
-          className="formulario"
+          className="form-field columns-2"
         >
+          <div className="input-group">
+            <label>
+              Fecha
+            </label>
 
-          <label>Fecha</label>
+            <Input
+              type="date"
+              name="fecha"
+              value={form.fecha}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <Input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group">
 
-          <br />
+            <label>
+              Producto
+            </label>
 
+            <Select
+              name="cultivo"
+              value={form.cultivo}
+              onChange={handleChange}
+              options={opcionesProductos}
+              placeholder="Seleccione un producto"
+              required
+            />
+          </div>
 
-          <label>Cultivo</label>
+          <div className="input-group">
+            <label>
+              Cantidad
+            </label>
 
-          <Select
-            name="cultivo"
-            value={form.cultivo}
-            onChange={handleChange}
-            options={opcionesCultivos}
-            placeholder="Seleccione un cultivo"
-            required
-          />
+            <Input
+              type="number"
+              name="cantidad"
+              value={form.cantidad}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-          <br />
+          <div className="input-group">
+            <label>
+              Observación
+            </label>
 
+            <Textarea
+              name="comentario"
+              value={form.comentario}
+              onChange={handleChange}
+              placeholder="Observaciones..."
+            />
+          </div>
+          <div className="form-button-container">
 
-          <label>Cantidad</label>
-
-          <Input
-            type="number"
-            name="cantidad"
-            value={form.cantidad}
-            onChange={handleChange}
-            required
-          />
-
-          <br />
-
-
-          <label>Observacion</label>
-
-          <Textarea
-            name="comentario"
-            value={form.comentario}
-            onChange={handleChange}
-            placeholder=" observaciones..."
-          />
-
-          <br />
-
-
-          <Button
-            type="submit"
-            className="btn btn-primary"
-          >
-            {editando !== null ? "Actualizar" : "Guardar"}
-          </Button>
-
+            <Button
+              type="submit"
+              className="btn btn-primary"
+            >
+              {editando !== null
+                ? "Actualizar"
+                : "Guardar"}
+            </Button>
+          </div>
         </form>
 
-
         <br />
-
         <hr />
 
         <div className="table-container">
@@ -257,11 +351,27 @@ export default function Huerta() {
             <thead>
 
               <tr>
-                <th>Fecha</th>
-                <th>Cultivo</th>
-                <th>Cantidad</th>
-                <th>Comentario</th>
-                <th>Acciones</th>
+
+                <th>
+                  Fecha
+                </th>
+
+                <th>
+                  Producto
+                </th>
+
+                <th>
+                  Cantidad
+                </th>
+
+                <th>
+                  Comentario
+                </th>
+
+                <th>
+                  Acciones
+                </th>
+
               </tr>
 
             </thead>
@@ -271,7 +381,9 @@ export default function Huerta() {
 
               {registros.map((r) => (
 
-                <tr key={r.idCosecha}>
+                <tr
+                  key={r.idCosecha}
+                >
 
                   <td>
                     {r.fechaCosecha}
@@ -281,19 +393,20 @@ export default function Huerta() {
                   <td>
 
                     {
-                      opcionesCultivos.find(
+                      opcionesProductos.find(
                         o =>
                           String(o.value) ===
-                          String(r.productoCosecha?.idProducto)
+                          String(
+                            r.productoCosecha
+                              ?.idProducto
+                          )
                       )?.label
                     }
 
                   </td>
 
 
-                  <td>
-                    {r.cantidadCosecha}
-                  </td>
+                  <td>{r.cantidadCosecha}</td>
 
 
                   <td>
@@ -307,7 +420,9 @@ export default function Huerta() {
 
                       <Button
                         variant="secondary"
-                        onClick={() => editarRegistro(r)}
+                        onClick={() =>
+                          editarRegistro(r)
+                        }
                       >
                         Editar
                       </Button>
@@ -316,10 +431,12 @@ export default function Huerta() {
                       <Button
                         variant="danger"
                         onClick={() =>
-                          eliminarRegistro(r.idCosecha)
+                          eliminarRegistro(
+                            r.idCosecha
+                          )
                         }
                       >
-                   Eliminar
+                        Eliminar
                       </Button>
 
                     </div>
@@ -341,7 +458,4 @@ export default function Huerta() {
     </div>
 
   );
-
 }
-
-

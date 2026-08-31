@@ -1,22 +1,22 @@
 [
     {
         "id": 1,
-        "nombre": "Tomate"
+        "nombre": "litros"
     },
     {
         "id": 2,
-        "nombre": "Lechuga"
+        "nombre": "kilogramos"
     },
     {
         "id": 3,
-        "nombre": "Papa"
+        "nombre": "mililitros"
     },
     {
         "id": 4,
-        "nombre": "Cebolla"
+        "nombre": "unidades"
     },
     {
         "id": 5,
-        "nombre": "Zapallo"
+        "nombre": "gramos"
     }
 ]

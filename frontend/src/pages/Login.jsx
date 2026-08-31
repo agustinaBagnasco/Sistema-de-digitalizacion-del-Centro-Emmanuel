@@ -24,9 +24,15 @@ function Login() {
                 clave: clave
             });
 
-            localStorage.setItem("usuario", respuesta.data.nombre);
-            console.log("login exitoso:", respuesta.data);
-            navigate("/");
+            if (respuesta.data.success) {
+
+    localStorage.setItem(
+        "usuario",
+        JSON.stringify(respuesta.data)
+    );
+
+    navigate("/");
+}
 
         } catch (error) {
 

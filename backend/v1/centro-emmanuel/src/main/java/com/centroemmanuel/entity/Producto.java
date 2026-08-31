@@ -51,4 +51,68 @@ public class Producto {
     }
 
     // Getters y Setters
+
+    public Integer getIdProducto() {
+    return idProducto;
+}
+
+public void setIdProducto(Integer idProducto) {
+    this.idProducto = idProducto;
+}
+
+public String getNombreProducto() {
+    return nombreProducto;
+}
+
+public void setNombreProducto(String nombreProducto) {
+    this.nombreProducto = nombreProducto;
+}
+
+public String getDescripcion() {
+    return descripcion;
+}
+
+public void setDescripcion(String descripcion) {
+    this.descripcion = descripcion;
+}
+
+public Double getStockActual() {
+    return stockActual;
+}
+
+public void setStockActual(Double stockActual) {
+    this.stockActual = stockActual;
+}
+
+public Double getStockMinimo() {
+    return stockMinimo;
+}
+
+public void setStockMinimo(Double stockMinimo) {
+    this.stockMinimo = stockMinimo;
+}
+
+public boolean isActivo() {
+    return activo;
+}
+
+public void setActivo(boolean activo) {
+    this.activo = activo;
+}
+
+public Categoria getCategoria() {
+    return categoria;
+}
+
+public void setCategoria(Categoria categoria) {
+    this.categoria = categoria;
+}
+
+public UnidadMedida getUnidadMedida() {
+    return unidadMedida;
+}
+
+public void setUnidadMedida(UnidadMedida unidadMedida) {
+    this.unidadMedida = unidadMedida;
+}
 }

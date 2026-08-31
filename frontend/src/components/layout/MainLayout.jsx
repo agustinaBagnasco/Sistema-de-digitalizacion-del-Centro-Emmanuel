@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
 
-import Sidebar from "../components/layout/sidebar/Sidebar";
-import Navbar from "../components/layout/navbar/Navbar";
+import Sidebar from "./sidebar/Sidebar";
+import Navbar from "./navbar/Navbar";
 
-import "./MainLayout.css";
+import "../layout/MainLayout.css";
 
 export default function MainLayout() {
 

@@ -11,7 +11,7 @@ import com.centroemmanuel.entity.Cosecha;
 import com.centroemmanuel.service.CosechaService;
 
 @RestController
-@RequestMapping("/cosechas")
+@RequestMapping("/api/cosechas")
 @CrossOrigin(origins = "http://localhost:5173")
 public class CosechaController {
 

@@ -1,545 +1,545 @@
-import { useEffect, useState } from "react";
-import api from "../../services/api";
-//import "./Roles.css";
+// import { useEffect, useState } from "react";
+// import api from "../../services/api";
+// //import "./Roles.css";
 
-function Roles() {
+// function Roles() {
 
-    const [roles, setRoles] = useState([]);
-    const [permisos, setPermisos] = useState([]);
+//     const [roles, setRoles] = useState([]);
+//     const [permisos, setPermisos] = useState([]);
 
-    const [mostrarFormulario, setMostrarFormulario] = useState(false);
+//     const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-    const [rolEditando, setRolEditando] = useState(null);
+//     const [rolEditando, setRolEditando] = useState(null);
 
-    const [formulario, setFormulario] = useState({
-        nombreRol: "",
-        descripcion: "",
-        permisos: []
-    });
+//     const [formulario, setFormulario] = useState({
+//         nombreRol: "",
+//         descripcion: "",
+//         permisos: []
+//     });
 
 
-    // =========================
-    // CARGAR DATOS
-    // =========================
+//     // =========================
+//     // CARGAR DATOS
+//     // =========================
 
-    useEffect(() => {
+//     useEffect(() => {
 
-        cargarRoles();
-        cargarPermisos();
+//         cargarRoles();
+//         cargarPermisos();
 
-    }, []);
+//     }, []);
 
 
-    const cargarRoles = async () => {
+//     const cargarRoles = async () => {
 
-        try {
+//         try {
 
-            const response = await api.get("/roles");
+//             const response = await api.get("/roles");
 
-            setRoles(response.data);
+//             setRoles(response.data);
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(
-                "Error al cargar roles:",
-                error
-            );
+//             console.error(
+//                 "Error al cargar roles:",
+//                 error
+//             );
 
-        }
+//         }
 
-    };
+//     };
 
 
-    const cargarPermisos = async () => {
+//     const cargarPermisos = async () => {
 
-        try {
+//         try {
 
-            const response = await api.get("/permisos");
+//             const response = await api.get("/permisos");
 
-            setPermisos(response.data);
+//             setPermisos(response.data);
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(
-                "Error al cargar permisos:",
-                error
-            );
+//             console.error(
+//                 "Error al cargar permisos:",
+//                 error
+//             );
 
-        }
+//         }
 
-    };
+//     };
 
 
-    // =========================
-    // CAMBIAR CAMPOS
-    // =========================
+//     // =========================
+//     // CAMBIAR CAMPOS
+//     // =========================
 
-    const cambiarCampo = (e) => {
+//     const cambiarCampo = (e) => {
 
-        const { name, value } = e.target;
+//         const { name, value } = e.target;
 
-        setFormulario(prev => ({
-            ...prev,
-            [name]: value
-        }));
+//         setFormulario(prev => ({
+//             ...prev,
+//             [name]: value
+//         }));
 
-    };
+//     };
 
 
-    // =========================
-    // SELECCIONAR PERMISO
-    // =========================
+//     // =========================
+//     // SELECCIONAR PERMISO
+//     // =========================
 
-    const cambiarPermiso = (idPermiso) => {
+//     const cambiarPermiso = (idPermiso) => {
 
-        setFormulario(prev => {
+//         setFormulario(prev => {
 
-            const seleccionado =
-                prev.permisos.includes(idPermiso);
+//             const seleccionado =
+//                 prev.permisos.includes(idPermiso);
 
 
-            if (seleccionado) {
+//             if (seleccionado) {
 
-                return {
-                    ...prev,
+//                 return {
+//                     ...prev,
 
-                    permisos: prev.permisos.filter(
-                        id => id !== idPermiso
-                    )
-                };
+//                     permisos: prev.permisos.filter(
+//                         id => id !== idPermiso
+//                     )
+//                 };
 
-            }
+//             }
 
 
-            return {
-                ...prev,
+//             return {
+//                 ...prev,
 
-                permisos: [
-                    ...prev.permisos,
-                    idPermiso
-                ]
-            };
+//                 permisos: [
+//                     ...prev.permisos,
+//                     idPermiso
+//                 ]
+//             };
 
-        });
+//         });
 
-    };
+//     };
 
 
-    // =========================
-    // NUEVO ROL
-    // =========================
+//     // =========================
+//     // NUEVO ROL
+//     // =========================
 
-    const nuevoRol = () => {
+//     const nuevoRol = () => {
 
-        setRolEditando(null);
+//         setRolEditando(null);
 
-        setFormulario({
-            nombreRol: "",
-            descripcion: "",
-            permisos: []
-        });
+//         setFormulario({
+//             nombreRol: "",
+//             descripcion: "",
+//             permisos: []
+//         });
 
-        setMostrarFormulario(true);
+//         setMostrarFormulario(true);
 
-    };
+//     };
 
 
-    // =========================
-    // EDITAR ROL
-    // =========================
+//     // =========================
+//     // EDITAR ROL
+//     // =========================
 
-    const editarRol = (rol) => {
+//     const editarRol = (rol) => {
 
-        setRolEditando(rol.idRol);
+//         setRolEditando(rol.idRol);
 
-        setFormulario({
-            nombreRol: rol.nombreRol,
-            descripcion: rol.descripcion,
+//         setFormulario({
+//             nombreRol: rol.nombreRol,
+//             descripcion: rol.descripcion,
 
-            permisos: rol.permisos
-                ? rol.permisos.map(
-                    permiso => permiso.idPermiso
-                )
-                : []
-        });
+//             permisos: rol.permisos
+//                 ? rol.permisos.map(
+//                     permiso => permiso.idPermiso
+//                 )
+//                 : []
+//         });
 
-        setMostrarFormulario(true);
+//         setMostrarFormulario(true);
 
-    };
+//     };
 
 
-    // =========================
-    // GUARDAR
-    // =========================
+//     // =========================
+//     // GUARDAR
+//     // =========================
 
-    const guardarRol = async (e) => {
+//     const guardarRol = async (e) => {
 
-        e.preventDefault();
+//         e.preventDefault();
 
 
-        try {
+//         try {
 
-            const datos = {
+//             const datos = {
 
-                nombreRol:
-                    formulario.nombreRol,
+//                 nombreRol:
+//                     formulario.nombreRol,
 
-                descripcion:
-                    formulario.descripcion,
+//                 descripcion:
+//                     formulario.descripcion,
 
-                permisos:
-                    formulario.permisos.map(id => ({
-                        idPermiso: id
-                    }))
-            };
+//                 permisos:
+//                     formulario.permisos.map(id => ({
+//                         idPermiso: id
+//                     }))
+//             };
 
 
-            if (rolEditando) {
+//             if (rolEditando) {
 
-                await api.put(
-                    `/roles/${rolEditando}`,
-                    datos
-                );
+//                 await api.put(
+//                     `/roles/${rolEditando}`,
+//                     datos
+//                 );
 
-            } else {
+//             } else {
 
-                await api.post(
-                    "/roles",
-                    datos
-                );
+//                 await api.post(
+//                     "/roles",
+//                     datos
+//                 );
 
-            }
+//             }
 
 
-            await cargarRoles();
+//             await cargarRoles();
 
-            setMostrarFormulario(false);
+//             setMostrarFormulario(false);
 
-            setRolEditando(null);
+//             setRolEditando(null);
 
-            setFormulario({
-                nombreRol: "",
-                descripcion: "",
-                permisos: []
-            });
+//             setFormulario({
+//                 nombreRol: "",
+//                 descripcion: "",
+//                 permisos: []
+//             });
 
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(
-                "Error al guardar rol:",
-                error
-            );
+//             console.error(
+//                 "Error al guardar rol:",
+//                 error
+//             );
 
-        }
+//         }
 
-    };
+//     };
 
 
-    // =========================
-    // ELIMINAR
-    // =========================
+//     // =========================
+//     // ELIMINAR
+//     // =========================
 
-    const eliminarRol = async (id) => {
+//     const eliminarRol = async (id) => {
 
-        const confirmar =
-            window.confirm(
-                "¿Está seguro que desea eliminar este rol?"
-            );
+//         const confirmar =
+//             window.confirm(
+//                 "¿Está seguro que desea eliminar este rol?"
+//             );
 
 
-        if (!confirmar) {
-            return;
-        }
+//         if (!confirmar) {
+//             return;
+//         }
 
 
-        try {
+//         try {
 
-            await api.delete(
-                `/roles/${id}`
-            );
+//             await api.delete(
+//                 `/roles/${id}`
+//             );
 
-            await cargarRoles();
+//             await cargarRoles();
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(
-                "Error al eliminar rol:",
-                error
-            );
+//             console.error(
+//                 "Error al eliminar rol:",
+//                 error
+//             );
 
-        }
+//         }
 
-    };
+//     };
 
 
-    return (
+//     return (
 
-        <div className="roles-container">
+//         <div className="roles-container">
 
 
-            {/* HEADER */}
+//             {/* HEADER */}
 
-            <div className="roles-header">
+//             <div className="roles-header">
 
-                <h2>Roles</h2>
+//                 <h2>Roles</h2>
 
-                <button
-                    onClick={nuevoRol}
-                >
-                    + Nuevo rol
-                </button>
+//                 <button
+//                     onClick={nuevoRol}
+//                 >
+//                     + Nuevo rol
+//                 </button>
 
-            </div>
+//             </div>
 
 
-            {/* TABLA */}
+//             {/* TABLA */}
 
-            <table>
+//             <table>
 
-                <thead>
+//                 <thead>
 
-                    <tr>
+//                     <tr>
 
-                        <th>Nombre</th>
+//                         <th>Nombre</th>
 
-                        <th>Descripción</th>
+//                         <th>Descripción</th>
 
-                        <th>Permisos</th>
+//                         <th>Permisos</th>
 
-                        <th>Acciones</th>
+//                         <th>Acciones</th>
 
-                    </tr>
+//                     </tr>
 
-                </thead>
+//                 </thead>
 
 
-                <tbody>
+//                 <tbody>
 
-                    {roles.map(rol => (
+//                     {roles.map(rol => (
 
-                        <tr key={rol.idRol}>
+//                         <tr key={rol.idRol}>
 
-                            <td>
-                                {rol.nombreRol}
-                            </td>
+//                             <td>
+//                                 {rol.nombreRol}
+//                             </td>
 
-                            <td>
-                                {rol.descripcion}
-                            </td>
+//                             <td>
+//                                 {rol.descripcion}
+//                             </td>
 
-                            <td>
+//                             <td>
 
-                                {rol.permisos?.map(
-                                    permiso => (
+//                                 {rol.permisos?.map(
+//                                     permiso => (
 
-                                        <span
-                                            key={
-                                                permiso.idPermiso
-                                            }
-                                            className="permiso-tag"
-                                        >
-                                            {
-                                                permiso.nombrePermiso
-                                            }
-                                        </span>
+//                                         <span
+//                                             key={
+//                                                 permiso.idPermiso
+//                                             }
+//                                             className="permiso-tag"
+//                                         >
+//                                             {
+//                                                 permiso.nombrePermiso
+//                                             }
+//                                         </span>
 
-                                    )
-                                )}
+//                                     )
+//                                 )}
 
-                            </td>
+//                             </td>
 
 
-                            <td>
+//                             <td>
 
-                                <button
-                                    className="editar"
-                                    onClick={() =>
-                                        editarRol(rol)
-                                    }
-                                >
-                                    Editar
-                                </button>
+//                                 <button
+//                                     className="editar"
+//                                     onClick={() =>
+//                                         editarRol(rol)
+//                                     }
+//                                 >
+//                                     Editar
+//                                 </button>
 
 
-                                <button
-                                    className="eliminar"
-                                    onClick={() =>
-                                        eliminarRol(
-                                            rol.idRol
-                                        )
-                                    }
-                                >
-                                    Eliminar
-                                </button>
+//                                 <button
+//                                     className="eliminar"
+//                                     onClick={() =>
+//                                         eliminarRol(
+//                                             rol.idRol
+//                                         )
+//                                     }
+//                                 >
+//                                     Eliminar
+//                                 </button>
 
-                            </td>
+//                             </td>
 
-                        </tr>
+//                         </tr>
 
-                    ))}
+//                     ))}
 
-                </tbody>
+//                 </tbody>
 
-            </table>
+//             </table>
 
 
-            {/* FORMULARIO */}
+//             {/* FORMULARIO */}
 
-            {mostrarFormulario && (
+//             {mostrarFormulario && (
 
-                <div className="modal">
+//                 <div className="modal">
 
-                    <div className="modal-content">
+//                     <div className="modal-content">
 
 
-                        <h3>
+//                         <h3>
 
-                            {rolEditando
-                                ? "Modificar rol"
-                                : "Nuevo rol"}
+//                             {rolEditando
+//                                 ? "Modificar rol"
+//                                 : "Nuevo rol"}
 
-                        </h3>
+//                         </h3>
 
 
-                        <form
-                            onSubmit={guardarRol}
-                        >
+//                         <form
+//                             onSubmit={guardarRol}
+//                         >
 
 
-                            {/* NOMBRE */}
+//                             {/* NOMBRE */}
 
-                            <label>
-                                Nombre del rol
-                            </label>
+//                             <label>
+//                                 Nombre del rol
+//                             </label>
 
-                            <input
-                                type="text"
-                                name="nombreRol"
-                                value={
-                                    formulario.nombreRol
-                                }
-                                onChange={
-                                    cambiarCampo
-                                }
-                                required
-                            />
+//                             <input
+//                                 type="text"
+//                                 name="nombreRol"
+//                                 value={
+//                                     formulario.nombreRol
+//                                 }
+//                                 onChange={
+//                                     cambiarCampo
+//                                 }
+//                                 required
+//                             />
 
 
-                            {/* DESCRIPCIÓN */}
+//                             {/* DESCRIPCIÓN */}
 
-                            <label>
-                                Descripción
-                            </label>
+//                             <label>
+//                                 Descripción
+//                             </label>
 
-                            <textarea
-                                name="descripcion"
-                                value={
-                                    formulario.descripcion
-                                }
-                                onChange={
-                                    cambiarCampo
-                                }
-                            />
+//                             <textarea
+//                                 name="descripcion"
+//                                 value={
+//                                     formulario.descripcion
+//                                 }
+//                                 onChange={
+//                                     cambiarCampo
+//                                 }
+//                             />
 
 
-                            {/* PERMISOS */}
+//                             {/* PERMISOS */}
 
-                            <h4>
-                                Permisos
-                            </h4>
+//                             <h4>
+//                                 Permisos
+//                             </h4>
 
 
-                            <div className="permisos-lista">
+//                             <div className="permisos-lista">
 
-                                {permisos.map(
-                                    permiso => (
+//                                 {permisos.map(
+//                                     permiso => (
 
-                                        <label
-                                            key={
-                                                permiso.idPermiso
-                                            }
-                                            className="permiso-item"
-                                        >
+//                                         <label
+//                                             key={
+//                                                 permiso.idPermiso
+//                                             }
+//                                             className="permiso-item"
+//                                         >
 
-                                            <input
-                                                type="checkbox"
+//                                             <input
+//                                                 type="checkbox"
 
-                                                checked={
-                                                    formulario.permisos.includes(
-                                                        permiso.idPermiso
-                                                    )
-                                                }
+//                                                 checked={
+//                                                     formulario.permisos.includes(
+//                                                         permiso.idPermiso
+//                                                     )
+//                                                 }
 
-                                                onChange={() =>
-                                                    cambiarPermiso(
-                                                        permiso.idPermiso
-                                                    )
-                                                }
-                                            />
+//                                                 onChange={() =>
+//                                                     cambiarPermiso(
+//                                                         permiso.idPermiso
+//                                                     )
+//                                                 }
+//                                             />
 
 
-                                            <div>
+//                                             <div>
 
-                                                <strong>
-                                                    {
-                                                        permiso.nombrePermiso
-                                                    }
-                                                </strong>
+//                                                 <strong>
+//                                                     {
+//                                                         permiso.nombrePermiso
+//                                                     }
+//                                                 </strong>
 
-                                                <small>
-                                                    {
-                                                        permiso.descripcion
-                                                    }
-                                                </small>
+//                                                 <small>
+//                                                     {
+//                                                         permiso.descripcion
+//                                                     }
+//                                                 </small>
 
-                                            </div>
+//                                             </div>
 
-                                        </label>
+//                                         </label>
 
-                                    )
-                                )}
+//                                     )
+//                                 )}
 
-                            </div>
+//                             </div>
 
 
-                            {/* BOTONES */}
+//                             {/* BOTONES */}
 
-                            <div className="form-buttons">
+//                             <div className="form-buttons">
 
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        setMostrarFormulario(
-                                            false
-                                        )
-                                    }
-                                >
-                                    Cancelar
-                                </button>
+//                                 <button
+//                                     type="button"
+//                                     onClick={() =>
+//                                         setMostrarFormulario(
+//                                             false
+//                                         )
+//                                     }
+//                                 >
+//                                     Cancelar
+//                                 </button>
 
 
-                                <button
-                                    type="submit"
-                                >
-                                    Guardar
-                                </button>
+//                                 <button
+//                                     type="submit"
+//                                 >
+//                                     Guardar
+//                                 </button>
 
-                            </div>
+//                             </div>
 
 
-                        </form>
+//                         </form>
 
-                    </div>
+//                     </div>
 
-                </div>
+//                 </div>
 
-            )}
+//             )}
 
-        </div>
+//         </div>
 
-    );
+//     );
 
-}
+// }
 
-export default Roles;
+// export default Roles;

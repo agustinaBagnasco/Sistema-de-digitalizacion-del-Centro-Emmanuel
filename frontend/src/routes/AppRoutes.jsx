@@ -1,14 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import MainLayout from "../layouts/MainLayout";
+import MainLayout from "../components/layout/MainLayout";
 
 import Dashboard from "../pages/Dashboard";
 import Huerta from "../pages/huerta";
 import Produccion from "../pages/administracion/Produccion";
 import Ventas from "../pages/administracion/Ventas";
 import ManoDeObra from "../pages/administracion/ManoDeObra";
-import StockProductos from "../pages/administracion/StockDeProductos";
-import StockInsumos from "../pages/administracion/StockDeInsumos";
+import Insumos from "../pages/administracion/Insumos";
+import Stocks from "../pages/administracion/Stocks";
 
 import Leche from "../pages/Lacteos/Leche";
 import Quesos from "../pages/Lacteos/Quesos";
@@ -20,7 +20,7 @@ import Molienda from "../pages/Alimentos-procesados/Molienda";
 
 import Usuarios from "../pages/administracion/Usuarios";
 import Login from "../pages/Login";
-import Roles from "../pages/administracion/Roles";
+//import Roles from "../pages/administracion/Roles";
 
 export default function AppRoutes() {
 
@@ -52,14 +52,14 @@ export default function AppRoutes() {
 
 
                 <Route path="/administracion/usuarios" element={<Usuarios />} />
-                <Route path="/administracion/usuarios/roles" element={<Roles />} />
-                <Route path="/administracion/produccion" element={<Produccion />} />
+               {/* <Route path="/administracion/usuarios/roles" element={<Roles />} /> */}
+                <Route path="/administracion/Produccion" element={<Produccion />} />
                 <Route path="/administracion/ManoDeObra" element={<ManoDeObra />} />
-                <Route path="/administracion/StockDeProductos" element={<StockProductos />} />
-                <Route path="/administracion/StockDeInsumos" element={<StockInsumos />} />
+                <Route path="/administracion/Insumos" element={<Insumos />} />
+                <Route path="/administracion/Stocks" element={<Stocks />} />
                 <Route path="/administracion/Ventas" element={<Ventas />} />
 
-            </Route>
+            </Route> 
 
             {/* Cualquier otra URL */}
             <Route path="*" element={<Navigate to="/login" replace />} />

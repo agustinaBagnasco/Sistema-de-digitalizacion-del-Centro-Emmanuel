@@ -69,9 +69,9 @@ export default function Quark() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de elaboracion de queso quark">
-        <form onSubmit={guardar} className="formulario">
-
+      <Card title="· REGISTRO DE ELABORACION DE QUARK ·">
+        <form onSubmit={guardar} className="form-field columns-2">
+  <div className="input-group">
           <label>Fecha</label>
           <Input
             type="date"
@@ -80,7 +80,8 @@ export default function Quark() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+            <div className="input-group">
 
           <label>Leche</label>
           <Input
@@ -90,7 +91,8 @@ export default function Quark() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+            <div className="input-group">
 
           <label>Cantidad de Frascos</label>
           <Input
@@ -100,7 +102,8 @@ export default function Quark() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+            <div className="input-group">
 
 
           <label>Tiempo de elaboracion</label>
@@ -111,8 +114,9 @@ export default function Quark() {
             onChange={handleChange}
             required
           />
+          </div>
 
-          <br />
+            <div className="input-group">
           <label>Comentario</label>
           <Textarea
             name="comentario"
@@ -120,14 +124,14 @@ export default function Quark() {
             onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
-          <br />
-
+          </div>
+        <div className="form-button-container">
           <Button
             type={"submit"}
             className={`btn btn-${"primary"}`}>
             Guardar
           </Button>
-
+</div>
         </form>
         <br />
         <hr />

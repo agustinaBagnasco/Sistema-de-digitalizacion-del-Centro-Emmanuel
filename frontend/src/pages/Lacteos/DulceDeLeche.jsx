@@ -1,4 +1,3 @@
-import cultivos from "../../data/cultivos.json";
 import { useState } from "react";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
@@ -8,15 +7,15 @@ import Textarea from "../../components/ui/Textarea";
 import FormField from '../../components/ui/FormField'
 
 export default function DulceDeLeche() {
-   const [form, setForm] = useState({
-      fecha: "",
-      litrosLeche: "",
-      cantidadAzucar: "",
-      cantidadBicarbonato: "",
-      tiempoElaboracion: "",
-      cantFrascos1kg: "",
-      cantFrascos420g: "",
-      comentario: "",
+  const [form, setForm] = useState({
+    fecha: "",
+    litrosLeche: "",
+    cantidadAzucar: "",
+    cantidadBicarbonato: "",
+    tiempoElaboracion: "",
+    cantFrascos1kg: "",
+    cantFrascos420g: "",
+    comentario: "",
   });
 
   const [registros, setRegistros] = useState([]);
@@ -79,97 +78,102 @@ export default function DulceDeLeche() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de elaboracion de dulce de leche">
-        <form onSubmit={guardar} className="formulario">
+      <Card title="· REGISTRO DE ELABORACION DE DULCE DE LECHE ·">
+        <form onSubmit={guardar} className="form-field columns-2">
+          <div className="input-group">
+            <label>Fecha</label>
+            <Input
+              type="date"
+              name="fecha"
+              value={form.fecha}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Leche </label>
+            <Input
+              type="number"
+              name="litrosLeche"
+              value={form.litrosLeche}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
 
-          <label>Fecha</label>
-          <Input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={handleChange}
-            required
-          />
-          <br />
-          <label>Leche </label>
-          <Input
-            type="number"
-            name="litrosLeche"
-            value={form.litrosLeche}
-            onChange={handleChange}
-            required
-          />
-          <br />
+            <label>Azucar</label>
+            <Input
+              type="number"
+              name="cantidadAzucar"
+              value={form.cantidadAzucar}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
 
-          <label>Azucar</label>
-          <Input
-            type="number"
-            name="cantidadAzucar"
-            value={form.cantidadAzucar}
-            onChange={handleChange}
-            required
-          />
-          <br />
 
-          
-          <label>Bicarbonato</label>
-          <Input
-            type="number"
-            name="cantidadBicarbonato"
-            value={form.cantidadBicarbonato}
-            onChange={handleChange}
-            required
-          />
-          <br />
+            <label>Bicarbonato</label>
+            <Input
+              type="number"
+              name="cantidadBicarbonato"
+              value={form.cantidadBicarbonato}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Tiempo de elaboracion</label>
+            <Input
+              type="number"
+              name="tiempoElaboracion"
+              value={form.tiempoElaboracion}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
 
-          <label>Tiempo de elaboracion</label>
-          <Input
-            type="number"
-            name="tiempoElaboracion"
-            value={form.tiempoElaboracion}
-            onChange={handleChange}
-            required
-          />
-          <br />
+            <label>Frascos 1kg</label>
+            <Input
+              type="number"
+              name="cantFrascos1kg"
+              value={form.cantFrascos1kg}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
 
-          <label>Frascos 1kg</label>
-          <Input
-            type="number"
-            name="cantFrascos1kg"
-            value={form.cantFrascos1kg}
-            onChange={handleChange}
-            required
-          />
-          <br />
-
-          <label>Frascos 420g</label>
-          <Input
-            type="number"
-            name="cantFrascos420g"
-            value={form.cantFrascos420g}
-            onChange={handleChange}
-            required
-          />
-          <br />
-          <label>Comentario</label>
-          <Textarea
-            name="comentario"
-            value={form.comentario}
-            onChange={handleChange}
-            placeholder="Ingrese observaciones..."
-          />
-          <br />
-
-          <Button
-            type={"submit"}
-            className={`btn btn-${"primary"}`}>
-            Guardar
-          </Button>
-
+            <label>Frascos 420g</label>
+            <Input
+              type="number"
+              name="cantFrascos420g"
+              value={form.cantFrascos420g}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Comentario</label>
+            <Textarea
+              name="comentario"
+              value={form.comentario}
+              onChange={handleChange}
+              placeholder="Ingrese observaciones..."
+            />
+          </div>
+          <div className="form-button-container">
+            <Button
+              type={"submit"}
+              className={`btn btn-${"primary"}`}>
+              Guardar
+            </Button>
+          </div>
         </form>
         <br />
         <hr />
-
 
         <div className="table-container">
           <table className="table">

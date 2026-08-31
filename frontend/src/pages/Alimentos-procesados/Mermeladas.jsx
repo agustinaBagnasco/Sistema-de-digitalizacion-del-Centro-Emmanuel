@@ -6,6 +6,7 @@ import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
 import FormField from '../../components/ui/FormField'
+import "../../components/ui/Forms.css";
 
 export default function Mermeladas() {
   const [form, setForm] = useState({
@@ -72,9 +73,10 @@ export default function Mermeladas() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de elaboracion de mermeladas">
-        <form onSubmit={guardar} className="formulario">
-
+    <Card title="· REGISTRO DE ELABORACION DE MERMELADAS ·">
+     
+        <form onSubmit={guardar} className="form-field columns-2">
+          <div className="input-group">
           <label>Fecha</label>
           <Input
             type="date"
@@ -83,7 +85,9 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          
+          <div className="input-group">
           <label>Fruta</label>
           <Select
             name="fruta"
@@ -92,8 +96,8 @@ export default function Mermeladas() {
             options={opcionesFrutas}
             placeholder="Seleccione una fruta"
           />
-          <br />
-
+          </div>
+        <div className="input-group">
           <label>Cantidad de fruta total</label>
           <Input
             type="number"
@@ -102,7 +106,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
           <label>Fruta descartada</label>
           <Input
             type="number"
@@ -111,7 +116,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
           <label>Fruta utilizada</label>
           <Input
             type="number"
@@ -120,7 +126,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+        <div className="input-group">
           <label>Azucar</label>
           <Input
             type="number"
@@ -129,7 +136,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
           <label>Tiempo de elaboracion</label>
           <Input
             type="number"
@@ -138,7 +146,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+          <div className="input-group">
           <label>Tiempo de coccion</label>
           <Input
             type="number"
@@ -147,7 +156,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+         <div className="input-group">
           <label>Frascos 1kg</label>
           <Input
             type="number"
@@ -156,7 +166,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+         <div className="input-group">
           <label>Cantidad Frascos 420g</label>
           <Input
             type="number"
@@ -165,7 +176,8 @@ export default function Mermeladas() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+        <div className="input-group">
           <label>Comentario</label>
           <Textarea
             name="comentario"
@@ -173,15 +185,18 @@ export default function Mermeladas() {
             onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
+          </div>
           <br />
-
+          
+          <div className="form-button-container">
           <Button
             type={"submit"}
             className={`btn btn-${"primary"}`}>
             Guardar
           </Button>
-
+          </div>
         </form>
+        
         <br />
         <hr />
 

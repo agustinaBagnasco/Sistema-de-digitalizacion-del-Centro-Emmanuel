@@ -72,9 +72,10 @@ export default function Quesos() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de elaboracion de quesos">
-        <form onSubmit={guardar} className="formulario">
+      <Card title="· REGISTRO DE ELABORACION DE QUESOS ·">
+        <form onSubmit={guardar} className="form-field columns-2">
 
+          <div className="input-group">
           <label>Fecha</label>
           <Input
             type="date"
@@ -83,7 +84,8 @@ export default function Quesos() {
             onChange={handleChange}
             required
           />
-          <br />
+        </div>
+        <div className="input-group">
           <label>Tipo de queso</label>
           <Select
             name="queso"
@@ -92,7 +94,8 @@ export default function Quesos() {
             options={opcionesQuesos}
             placeholder="Seleccione un tipo de queso"
           />
-          <br />
+        </div>
+        <div className="input-group">
 
           <label>Cantidad</label>
           <Input
@@ -102,7 +105,8 @@ export default function Quesos() {
             onChange={handleChange}
             required
           />
-          <br />
+        </div>
+        <div className="input-group">
           <label>Comentario</label>
           <Textarea
             name="comentario"
@@ -110,61 +114,62 @@ export default function Quesos() {
             onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
-          <br />
-
-          <Button
-            type={"submit"}
-            className={`btn btn-${"primary"}`}>
-            Guardar
-          </Button>
-
-        </form>
-        <br />
-        <hr />
-
-
-        <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Cantidad</th>
-                <th>Tipo de queso</th>
-                <th>Comentario</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {registros.map((r, i) => (
-                <tr key={i}>
-                  <td>{r.fecha}</td>
-                  <td>{r.cantidad}</td>
-                  <td>{opcionesQuesos.find(o => String(o.value) === String(r.queso))?.label}</td>
-                  <td>{r.comentario}</td>Q
-                  <td>
-                    <div className="table-actions">
-                      <Button
-                        variant="secondary"
-                        onClick={() => editarRegistro(i)}
-                      >
-                        Editar
-                      </Button>
-
-                      <Button
-                        variant="danger"
-                        onClick={() => eliminarRegistro(i)}
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      </Card>
-    </div>
+      <div className="form-button-container">
+        <Button
+          type={"submit"}
+          className={`btn btn-${"primary"}`}>
+          Guardar
+        </Button>
+        </div>
+
+      </form>
+      <br />
+      <hr />
+
+
+      <div className="table-container">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Cantidad</th>
+              <th>Tipo de queso</th>
+              <th>Comentario</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {registros.map((r, i) => (
+              <tr key={i}>
+                <td>{r.fecha}</td>
+                <td>{r.cantidad}</td>
+                <td>{opcionesQuesos.find(o => String(o.value) === String(r.queso))?.label}</td>
+                <td>{r.comentario}</td>Q
+                <td>
+                  <div className="table-actions">
+                    <Button
+                      variant="secondary"
+                      onClick={() => editarRegistro(i)}
+                    >
+                      Editar
+                    </Button>
+
+                    <Button
+                      variant="danger"
+                      onClick={() => eliminarRegistro(i)}
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+    </div >
 
   );
 }

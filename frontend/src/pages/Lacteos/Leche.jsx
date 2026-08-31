@@ -78,9 +78,10 @@ export default function Leche() {
 
   return (
     <div className="pagina">
-      <Card title="Registro de produccion de leche">
-        <form onSubmit={guardar} className="formulario">
+      <Card title="· REGISTRO DE PRODUCCION DE LECHE ·">
+        <form onSubmit={guardar} className="form-field columns-2">
 
+ <div className="input-group">
           <label>Fecha</label>
           <Input
             type="date"
@@ -89,7 +90,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+         <div className="input-group">
           <h3>Destino </h3>
           <hr />
           <br />
@@ -101,7 +103,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+        <div className="input-group">
 
           <label>Venta directa</label>
           <Input
@@ -111,7 +114,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+         <div className="input-group">
 
           
           <label>Consumo cocina</label>
@@ -122,7 +126,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+           <div className="input-group">
 
           <label>Queso</label>
           <Input
@@ -132,7 +137,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+           <div className="input-group">
 
           <label>Dulce de leche</label>
           <Input
@@ -142,7 +148,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+         <div className="input-group">
 
           <label>Quark</label>
           <Input
@@ -152,7 +159,8 @@ export default function Leche() {
             onChange={handleChange}
             required
           />
-          <br />
+          </div>
+       <div className="input-group">
           <label>Comentario</label>
           <Textarea
             name="comentario"
@@ -160,14 +168,14 @@ export default function Leche() {
             onChange={handleChange}
             placeholder="Ingrese observaciones..."
           />
-          <br />
-
+          </div>
+          <div className="form-button-container">
           <Button
             type={"submit"}
             className={`btn btn-${"primary"}`}>
             Guardar
           </Button>
-
+          </div>
         </form>
         <br />
         <hr />
