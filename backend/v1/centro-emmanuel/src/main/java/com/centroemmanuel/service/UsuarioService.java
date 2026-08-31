@@ -1,4 +1,5 @@
 package com.centroemmanuel.service;
+<<<<<<< HEAD
 
 import java.util.List;
 
@@ -6,10 +7,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.centroemmanuel.entity.Usuario;
+=======
+import org.springframework.stereotype.Service;
+import com.centroemmanuel.entity.Usuario;
+import com.centroemmanuel.enums.Rol;
+>>>>>>> ffa1c60 (Login y Registro de usuario)
 import com.centroemmanuel.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
+<<<<<<< HEAD
 
     private final UsuarioRepository usuarioRepository;
 
@@ -152,3 +159,34 @@ public class UsuarioService {
 
 }
 
+=======
+    private final UsuarioRepository usuarioRepository;
+
+    public UsuarioService(UsuarioRepository pUsuarioRepository){
+        this.usuarioRepository = pUsuarioRepository;
+    }
+
+    public boolean existeUsuario(String pUsername){
+        return usuarioRepository.existsByUsername(pUsername);
+    }
+
+    public Usuario getUsuarioByUsername(String pUsername) {
+        return usuarioRepository.findByUsername(pUsername);
+    }
+
+    public Usuario getUsuarioById(int idUsuario) {
+        return usuarioRepository.findByIdUsuario(idUsuario);
+    }
+
+    public boolean crearUsuario(String nombreUsuario, String nombre, String apellido, String clave, String email) {
+        if (existeUsuario(nombreUsuario)) {
+            return false;
+        }
+        
+        Usuario nuevoUsuario = new Usuario(nombreUsuario, nombre, apellido, clave, email, Rol.OPERARIO);
+        usuarioRepository.save(nuevoUsuario);
+        return true;
+    }
+
+}
+>>>>>>> ffa1c60 (Login y Registro de usuario)

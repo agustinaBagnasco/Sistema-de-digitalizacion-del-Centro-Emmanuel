@@ -1,5 +1,8 @@
 package com.centroemmanuel.entity;
 
+import com.centroemmanuel.enums.Tipo;
+import com.centroemmanuel.enums.UnidadMedida;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -32,14 +35,16 @@ public class Producto {
 
     @ManyToOne
     @JoinColumn(name = "id_unidad_medida")
+    private Tipo tipo;
+
+    @ManyToOne
+    @JoinColumn(name = "id_unidad_medida")
     private UnidadMedida unidadMedida;
 
     public Producto() {
     }
 
-    public Producto(Integer pIdProducto, String pNombreProducto, String pDescripcion,
-                    Double pStockActual, Double pStockMinimo, boolean pActivo,
-                    Categoria pCategoria, UnidadMedida pUnidadMedida) {
+    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, Double pStockActual, Double pStockMinimo, boolean pActivo, Categoria pCategoria, Tipo pTipo, UnidadMedida pUnidadMedida){
         this.idProducto = pIdProducto;
         this.nombreProducto = pNombreProducto;
         this.descripcion = pDescripcion;
@@ -47,6 +52,7 @@ public class Producto {
         this.stockMinimo = pStockMinimo;
         this.activo = pActivo;
         this.categoria = pCategoria;
+        this.tipo = pTipo;
         this.unidadMedida = pUnidadMedida;
     }
 

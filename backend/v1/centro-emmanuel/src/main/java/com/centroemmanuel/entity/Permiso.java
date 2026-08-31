@@ -25,16 +25,10 @@ public class Permiso {
     @Column(name = "descripcion")
     private String descripcion;
 
-
-    // Relación Permiso - Rol
-    @ManyToMany(mappedBy = "permisos")
-    @JsonIgnore
-    private List<Rol> roles = new ArrayList<>();
-
-
     public Permiso(){}
 
 
+    //Permisos va a tener que conectarse a cada pagina del front para administrar el acceso o no a la pagina
     public Permiso(int pIdPermiso, String pNombrePermiso, String pDescripcion){
 
         this.idPermiso = pIdPermiso;
@@ -70,14 +64,5 @@ public class Permiso {
 
     public void setDescripcion(String descripcion){
         this.descripcion = descripcion;
-    }
-
-
-    public List<Rol> getRoles(){
-        return roles;
-    }
-
-    public void setRoles(List<Rol> roles){
-        this.roles = roles;
     }
 }
