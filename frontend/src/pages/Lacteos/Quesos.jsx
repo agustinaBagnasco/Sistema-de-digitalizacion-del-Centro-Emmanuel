@@ -1,5 +1,4 @@
 import { useState } from "react";
-import quesos from "../../data/quesos.json";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";
@@ -18,10 +17,10 @@ export default function Quesos() {
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesQuesos = quesos.map(queso => ({
-    value: queso.id,
-    label: queso.nombre,
-  }));
+  // const opcionesQuesos = quesos.map(queso => ({
+  //   value: queso.id,
+  //   label: queso.nombre,
+  // }));
 
   function handleChange(e) {
     setForm({

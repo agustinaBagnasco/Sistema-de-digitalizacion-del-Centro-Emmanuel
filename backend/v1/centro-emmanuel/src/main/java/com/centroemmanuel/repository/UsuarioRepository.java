@@ -5,11 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    boolean existsByUsername(String username);
+    boolean existsByNombreUsuario(String nombreUsuario);
 
-    Usuario findByUsername(String nombreUsuario);
-    
-    Usuario findByIdUsuario(int idUsuario);
+     Optional<Usuario> findByNombreUsuario(String nombreUsuario);
+
+    Optional<Usuario> findByIdUsuario(int idUsuario);
 }

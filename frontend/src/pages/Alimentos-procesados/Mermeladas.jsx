@@ -1,5 +1,4 @@
 import { useState } from "react";
-import frutas from "../../data/frutas.json";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";

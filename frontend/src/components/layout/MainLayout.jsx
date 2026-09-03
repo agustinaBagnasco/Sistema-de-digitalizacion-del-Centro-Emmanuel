@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import Sidebar from "./sidebar/Sidebar";
 import Navbar from "./navbar/Navbar";
+import Breadcrumbs from "../ui/Breadcrumbs";
 
 import "../layout/MainLayout.css";
 
@@ -26,6 +27,8 @@ export default function MainLayout() {
                 />
 
                 <main className="layout__page">
+
+                    <Breadcrumbs />
 
                     <Outlet />
 

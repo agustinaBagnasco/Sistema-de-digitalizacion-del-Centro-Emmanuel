@@ -1,5 +1,4 @@
 import { useState } from "react";
-import granos from "../../data/granos.json";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";

@@ -8,7 +8,7 @@ import Produccion from "../pages/administracion/Produccion";
 import Ventas from "../pages/administracion/Ventas";
 import ManoDeObra from "../pages/administracion/ManoDeObra";
 import Insumos from "../pages/administracion/Insumos";
-import Stocks from "../pages/administracion/Stocks";
+import Productos from "../pages/administracion/Productos";
 
 import Leche from "../pages/Lacteos/Leche";
 import Quesos from "../pages/Lacteos/Quesos";
@@ -20,7 +20,7 @@ import Molienda from "../pages/Alimentos-procesados/Molienda";
 
 import Usuarios from "../pages/administracion/Usuarios";
 import Login from "../pages/Login";
-//import Roles from "../pages/administracion/Roles";
+
 
 export default function AppRoutes() {
 
@@ -52,12 +52,11 @@ export default function AppRoutes() {
 
 
                 <Route path="/administracion/usuarios" element={<Usuarios />} />
-               {/* <Route path="/administracion/usuarios/roles" element={<Roles />} /> */}
                 <Route path="/administracion/Produccion" element={<Produccion />} />
                 <Route path="/administracion/ManoDeObra" element={<ManoDeObra />} />
                 <Route path="/administracion/Insumos" element={<Insumos />} />
-                <Route path="/administracion/Stocks" element={<Stocks />} />
                 <Route path="/administracion/Ventas" element={<Ventas />} />
+                <Route path="/administracion/Productos" element={<Productos />} />
 
             </Route> 
 

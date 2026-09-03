@@ -1,6 +1,7 @@
 package com.centroemmanuel.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +34,14 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscar(@PathVariable int id) {
 
-        Usuario usuario = usuarioService.buscarPorId(id);
+        Optional<Usuario> usuario =
+                usuarioService.buscarPorId(id);
 
-        if (usuario == null) {
+        if (usuario.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(usuario.get());
     }
 
     // POST /api/usuarios
@@ -47,7 +49,8 @@ public class UsuarioController {
     public ResponseEntity<Usuario> crear(
             @RequestBody Usuario usuario) {
 
-        Usuario nuevoUsuario = usuarioService.crear(usuario);
+        Usuario nuevoUsuario =
+                usuarioService.crear(usuario);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -75,7 +78,8 @@ public class UsuarioController {
     public ResponseEntity<Void> eliminar(
             @PathVariable int id) {
 
-        boolean eliminado = usuarioService.eliminar(id);
+        boolean eliminado =
+                usuarioService.eliminar(id);
 
         if (!eliminado) {
             return ResponseEntity.notFound().build();

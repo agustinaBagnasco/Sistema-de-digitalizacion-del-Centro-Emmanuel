@@ -11,7 +11,7 @@ import com.centroemmanuel.entity.Producto;
 import com.centroemmanuel.service.ProductoService;
 
 @RestController
-@RequestMapping("/productos")
+@RequestMapping("/api/productos")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProductoController {
 
@@ -21,12 +21,6 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
-
-    // ==========================================
-    // LISTAR PRODUCTOS
-    // GET /productos
-    // ==========================================
-
     @GetMapping
     public ResponseEntity<List<Producto>> listar() {
 
@@ -34,12 +28,6 @@ public class ProductoController {
                 productoService.listar()
         );
     }
-
-
-    // ==========================================
-    // BUSCAR PRODUCTO
-    // GET /productos/{id}
-    // ==========================================
 
     @GetMapping("/{id}")
     public ResponseEntity<Producto> buscarPorId(
@@ -55,12 +43,6 @@ public class ProductoController {
         return ResponseEntity.notFound().build();
     }
 
-
-    // ==========================================
-    // CREAR PRODUCTO
-    // POST /productos
-    // ==========================================
-
     @PostMapping
     public ResponseEntity<Producto> guardar(
             @RequestBody Producto producto) {
@@ -73,11 +55,6 @@ public class ProductoController {
                 .body(nuevoProducto);
     }
 
-
-    // ==========================================
-    // ACTUALIZAR PRODUCTO
-    // PUT /productos/{id}
-    // ==========================================
 
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizar(
@@ -94,11 +71,6 @@ public class ProductoController {
         return ResponseEntity.ok(actualizado);
     }
 
-
-    // ==========================================
-    // ELIMINAR PRODUCTO
-    // DELETE /productos/{id}
-    // ==========================================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(

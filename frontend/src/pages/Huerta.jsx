@@ -5,6 +5,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Textarea from "../components/ui/Textarea";
 import api from "../services/api";
+import FormField from '../components/ui/FormField'
 
 export default function Huerta() {
 
@@ -19,22 +20,12 @@ export default function Huerta() {
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-
-  // ==========================================
-  // OPCIONES PARA EL SELECT DE PRODUCTOS
-  // ==========================================
-
   const opcionesProductos = productos
     .filter(producto => producto.activo)
     .map(producto => ({
       value: producto.idProducto,
       label: producto.nombreProducto,
     }));
-
-
-  // ==========================================
-  // CARGAR PRODUCTOS Y COSECHAS
-  // ==========================================
 
   useEffect(() => {
     cargarProductos();
@@ -79,11 +70,6 @@ export default function Huerta() {
     }
   }
 
-
-  // ==========================================
-  // CAMBIAR CAMPOS
-  // ==========================================
-
   function handleChange(e) {
 
     setForm({
@@ -92,11 +78,6 @@ export default function Huerta() {
     });
 
   }
-
-
-  // ==========================================
-  // GUARDAR / ACTUALIZAR
-  // ==========================================
 
   async function guardar(e) {
 
@@ -182,11 +163,6 @@ export default function Huerta() {
     }
   }
 
-
-  // ==========================================
-  // EDITAR
-  // ==========================================
-
   function editarRegistro(registro) {
 
     setForm({
@@ -211,11 +187,6 @@ export default function Huerta() {
 
   }
 
-
-  // ==========================================
-  // ELIMINAR
-  // ==========================================
-
   async function eliminarRegistro(id) {
 
     try {
@@ -237,11 +208,6 @@ export default function Huerta() {
 
   }
 
-
-  // ==========================================
-  // LIMPIAR FORMULARIO
-  // ==========================================
-
   function limpiarFormulario() {
 
     setForm({
@@ -256,11 +222,6 @@ export default function Huerta() {
     setEditando(null);
 
   }
-
-
-  // ==========================================
-  // HTML
-  // ==========================================
 
   return (
 
@@ -349,9 +310,7 @@ export default function Huerta() {
           <table className="table">
 
             <thead>
-
               <tr>
-
                 <th>
                   Fecha
                 </th>

@@ -11,8 +11,13 @@ export default function Navbar({ onMenuClick }) {
     year: "numeric",
   }).format(new Date());
 
-  const nombre = localStorage.getItem("usuario") || "Invitado";
+  //const nombre = localStorage.getItem("usuario") || "Invitado";
 
+  const usuarioGuardado = localStorage.getItem("usuario");
+
+const usuario = usuarioGuardado
+    ? JSON.parse(usuarioGuardado).nombre
+    : "Invitado";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -68,10 +73,10 @@ export default function Navbar({ onMenuClick }) {
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <div className="user-avatar">
-                {nombre.charAt(0)}
+                {usuario.charAt(0)}
               </div>
 
-              <span>{nombre}</span>
+              <span>{usuario}</span>
 
               <ChevronDown size={18} />
             </button>

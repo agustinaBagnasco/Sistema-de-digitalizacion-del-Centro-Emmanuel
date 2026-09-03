@@ -29,6 +29,13 @@ public class ProductoService {
 
     // Guardar producto
     public Producto guardar(Producto producto) {
+            if (producto.getStockActual() == null) {
+            producto.setStockActual(0.0);
+        }
+
+        if (producto.getStockMinimo() == null) {
+            producto.setStockMinimo(0.0);
+        }
         return productoRepository.save(producto);
     }
 
@@ -69,6 +76,9 @@ public class ProductoService {
             producto.setUnidadMedida(
                     datos.getUnidadMedida()
             );
+            producto.setTipo(
+                datos.getTipo()
+                );
 
             return productoRepository.save(producto);
         }

@@ -1,29 +1,19 @@
 package com.centroemmanuel.entity;
 import java.util.ArrayList;
 import java.util.List;
-import com.centroemmanuel.enums.Rol;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.*;
-//import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name = "usuario")
 public class Usuario {
-<<<<<<< HEAD
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-=======
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
->>>>>>> ffa1c60 (Login y Registro de usuario)
     private int idUsuario;
 
 
@@ -49,52 +39,19 @@ public class Usuario {
 
     @Column(name = "activo")
     private boolean activo;
-<<<<<<< HEAD
-
-
-    // Un usuario puede tener varios roles
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "usuario_rol",
-        joinColumns = @JoinColumn(name = "id_usuario"),
-        inverseJoinColumns = @JoinColumn(name = "id_rol")
-    )
-    //@JsonManagedReference
-    private List<Rol> roles = new ArrayList<>();
-
-=======
-    private Rol rol;
+   
+   @Transient
     private List<Permiso> permisos;
->>>>>>> ffa1c60 (Login y Registro de usuario)
 
     public Usuario(){this.permisos = new ArrayList<>();}
 
-<<<<<<< HEAD
-
-    public Usuario(int pIdUsuario, 
-                   String pNombreUsuario, 
-                   String pNombre, 
-                   String pApellido, 
-                   String pClave, 
-                   String pEmail, 
-                   Boolean pActivo){
-
-        this.idUsuario = pIdUsuario;
-=======
-    public Usuario(String pNombreUsuario, String pNombre, String pApellido, String pClave, String pEmail, Rol pRrol) {
->>>>>>> ffa1c60 (Login y Registro de usuario)
+    public Usuario(String pNombreUsuario, String pNombre, String pApellido, String pClave, String pEmail) {
         this.nombreUsuario = pNombreUsuario;
         this.nombre = pNombre;
         this.apellido = pApellido;
         this.clave = pClave;
         this.email = pEmail;
-<<<<<<< HEAD
-        this.activo = pActivo;
-=======
-        this.rol = pRrol;
         this.permisos = new ArrayList<>();
->>>>>>> ffa1c60 (Login y Registro de usuario)
     }
 
 
@@ -113,82 +70,54 @@ public class Usuario {
         this.idUsuario = idUsuario;
     }
 
-
-<<<<<<< HEAD
-    public String getNombreUsuario(){
+        public String getNombreUsuario() {
         return nombreUsuario;
     }
 
-    public void setNombreUsuario(String nombreUsuario){
+    public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
     }
-
-
-    public String getNombre(){
+        public String getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre){
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-
-    public String getApellido(){
+    public String getApellido() {
         return apellido;
     }
 
-    public void setApellido(String apellido){
+    public void setApellido(String apellido) {
         this.apellido = apellido;
     }
 
-
-    public String getClave(){
+    public String getClave() {
         return clave;
     }
 
-    public void setClave(String clave){
+    public void setClave(String clave) {
         this.clave = clave;
     }
 
-
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
-
-    public boolean isActivo(){
+    public boolean isActivo() {
         return activo;
     }
 
-    public void setActivo(boolean activo){
+    public void setActivo(boolean activo) {
         this.activo = activo;
     }
-
-
-    public List<Rol> getRoles(){
-        return roles;
-    }
-
-    public void setRoles(List<Rol> roles){
-        this.roles = roles;
-    }
-}
-=======
-    public String getEmail(){return email;}
-    public void setEmail(String pEmail){this.email = pEmail;}
-    
-    public boolean isActivo(){return activo;}
-    public void setActivo(boolean pActivo){this.activo = pActivo;}
-    
-    public Rol getRol(){return rol;}
-    public void setRol(Rol pRol){this.rol = pRol;}
 
     public List<Permiso> getPermisos(){return permisos;}
     public void setPermisos(List<Permiso> pPermisos){this.permisos = pPermisos;}
     //endregion
 }
->>>>>>> ffa1c60 (Login y Registro de usuario)

@@ -1,6 +1,7 @@
 package com.centroemmanuel.entity;
 
 import com.centroemmanuel.enums.Tipo;
+import com.centroemmanuel.enums.Categoria;
 import com.centroemmanuel.enums.UnidadMedida;
 
 import jakarta.persistence.*;
@@ -29,16 +30,16 @@ public class Producto {
     @Column(name = "activo")
     private boolean activo;
 
-    @ManyToOne
-    @JoinColumn(name = "id_categoria")
-    private Categoria categoria;
-
-    @ManyToOne
-    @JoinColumn(name = "id_unidad_medida")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
     private Tipo tipo;
 
-    @ManyToOne
-    @JoinColumn(name = "id_unidad_medida")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria", nullable = false)
+    private Categoria categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "unidad_medida", nullable = false)
     private UnidadMedida unidadMedida;
 
     public Producto() {
@@ -104,6 +105,12 @@ public boolean isActivo() {
 
 public void setActivo(boolean activo) {
     this.activo = activo;
+}
+public Tipo getTipo() {
+    return tipo;
+}
+public void setTipo(Tipo tipo) {
+    this.tipo = tipo;
 }
 
 public Categoria getCategoria() {
