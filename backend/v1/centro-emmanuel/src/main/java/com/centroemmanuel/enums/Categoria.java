@@ -2,9 +2,12 @@ package com.centroemmanuel.enums;
 
 public enum Categoria {
     LECHE,
-    HARINA,
+    MOLIENDA,
     MERMELADA,
     DULCEDELECHE,
     QUESO,
-    COSECHA
+    FRUTASYHORTALIZAS,
+    FRUTA,
+    GRANOS,
+    OTROS
 }

@@ -79,6 +79,13 @@ export default function Leche() {
   return (
     <div className="pagina">
       <Card title="· REGISTRO DE PRODUCCION DE LECHE ·">
+         <div className="form-button-container">
+          <Button
+            onClick={() => {alert("Funcionalidad de carga de control lechero no implementada aún.")}}
+            className={`btn btn-${"danger"}`}>
+            Cargar Control Lechero
+          </Button>
+          </div>
         <form onSubmit={guardar} className="form-field columns-2">
 
  <div className="input-group">
@@ -92,7 +99,7 @@ export default function Leche() {
           />
           </div>
          <div className="input-group">
-          <h3>Destino </h3>
+          <h3>Destino (Lts)</h3>
           <hr />
           <br />
           <label>Terneros</label>

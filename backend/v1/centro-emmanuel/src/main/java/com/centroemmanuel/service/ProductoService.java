@@ -64,7 +64,9 @@ public class ProductoService {
             producto.setStockMinimo(
                     datos.getStockMinimo()
             );
-
+            producto.setCosto(
+                datos.getCosto()
+            );
             producto.setActivo(
                     datos.isActivo()
             );

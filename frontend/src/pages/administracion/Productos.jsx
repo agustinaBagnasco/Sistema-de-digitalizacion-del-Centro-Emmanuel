@@ -28,6 +28,7 @@ function Productos() {
     const [descripcion, setDescripcion] = useState("");
     const [stockActual, setStockActual] = useState("");
     const [stockMinimo, setStockMinimo] = useState("");
+    const [costo, setCosto] = useState("");
     const [activo, setActivo] = useState(true);
     const [tipo, setTipo] = useState("");
     const [categoria, setCategoria] = useState("");
@@ -36,11 +37,12 @@ function Productos() {
     const [error, setError] = useState("");
     const [cargando, setCargando] = useState(false);
 
-    // ========================= CARGAR DATOS =========================
+    const [busqueda, setBusqueda] = useState("");
+    const [filtroTipo, setFiltroTipo] = useState("");
+    const [filtroCategoria, setFiltroCategoria] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
 
-    useEffect(() => {
-        cargarProductos();
-    }, []);
+    // ========================= CARGAR DATOS =========================
 
     const cargarProductos = async () => {
 
@@ -48,6 +50,7 @@ function Productos() {
             setCargando(true);
             const respuesta = await obtenerProductos();
             setProductos(respuesta.data);
+            console.log("PRODUCTOS:", respuesta.data);
 
         } catch (error) {
 
@@ -60,6 +63,9 @@ function Productos() {
         }
     };
 
+    useEffect(() => {
+        cargarProductos();
+    }, []);
 
     // ========================= LIMPIAR FORMULARIO =========================
 
@@ -69,6 +75,7 @@ function Productos() {
         setDescripcion("");
         setStockActual("");
         setStockMinimo("");
+        setCosto("");
         setTipo("");
         setCategoria("");
         setUnidadMedida("");
@@ -85,6 +92,12 @@ function Productos() {
 
     const abrirNuevoProducto = () => {
         limpiarFormulario();
+        setTimeout(() => {
+            document.getElementById("formulario-producto")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 100);
         setMostrarModal(true);
     };
 
@@ -112,6 +125,12 @@ function Productos() {
                 ? producto.stockMinimo
                 : ""
         );
+        setCosto(
+            producto.costo !== null &&
+                producto.costo !== undefined
+                ? producto.costo
+                : ""
+        );
         setTipo(producto.tipo || "");
 
         setCategoria(producto.categoria || "");
@@ -120,6 +139,13 @@ function Productos() {
 
 
         setActivo(producto.activo);
+
+        setTimeout(() => {
+            document.getElementById("formulario-producto")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }, 100);
 
         setError("");
 
@@ -163,7 +189,6 @@ function Productos() {
             return;
         }
 
-
         const producto = {
 
             nombreProducto: nombreProducto.trim(),
@@ -175,9 +200,10 @@ function Productos() {
             stockMinimo: stockMinimo === ""
                 ? 0
                 : Number(stockMinimo),
-
+            costo: costo === ""
+                ? 0
+                : Number(costo),
             activo: activo,
-
             tipo: tipo,
             categoria: categoria,
             unidadMedida: unidadMedida,
@@ -227,6 +253,7 @@ function Productos() {
                 descripcion: producto.descripcion,
                 stockActual: producto.stockActual,
                 stockMinimo: producto.stockMinimo,
+                costo: producto.costo,
                 activo: !producto.activo,
                 tipo: producto.tipo,
                 categoria: producto.categoria,
@@ -245,6 +272,36 @@ function Productos() {
             setError("No se pudo cambiar el estado del producto.");
         }
     };
+
+    // ========================= BUSQUEDA Y FILTROS =========================
+
+    const productosFiltrados = productos.filter((producto) => {
+
+        const coincideBusqueda =
+            producto.nombreProducto
+                .toLowerCase()
+                .includes(busqueda.toLowerCase());
+
+        const coincideTipo =
+            !filtroTipo || producto.tipo === filtroTipo;
+
+        const coincideCategoria =
+            !filtroCategoria || producto.categoria === filtroCategoria;
+
+        const coincideEstado =
+            !filtroEstado ||
+            (filtroEstado === "ACTIVO" && producto.activo) ||
+            (filtroEstado === "INACTIVO" && !producto.activo);
+
+        return (
+            coincideBusqueda &&
+            coincideTipo &&
+            coincideCategoria &&
+            coincideEstado
+        );
+    });
+
+
 
     // ========================= ELIMINAR =========================
 
@@ -271,13 +328,8 @@ function Productos() {
             setError("No se pudo eliminar el producto.");
         }
     };
-    console.log("TIPOS:", tipos);
-    console.log("CATEGORIAS:", categorias);
-    console.log("UNIDADES:", unidadesMedida);
 
     return (
-
-
         <div className="pagina">
             <Card title="· PRODUCTOS | INSUMOS ·">
                 <Button
@@ -286,8 +338,6 @@ function Productos() {
                 >
                     + Nuevo producto
                 </Button>
-
-
 
                 {/* =========================  ERROR  ========================= */}
 
@@ -304,6 +354,45 @@ function Productos() {
 
                 {/* ========================= TABLA ========================= */}
 
+                <div className="productos-filtros">
+
+                    <Input
+                        type="text"
+                        placeholder="Buscar producto..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
+
+                    <Select
+                        value={filtroTipo}
+                        onChange={(e) => setFiltroTipo(e.target.value)}
+                        options={[
+                            { value: "", label: "Todos los tipos" },
+                            ...tipos
+                        ]}
+                    />
+
+                    <Select
+                        value={filtroCategoria}
+                        onChange={(e) => setFiltroCategoria(e.target.value)}
+                        options={[
+                            { value: "", label: "Todas las categorías" },
+                            ...categorias
+                        ]}
+                    />
+
+                    <Select
+                        value={filtroEstado}
+                        onChange={(e) => setFiltroEstado(e.target.value)}
+                        options={[
+                            { value: "", label: "Todos los estados" },
+                            { value: "ACTIVO", label: "Activos" },
+                            { value: "INACTIVO", label: "Inactivos" }
+                        ]}
+                    />
+
+                </div>
+
                 <div className="productos-table-container">
                     {cargando ? (
                         <p className="mensaje-cargando">
@@ -318,94 +407,101 @@ function Productos() {
                             >
                                 Agregar primer producto
                             </Button>
+
                         </div>
+
                     ) : (
-                        <table className="productos-table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Descripción</th>
-                                    <th>Categoría</th>
-                                    <th>Unidad</th>
-                                    <th>Stock actual</th>
-                                    <th>Stock mínimo</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
 
-                            <tbody>
-                                {productos.map((producto) => (
-                                    <tr key={producto.idProducto}>
-                                        <td>
-                                            <strong>{producto.nombreProducto}</strong>
-                                        </td>
+                        <div className="table-container">
+                            <table className="table">
+                                <thead style={{ backgroundColor: "#f2f2f2" }}>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Descripción</th>
+                                        <th>Tipo</th>
+                                        <th>Categoría</th>
+                                        <th>Unidad</th>
+                                        <th>Stock inicial</th>
+                                        <th>Stock mínimo</th>
+                                        <th>Costo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
 
-                                        <td>{producto.descripcion || "-"}</td>
-                                        <td>{producto.tipo || "-"}</td>
-                                        <td>{producto.categoria || "-"}</td>
+                                <tbody>
+                                    {productosFiltrados.map((producto) => (
+                                        <tr key={producto.idProducto}>
+                                            <td>
+                                                <strong>{producto.nombreProducto}</strong>
+                                            </td>
 
-                                        <td>{producto.unidadMedida || "-"}</td>
+                                            <td>{producto.descripcion || "-"}</td>
+                                            <td>{producto.tipo || "-"}</td>
+                                            <td>{producto.categoria || "-"}</td>
+
+                                            <td>{producto.unidadMedida || "-"}</td>
 
 
-                                        <td>{producto.stockActual ?? 0}</td>
+                                            <td>{producto.stockActual ?? 0}</td>
 
-                                        <td>{producto.stockMinimo ?? 0}</td>
-
-                                        <td>
-                                            <span
-                                                className={
-                                                    producto.activo
-                                                        ? "estado activo"
-                                                        : "estado inactivo"
-                                                }
-                                            >
-                                                {producto.activo
-                                                    ? "Activo"
-                                                    : "Inactivo"
-                                                }
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <div className="acciones">
-                                                <button
-                                                    className="btn-editar"
-                                                    onClick={() =>
-                                                        abrirEditarProducto(producto)
-                                                    }
-                                                >
-                                                    Editar
-                                                </button>
-                                                <button
+                                            <td>{producto.stockMinimo ?? 0}</td>
+                                            <td>{producto.costo ?? 0}</td>
+                                            <td>
+                                                <span
                                                     className={
                                                         producto.activo
-                                                            ? "btn-desactivar"
-                                                            : "btn-activar"
-                                                    }
-                                                    onClick={() =>
-                                                        cambiarEstado(producto)
+                                                            ? "estado activo"
+                                                            : "estado inactivo"
                                                     }
                                                 >
                                                     {producto.activo
-                                                        ? "Desactivar"
-                                                        : "Activar"
+                                                        ? "Activo"
+                                                        : "Inactivo"
                                                     }
-                                                </button>
-                                                <button
-                                                    className="btn-eliminar"
-                                                    onClick={() =>
-                                                        eliminarProductoTabla(producto)
-                                                    }
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                </span>
+                                            </td>
+
+                                            <td>
+                                                <div className="table-actions">
+                                                    <Button
+                                                        variant="secondary"
+                                                        onClick={() =>
+                                                            abrirEditarProducto(producto)
+                                                        }
+                                                    >
+                                                        Editar
+                                                    </Button>
+                                                    <Button
+                                                        variant={
+                                                            producto.activo
+                                                                ? "warning"
+                                                                : "primary"
+                                                        }
+                                                        onClick={() =>
+                                                            cambiarEstado(producto)
+                                                        }
+                                                    >
+                                                        {producto.activo
+                                                            ? "Desactivar"
+                                                            : "Activar"
+                                                        }
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        onClick={() =>
+                                                            eliminarProductoTabla(producto)
+                                                        }
+                                                    >
+                                                        Eliminar
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
 
@@ -443,7 +539,7 @@ function Productos() {
                             <br />
 
                             {/* FORMULARIO */}
-                            <form onSubmit={guardarProducto} className="form-field columns-2">
+                            <form onSubmit={guardarProducto} id="formulario-producto" className="form-field columns-2">
                                 {/* NOMBRE */}
                                 <div className="form-group">
                                     <label>
@@ -510,7 +606,7 @@ function Productos() {
                                 {/* STOCK */}
                                 <div className="form-row">
                                     <div className="form-group">
-                                        <label>Stock actual</label>
+                                        <label>Stock inicial</label>
                                         <Input
                                             type="number"
                                             min="0"
@@ -531,6 +627,18 @@ function Productos() {
                                             value={stockMinimo}
                                             onChange={(e) =>
                                                 setStockMinimo(e.target.value)
+                                            }
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Costo</label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            value={costo}
+                                            onChange={(e) =>
+                                                setCosto(e.target.value)
                                             }
                                         />
                                     </div>

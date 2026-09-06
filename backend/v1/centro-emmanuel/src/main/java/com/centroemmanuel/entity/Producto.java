@@ -27,6 +27,9 @@ public class Producto {
     @Column(name = "stock_minimo")
     private Double stockMinimo;
 
+    @Column(name = "costo")
+    private Double costo;
+
     @Column(name = "activo")
     private boolean activo;
 
@@ -45,12 +48,13 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, Double pStockActual, Double pStockMinimo, boolean pActivo, Categoria pCategoria, Tipo pTipo, UnidadMedida pUnidadMedida){
+    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, Double pStockActual, Double pStockMinimo, Double pCosto, boolean pActivo, Categoria pCategoria, Tipo pTipo, UnidadMedida pUnidadMedida){
         this.idProducto = pIdProducto;
         this.nombreProducto = pNombreProducto;
         this.descripcion = pDescripcion;
         this.stockActual = pStockActual;
         this.stockMinimo = pStockMinimo;
+        this.costo = pCosto;
         this.activo = pActivo;
         this.categoria = pCategoria;
         this.tipo = pTipo;
@@ -99,6 +103,13 @@ public void setStockMinimo(Double stockMinimo) {
     this.stockMinimo = stockMinimo;
 }
 
+public Double getCosto() {
+    return costo;
+}
+
+public void setCosto(Double costo) {
+    this.costo = costo;
+}
 public boolean isActivo() {
     return activo;
 }

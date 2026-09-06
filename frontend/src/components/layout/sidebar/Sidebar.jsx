@@ -1,25 +1,125 @@
+// import { NavLink } from "react-router-dom";
+// import { menuItems } from "./menuItems";
+// import "./Sidebar.css";
+// import logo from "../../../assets/logo.png";
+// import { useState } from "react";
+
+
+// export default function Sidebar({ open, onClose }) {
+
+//   const [openMenu, setOpenMenu] = useState(null);
+
+
+//   return (
+//     <>
+//       {open && <div className="sidebar-overlay" onClick={onClose}></div>}
+
+//       <aside className={`sidebar ${open ? "open" : ""}`}>
+
+//         <div className="sidebar-header">
+//           <NavLink
+//             to="/"
+//             onClick={onClose}
+//             className="logo-link"
+//           >
+//             <img
+//               src={logo}
+//               alt="Centro Emmanuel"
+//               className="sidebar-logo"
+//             />
+//           </NavLink>
+ 
+
+//           <p>Sistema de Gestión</p>
+//         </div>
+
+//         <nav>
+//           {menuItems.map((item, index) => (
+//             <div key={index}>
+
+//               {item.children ? (
+//                 <>
+//                   <button
+//                     className="menu-item submenu-button"
+//                     onClick={() =>
+//                       setOpenMenu(openMenu === index ? null : index)
+//                     }
+//                   >
+//                     <span>{item.label}</span>
+//                     <span>{openMenu === index ? "▾" : "▸"}</span>
+//                   </button>
+
+//                   {openMenu === index && (
+//                     <div className="submenu">
+//                       {item.children.map((sub) => (
+//                         <NavLink
+//                           key={sub.path}
+//                           to={sub.path}
+//                           onClick={onClose}
+//                           className={({ isActive }) =>
+//                             isActive
+//                               ? "submenu-item active"
+//                               : "submenu-item"
+//                           }
+//                         >
+//                           {sub.label}
+//                         </NavLink>
+//                       ))}
+//                     </div>
+//                   )}
+//                 </>
+//               ) : (
+//                 <NavLink
+//                   to={item.path}
+//                   onClick={onClose}
+//                   className={({ isActive }) =>
+//                     isActive ? "menu-item active" : "menu-item"
+//                   }
+//                 >
+//                   {item.label}
+//                 </NavLink>
+//               )}
+
+//             </div>
+//           ))}
+//         </nav>
+//       </aside>
+//     </>
+//   );
+// }
+
+
 import { NavLink } from "react-router-dom";
 import { menuItems } from "./menuItems";
 import "./Sidebar.css";
 import logo from "../../../assets/logoCe.png";
 import { useState } from "react";
 
-
 export default function Sidebar({ open, onClose }) {
 
   const [openMenu, setOpenMenu] = useState(null);
 
+  const handleClose = () => {
+    setOpenMenu(null);
+    onClose();
+  };
 
   return (
     <>
-      {open && <div className="sidebar-overlay" onClick={onClose}></div>}
+      {open && (
+        <div
+          className="sidebar-overlay"
+          onClick={handleClose}
+        />
+      )}
 
       <aside className={`sidebar ${open ? "open" : ""}`}>
 
         <div className="sidebar-header">
+
           <NavLink
             to="/"
-            onClick={onClose}
+            onClick={handleClose}
             className="logo-link"
           >
             <img
@@ -28,13 +128,15 @@ export default function Sidebar({ open, onClose }) {
               className="sidebar-logo"
             />
           </NavLink>
- 
 
           <p>Sistema de Gestión</p>
+
         </div>
 
         <nav>
+
           {menuItems.map((item, index) => (
+
             <div key={index}>
 
               {item.children ? (
@@ -42,20 +144,27 @@ export default function Sidebar({ open, onClose }) {
                   <button
                     className="menu-item submenu-button"
                     onClick={() =>
-                      setOpenMenu(openMenu === index ? null : index)
+                      setOpenMenu(
+                        openMenu === index ? null : index
+                      )
                     }
                   >
                     <span>{item.label}</span>
-                    <span>{openMenu === index ? "▾" : "▸"}</span>
+
+                    <span>
+                      {openMenu === index ? "▾" : "▸"}
+                    </span>
                   </button>
 
                   {openMenu === index && (
                     <div className="submenu">
+
                       {item.children.map((sub) => (
+
                         <NavLink
                           key={sub.path}
                           to={sub.path}
-                          onClick={onClose}
+                          onClick={handleClose}
                           className={({ isActive }) =>
                             isActive
                               ? "submenu-item active"
@@ -64,25 +173,35 @@ export default function Sidebar({ open, onClose }) {
                         >
                           {sub.label}
                         </NavLink>
+
                       ))}
+
                     </div>
                   )}
+
                 </>
               ) : (
+
                 <NavLink
                   to={item.path}
-                  onClick={onClose}
+                  onClick={handleClose}
                   className={({ isActive }) =>
-                    isActive ? "menu-item active" : "menu-item"
+                    isActive
+                      ? "menu-item active"
+                      : "menu-item"
                   }
                 >
                   {item.label}
                 </NavLink>
+
               )}
 
             </div>
+
           ))}
+
         </nav>
+
       </aside>
     </>
   );

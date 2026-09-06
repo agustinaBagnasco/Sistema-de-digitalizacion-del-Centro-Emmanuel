@@ -4,5 +4,7 @@ public enum UnidadMedida {
     KG,
     LT,
     MG,
-    ML
+    ML,
+    UNIDAD,
+    ATADO
 }

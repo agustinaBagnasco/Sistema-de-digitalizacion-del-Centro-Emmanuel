@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";
@@ -6,29 +6,84 @@ import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
 import FormField from '../../components/ui/FormField'
 import "../../components/ui/Forms.css";
+import api from "../../services/api";
 
 export default function Mermeladas() {
   const [form, setForm] = useState({
     fecha: "",
-    cantidad: "",
-    queso: "",
+    fruta: "",
+    cantidadFrutaTotal: "",
+    frutaDescartada: "",
+    frutaUtilizada: "",
+    cantidadAzucar: "",
+    tiempoElaboracion: "",
+    tiempoCoccion: "",
+    cantidadFrascos1kg: "",
+    cantidadFrascos420: "",
     comentario: "",
   });
 
+  const [insumos, setInsumos] = useState([]);
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesFrutas = frutas.map(fruta => ({
-    value: fruta.id,
-    label: fruta.nombre,
+  useEffect(() => {
+    cargarInsumos();
+  }, []);
+
+  async function cargarInsumos() {
+    try {
+      const respuesta = await api.get("/productos");
+
+      // Solo productos activos
+
+      const insumosFrutas = respuesta.data.filter(
+        producto =>
+          producto.activo &&
+          producto.tipo === "INSUMO" &&
+          producto.categoria === "FRUTA"
+      );
+
+      setInsumos(insumosFrutas);
+
+
+    } catch (error) {
+      console.error("Error al cargar insumos:", error);
+    }
+  }
+
+  const opcionesFrutas = insumos.map(insumo => ({
+    value: insumo.idProducto,
+    label: insumo.nombreProducto,
   }));
 
+
   function handleChange(e) {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  }
+  const { name, value } = e.target;
+
+  setForm(prev => {
+    const nuevoForm = {
+      ...prev,
+      [name]: value,
+    };
+
+    if (name === "cantidadFrutaTotal" || name === "frutaDescartada") {
+      const total = parseFloat(nuevoForm.cantidadFrutaTotal) || 0;
+      const descartada = parseFloat(nuevoForm.frutaDescartada) || 0;
+
+      nuevoForm.frutaUtilizada = Math.max(total - descartada, 0);
+    }
+
+    return nuevoForm;
+  });
+}
+
+  // function handleChange(e) {
+  //   setForm({
+  //     ...form,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // }
 
   function guardar(e) {
     e.preventDefault();
@@ -72,130 +127,131 @@ export default function Mermeladas() {
 
   return (
     <div className="pagina">
-    <Card title="· REGISTRO DE ELABORACION DE MERMELADAS ·">
-     
+      <Card title="· REGISTRO DE ELABORACION DE MERMELADAS ·">
+
         <form onSubmit={guardar} className="form-field columns-2">
           <div className="input-group">
-          <label>Fecha</label>
-          <Input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={handleChange}
-            required
-          />
+            <label>Fecha</label>
+            <Input
+              type="date"
+              name="fecha"
+              value={form.fecha}
+              onChange={handleChange}
+              required
+            />
           </div>
-          
+
           <div className="input-group">
-          <label>Fruta</label>
-          <Select
-            name="fruta"
-            value={form.fruta}
-            onChange={handleChange}
-            options={opcionesFrutas}
-            placeholder="Seleccione una fruta"
-          />
-          </div>
-        <div className="input-group">
-          <label>Cantidad de fruta total</label>
-          <Input
-            type="number"
-            name="cantidadFrutaTotal"
-            value={form.cantidadFrutaTotal}
-            onChange={handleChange}
-            required
-          />
+            <label>Fruta</label>
+            <Select
+              name="fruta"
+              value={form.fruta}
+              onChange={handleChange}
+              options={opcionesFrutas}
+              placeholder="Seleccione una fruta"
+              required
+            />
           </div>
           <div className="input-group">
-          <label>Fruta descartada</label>
-          <Input
-            type="number"
-            name="frutaDescartada"
-            value={form.frutaDescartada}
-            onChange={handleChange}
-            required
-          />
+            <label>Cantidad de fruta total</label>
+            <Input
+              type="number"
+              name="cantidadFrutaTotal"
+              value={form.cantidadFrutaTotal}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="input-group">
-          <label>Fruta utilizada</label>
-          <Input
-            type="number"
-            name="frutaUtilizada"
-            value={form.frutaUtilizada}
-            onChange={handleChange}
-            required
-          />
-          </div>
-        <div className="input-group">
-          <label>Azucar</label>
-          <Input
-            type="number"
-            name="cantidadAzucar"
-            value={form.cantidadAzucar}
-            onChange={handleChange}
-            required
-          />
+            <label>Fruta descartada (kgs)</label>
+            <Input
+              type="number"
+              name="frutaDescartada"
+              value={form.frutaDescartada}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="input-group">
-          <label>Tiempo de elaboracion</label>
-          <Input
-            type="number"
-            name="tiempoElaboracion"
-            value={form.tiempoElaboracion}
-            onChange={handleChange}
-            required
-          />
+            <label>Fruta utilizada (kgs)</label>
+            <Input
+            style={{ backgroundColor: "#e9ecef", cursor: "not-allowed" }}
+              type="number"
+              name="frutaUtilizada"
+              value={form.frutaUtilizada}
+             readOnly
+            />
           </div>
           <div className="input-group">
-          <label>Tiempo de coccion</label>
-          <Input
-            type="number"
-            name="tiempoCoccion"
-            value={form.tiempoCoccion}
-            onChange={handleChange}
-            required
-          />
+            <label>Azucar (Kgs)</label>
+            <Input
+              type="number"
+              name="cantidadAzucar"
+              value={form.cantidadAzucar}
+              onChange={handleChange}
+              required
+            />
           </div>
-         <div className="input-group">
-          <label>Frascos 1kg</label>
-          <Input
-            type="number"
-            name="cantidadFrascos1kg"
-            value={form.cantidadFrascos1kg}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group">
+            <label>Tiempo de elaboracion (horas)</label>
+            <Input
+              type="number"
+              name="tiempoElaboracion"
+              value={form.tiempoElaboracion}
+              onChange={handleChange}
+              required
+            />
           </div>
-         <div className="input-group">
-          <label>Cantidad Frascos 420g</label>
-          <Input
-            type="number"
-            name="cantidadFrascos420"
-            value={form.cantidadFrascos420}
-            onChange={handleChange}
-            required
-          />
+          <div className="input-group">
+            <label>Tiempo de cocción (horas)</label>
+            <Input
+              type="number"
+              name="tiempoCoccion"
+              value={form.tiempoCoccion}
+              onChange={handleChange}
+              required
+            />
           </div>
-        <div className="input-group">
-          <label>Comentario</label>
-          <Textarea
-            name="comentario"
-            value={form.comentario}
-            onChange={handleChange}
-            placeholder="Ingrese observaciones..."
-          />
+          <div className="input-group">
+            <label>Frascos 1kg</label>
+            <Input
+              type="number"
+              name="cantidadFrascos1kg"
+              value={form.cantidadFrascos1kg}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Cantidad Frascos 420g</label>
+            <Input
+              type="number"
+              name="cantidadFrascos420"
+              value={form.cantidadFrascos420}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Comentario</label>
+            <Textarea
+              name="comentario"
+              value={form.comentario}
+              onChange={handleChange}
+              placeholder="Ingrese observaciones..."
+            />
           </div>
           <br />
-          
+
           <div className="form-button-container">
-          <Button
-            type={"submit"}
-            className={`btn btn-${"primary"}`}>
-            Guardar
-          </Button>
+            <Button
+              type={"submit"}
+              className={`btn btn-${"primary"}`}>
+              Guardar
+            </Button>
           </div>
         </form>
-        
+
         <br />
         <hr />
 
@@ -207,7 +263,7 @@ export default function Mermeladas() {
                 <th>Fruta</th>
                 <th>Fruta Total</th>
                 <th>Fruta Descarte</th>
-                <th>Fruta Utilizada</th>
+                <th>Fruta Utilizada </th>
                 <th>Azucar</th>
                 <th>Tiempo Elaboracion</th>
                 <th>Tiempo Coccion</th>

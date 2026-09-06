@@ -18,10 +18,10 @@ export default function Molienda() {
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesGranos = granos.map(grano => ({
-    value: grano.id,
-    label: grano.nombre,
-  }));
+  // const opcionesGranos = granos.map(grano => ({
+  //   value: grano.id,
+  //   label: grano.nombre,
+  // }));
 
   function handleChange(e) {
     setForm({
@@ -88,13 +88,13 @@ export default function Molienda() {
           </div>
           <div className="input-group">
           <label>Grano</label>
-          <Select
+          {/* <Select
             name="grano"
             value={form.grano}
             onChange={handleChange}
             options={opcionesGranos}
             placeholder="Seleccione tipo de grano"
-          />
+          /> */}
           </div>
           <div className="input-group">
 

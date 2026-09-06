@@ -30,16 +30,21 @@ export const tipos = [
 
 export const categorias = [
     { value: "LECHE", label: "Leche" },
-    { value: "HARINA", label: "Harina" },
+    { value: "MOLIENDA", label: "Molienda" },
     { value: "MERMELADA", label: "Mermelada" },
     { value: "DULCEDELECHE", label: "Dulce de leche" },
     { value: "QUESO", label: "Queso" },
-    { value: "COSECHA", label: "Cosecha" }
+    { value: "FRUTASYHORTALIZAS", label: "Frutas y hortalizas" },
+    { value: "FRUTA", label: "Fruta" }, 
+    { value: "GRANOS", label: "Granos" },
+    { value: "OTROS", label: "Otros" }
 ];
 
 export const unidadesMedida = [
     { value: "KG", label: "Kilogramos (KG)" },
     { value: "LT", label: "Litros (LT)" },
     { value: "MG", label: "Miligramos (MG)" },
-    { value: "ML", label: "Mililitros (ML)" }
+    { value: "ML", label: "Mililitros (ML)" },
+    { value: "UN", label: "Unidades (UN)" },
+    { value: "ATADO", label: "Atados (ATADO)" }
 ];

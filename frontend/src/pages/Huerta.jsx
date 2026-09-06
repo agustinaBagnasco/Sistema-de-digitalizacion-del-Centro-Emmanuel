@@ -250,7 +250,7 @@ export default function Huerta() {
           <div className="input-group">
 
             <label>
-              Producto
+              Cultivo
             </label>
 
             <Select
@@ -258,7 +258,7 @@ export default function Huerta() {
               value={form.cultivo}
               onChange={handleChange}
               options={opcionesProductos}
-              placeholder="Seleccione un producto"
+              placeholder="Seleccione un cultivo"
               required
             />
           </div>

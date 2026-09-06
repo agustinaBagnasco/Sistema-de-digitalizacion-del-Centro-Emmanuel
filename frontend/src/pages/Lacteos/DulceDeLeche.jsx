@@ -91,7 +91,7 @@ export default function DulceDeLeche() {
             />
           </div>
           <div className="input-group">
-            <label>Leche </label>
+            <label>Leche (Litros) </label>
             <Input
               type="number"
               name="litrosLeche"
@@ -102,7 +102,7 @@ export default function DulceDeLeche() {
           </div>
           <div className="input-group">
 
-            <label>Azucar</label>
+            <label>Azucar (Kgs)</label>
             <Input
               type="number"
               name="cantidadAzucar"
@@ -114,7 +114,7 @@ export default function DulceDeLeche() {
           <div className="input-group">
 
 
-            <label>Bicarbonato</label>
+            <label>Bicarbonato (Grs)</label>
             <Input
               type="number"
               name="cantidadBicarbonato"
@@ -124,7 +124,7 @@ export default function DulceDeLeche() {
             />
           </div>
           <div className="input-group">
-            <label>Tiempo de elaboracion</label>
+            <label>Tiempo de elaboración</label>
             <Input
               type="number"
               name="tiempoElaboracion"

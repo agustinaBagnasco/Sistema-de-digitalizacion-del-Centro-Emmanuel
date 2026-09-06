@@ -1,5 +1,4 @@
 :root {
-
   /* ===== Colores principales ===== */
   --color-primary: #02A5B2;
   --color-primary-dark: #018994;
@@ -44,8 +43,8 @@
   --space-2xl: 48px;
 
   /* ===== Layout ===== */
-  --sidebar-width: 360px;
-  --sidebar-width-collapsed: 80px;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
   --navbar-height: 64px;
   --container-padding: 24px;
 
@@ -68,9 +67,32 @@
   --transition: all .25s ease;
 }
 
-/* ===== Breakpoints ===== */
-/*
-Mobile   : 0 - 767
-Tablet   : 768 - 1023
-Desktop  : 1024+
-*/
+/* =============== TABLET 768px - 1023px ============ */
+
+@media (max-width: 1023px) {
+  :root {
+    --sidebar-width: 230px;
+    --container-padding: 20px;
+  }
+}
+
+/* ================= MOBILE 0px - 767px  ============== */
+
+@media (max-width: 767px) {
+
+  :root {
+    --sidebar-width: 0px;
+    --sidebar-width-collapsed: 0px;
+
+    --navbar-height: 60px;
+
+    --container-padding: 16px;
+
+    --space-lg: 20px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
+
+    --font-xl: 1.5rem;
+    --font-2xl: 1.8rem;
+  }
+}

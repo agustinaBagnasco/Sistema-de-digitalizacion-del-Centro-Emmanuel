@@ -83,7 +83,7 @@ export default function Quark() {
           </div>
             <div className="input-group">
 
-          <label>Leche</label>
+          <label>Leche (Lts)</label>
           <Input
             type="number"
             name="litrosLeche"
