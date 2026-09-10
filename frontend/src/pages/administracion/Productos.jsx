@@ -5,7 +5,7 @@ import {
     actualizarProducto,
     eliminarProducto,
     tipos,
-    categorias,
+    categorias, 
     unidadesMedida
 } from "../../services/producto";
 import Card from "../../components/ui/Card";

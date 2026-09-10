@@ -21,12 +21,6 @@ public class CosechaController {
         this.cosechaService = cosechaService;
     }
 
-
-    // ==========================================
-    // LISTAR TODAS
-    // GET /cosechas
-    // ==========================================
-
     @GetMapping
     public ResponseEntity<List<Cosecha>> listar() {
 
@@ -34,12 +28,6 @@ public class CosechaController {
                 cosechaService.listar()
         );
     }
-
-
-    // ==========================================
-    // BUSCAR POR ID
-    // GET /cosechas/1
-    // ==========================================
 
     @GetMapping("/{id}")
     public ResponseEntity<Cosecha> buscarPorId(
@@ -55,12 +43,6 @@ public class CosechaController {
         return ResponseEntity.notFound().build();
     }
 
-
-    // ==========================================
-    // CREAR
-    // POST /cosechas
-    // ==========================================
-
     @PostMapping
     public ResponseEntity<Cosecha> guardar(
             @RequestBody Cosecha cosecha) {
@@ -72,12 +54,6 @@ public class CosechaController {
                 .status(HttpStatus.CREATED)
                 .body(nuevaCosecha);
     }
-
-
-    // ==========================================
-    // ACTUALIZAR
-    // PUT /cosechas/1
-    // ==========================================
 
     @PutMapping("/{id}")
     public ResponseEntity<Cosecha> actualizar(
@@ -93,12 +69,6 @@ public class CosechaController {
 
         return ResponseEntity.ok(actualizada);
     }
-
-
-    // ==========================================
-    // ELIMINAR
-    // DELETE /cosechas/1
-    // ==========================================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(

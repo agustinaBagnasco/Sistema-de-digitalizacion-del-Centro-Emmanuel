@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.centroemmanuel.entity.Usuario;
 import com.centroemmanuel.service.UsuarioService;
 
-@RestController
+@RestController 
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "http://localhost:5173")
 public class UsuarioController {

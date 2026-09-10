@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import {}
 import Card from "../components/ui/Card";
 import Select from "../components/ui/Select";
 import Input from "../components/ui/Input";
@@ -20,55 +21,60 @@ export default function Huerta() {
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  const opcionesProductos = productos
-    .filter(producto => producto.activo)
-    .map(producto => ({
-      value: producto.idProducto,
-      label: producto.nombreProducto,
-    }));
-
-  useEffect(() => {
+     useEffect(() => {
     cargarProductos();
     cargarCosechas();
   }, []);
 
-
-  async function cargarProductos() {
-
-    try {
-
-      const respuesta = await api.get("/productos");
-
-      setProductos(respuesta.data);
-
-    } catch (error) {
-
-      console.error(
-        "Error al cargar productos:",
-        error
-      );
-
-    }
-  }
-
-
+    
   async function cargarCosechas() {
+  try {
+    const respuesta = await api.get("/cosechas");
 
-    try {
+    setRegistros(respuesta.data);
 
-      const respuesta = await api.get("/cosechas");
-
-      setRegistros(respuesta.data);
-
-    } catch (error) {
-
-      console.error(
-        "Error al cargar las cosechas:",
-        error
-      );
-
-    }
+  } catch (error) {
+    console.error(
+      "Error al cargar las cosechas:",
+      error
+    );
   }
+}
+ 
+const opcionesProductos = productos
+  .filter(
+    producto =>
+      producto.activo &&
+      producto.categoria === "FRUTASYHORTALIZAS"
+  )
+  .map(producto => ({
+    value: producto.idProducto,
+    label: producto.nombreProducto,
+  }));
+
+
+async function cargarProductos() {
+  try {
+    const respuesta = await api.get("/productos");
+
+    console.log("========== HUERTA ==========");
+    console.log("PRODUCTOS:", respuesta.data);
+
+    respuesta.data.forEach(producto => {
+      console.log(
+        producto.nombreProducto,
+        "| activo:", producto.activo,
+        "| tipo:", producto.tipo,
+        "| categoria:", producto.categoria
+      );
+    });
+
+    setProductos(respuesta.data);
+
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
+  }
+}
 
   function handleChange(e) {
 
