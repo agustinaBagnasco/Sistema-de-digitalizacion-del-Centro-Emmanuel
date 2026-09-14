@@ -12,17 +12,29 @@ public class ProduccionLeche {
     @Column(name = "id_produccion_leche")
     private Integer idProduccionLeche;
 
-    @Column(nullable = false)
-    private double litros;
-
-    @Column(length = 100)
-    private String destino;
-
-    @Column(nullable = false)
+    @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
+    @Column(name = "litros_terneros", nullable = false)
+    private double litrosTerneros;
+
+    @Column(name = "venta_directa", nullable = false)
+    private double ventaDirecta;
+
+    @Column(name = "consumo_cocina", nullable = false)
+    private double consumoCocina;
+
+    @Column(name = "elaboracion_quesos", nullable = false)
+    private double elaboracionQuesos;
+
+    @Column(name = "elaboracion_dulce_de_leche", nullable = false)
+    private double elaboracionDulceDeLeche;
+
+    @Column(name = "elaboracion_quark", nullable = false)
+    private double elaboracionQuark;
+
     @Column(length = 500)
-    private String observaciones;
+    private String comentario;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
@@ -30,22 +42,6 @@ public class ProduccionLeche {
 
     public ProduccionLeche() {
     }
-
-    public ProduccionLeche(Integer idProduccionLeche,
-                           double litros,
-                           String destino,
-                           String observaciones,
-                           Usuario usuario) {
-
-        this.idProduccionLeche = idProduccionLeche;
-        this.litros = litros;
-        this.destino = destino;
-        this.observaciones = observaciones;
-        this.usuario = usuario;
-        this.fecha = LocalDate.now();
-    }
-
-    // Getters y Setters
 
     public Integer getIdProduccionLeche() {
         return idProduccionLeche;
@@ -55,32 +51,68 @@ public class ProduccionLeche {
         this.idProduccionLeche = idProduccionLeche;
     }
 
-    public double getLitros() {
-        return litros;
-    }
-
-    public void setLitros(double litros) {
-        this.litros = litros;
-    }
-
-    public String getDestino() {
-        return destino;
-    }
-
-    public void setDestino(String destino) {
-        this.destino = destino;
-    }
-
     public LocalDate getFecha() {
         return fecha;
     }
 
-    public String getObservaciones() {
-        return observaciones;
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public double getLitrosTerneros() {
+        return litrosTerneros;
+    }
+
+    public void setLitrosTerneros(double litrosTerneros) {
+        this.litrosTerneros = litrosTerneros;
+    }
+
+    public double getVentaDirecta() {
+        return ventaDirecta;
+    }
+
+    public void setVentaDirecta(double ventaDirecta) {
+        this.ventaDirecta = ventaDirecta;
+    }
+
+    public double getConsumoCocina() {
+        return consumoCocina;
+    }
+
+    public void setConsumoCocina(double consumoCocina) {
+        this.consumoCocina = consumoCocina;
+    }
+
+    public double getElaboracionQuesos() {
+        return elaboracionQuesos;
+    }
+
+    public void setElaboracionQuesos(double elaboracionQuesos) {
+        this.elaboracionQuesos = elaboracionQuesos;
+    }
+
+    public double getElaboracionDulceDeLeche() {
+        return elaboracionDulceDeLeche;
+    }
+
+    public void setElaboracionDulceDeLeche(double elaboracionDulceDeLeche) {
+        this.elaboracionDulceDeLeche = elaboracionDulceDeLeche;
+    }
+
+    public double getElaboracionQuark() {
+        return elaboracionQuark;
+    }
+
+    public void setElaboracionQuark(double elaboracionQuark) {
+        this.elaboracionQuark = elaboracionQuark;
+    }
+
+    public String getComentario() {
+        return comentario;
+    }
+
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
     }
 
     public Usuario getUsuario() {
@@ -91,3 +123,4 @@ public class ProduccionLeche {
         this.usuario = usuario;
     }
 }
+
