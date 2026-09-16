@@ -38,7 +38,7 @@ public class ProduccionLecheService {
     public ProduccionLeche guardar(ProduccionLeche produccionLeche) {
 
         if (produccionLeche.getUsuario() == null ||
-            produccionLeche.getUsuario().getIdUsuario() == null) {
+            produccionLeche.getUsuario().getIdUsuario() == 0) {
 
             throw new RuntimeException(
                     "No se recibió el usuario que registra la producción."

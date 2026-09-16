@@ -5,6 +5,7 @@ import com.centroemmanuel.enums.Categoria;
 import com.centroemmanuel.enums.UnidadMedida;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "producto")
@@ -44,6 +45,12 @@ public class Producto {
     @Enumerated(EnumType.STRING)
     @Column(name = "unidad_medida", nullable = false)
     private UnidadMedida unidadMedida;
+
+    // Producto que se obtiene al procesar este insumo 
+    @ManyToOne 
+    @JoinColumn(name = "id_producto_resultado") 
+    @JsonIgnoreProperties("productoResultado")
+    private Producto productoResultado;
 
     public Producto() {
     }
@@ -139,4 +146,11 @@ public UnidadMedida getUnidadMedida() {
 public void setUnidadMedida(UnidadMedida unidadMedida) {
     this.unidadMedida = unidadMedida;
 }
+
+public Producto getProductoResultado() { 
+    return productoResultado; 
+    } 
+public void setProductoResultado(Producto productoResultado) {
+     this.productoResultado = productoResultado; 
+     }
 }

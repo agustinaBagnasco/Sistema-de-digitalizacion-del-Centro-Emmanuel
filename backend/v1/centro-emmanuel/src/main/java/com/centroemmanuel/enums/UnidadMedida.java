@@ -6,5 +6,6 @@ public enum UnidadMedida {
     MG,
     ML,
     UNIDAD,
-    ATADO
+    ATADO,
+    HORMA
 }

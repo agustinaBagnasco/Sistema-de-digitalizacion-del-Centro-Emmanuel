@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "../../components/ui/Card";
 import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
-import FormField from '../../components/ui/FormField'
+import FormField from '../../components/ui/FormField';
+import api from "../../services/api";
 
 export default function Molienda() {
   const [form, setForm] = useState({
@@ -15,13 +16,86 @@ export default function Molienda() {
     comentario: "",
   });
 
+  const [granos, setGranos] = useState([]);
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
 
-  // const opcionesGranos = granos.map(grano => ({
-  //   value: grano.id,
-  //   label: grano.nombre,
-  // }));
+  useEffect(() => {
+    cargarGranos();
+    cargarElaboraciones();
+  }, []);
+
+  // =========================
+  // CARGAR GRANOS
+  // =========================
+
+  async function cargarGranos() {
+    try {
+      const response = await api.get("/productos");
+
+      const productosGranos = response.data.filter(
+        (producto) =>
+          producto.tipo === "INSUMO" &&
+          producto.categoria === "GRANOS" &&
+          producto.activo === true
+      );
+
+      setGranos(productosGranos);
+    } catch (error) {
+      console.error("Error al cargar granos:", error);
+    }
+  }
+
+  // =========================
+  // CARGAR ELABORACIONES
+  // =========================
+
+  async function cargarElaboraciones() {
+    try {
+      const response = await api.get("/elaboraciones");
+
+      const data =
+        typeof response.data === "string"
+          ? JSON.parse(response.data)
+          : response.data;
+
+      console.log("ELABORACIONES:", data);
+
+      const elaboracionesMolienda = data.filter(
+        (elaboracion) =>
+          elaboracion.detalles &&
+          elaboracion.detalles.length > 0 &&
+          elaboracion.detalles.some(
+            (detalle) =>
+              detalle.insumoUtilizado?.categoria === "GRANOS"
+          )
+      );
+
+      setRegistros(elaboracionesMolienda);
+
+    } catch (error) {
+      console.error(
+        "Error al cargar elaboraciones:",
+        error
+      );
+    }
+  }
+
+
+
+
+  // =========================
+  // OPCIONES DEL SELECT
+  // =========================
+
+  const opcionesGranos = granos.map((grano) => ({
+    value: grano.idProducto,
+    label: grano.nombreProducto,
+  }));
+
+  // =========================
+  // CAMBIAR CAMPOS
+  // =========================
 
   function handleChange(e) {
     setForm({
@@ -30,11 +104,135 @@ export default function Molienda() {
     });
   }
 
-  function guardar(e) {
+  // =========================
+  // GUARDAR
+  // =========================
+
+  async function guardar(e) {
     e.preventDefault();
 
-    setRegistros([...registros, form]);
+    try {
+      const granoSeleccionado = granos.find(
+        (grano) =>
+          Number(grano.idProducto) === Number(form.grano)
+      );
 
+      if (!granoSeleccionado) {
+        alert("Debe seleccionar un grano.");
+        return;
+      }
+
+      // El grano debe tener configurado
+      // su producto resultado.
+      if (!granoSeleccionado.productoResultado) {
+        alert(
+          "El grano seleccionado no tiene configurado su producto resultado."
+        );
+        return;
+      }
+
+      const usuarioGuardado = localStorage.getItem("usuario");
+
+      if (!usuarioGuardado) {
+        alert("No se encontró el usuario logueado.");
+        return;
+      }
+
+      const usuario = JSON.parse(usuarioGuardado);
+
+      if (!usuario.idUsuario) {
+        alert("El usuario logueado no tiene un ID.");
+        return;
+      }
+
+      // const usuarioId = localStorage.getItem("usuarioId");
+
+      // if (!usuarioId) {
+      //   alert("No se encontró el usuario logueado.");
+      //   return;
+      // }
+
+      const elaboracion = {
+        productoElaborado: {
+          idProducto:
+            granoSeleccionado.productoResultado.idProducto,
+        },
+
+        fechaElaboracion: form.fecha,
+
+        tiempoElaboracion: Number(
+          form.tiempoElaboracion
+        ),
+
+        // Los kg envasados son la cantidad producida
+        cantidadProducida: Number(
+          form.kgsEnvasados
+        ),
+
+        usuario: {
+          idUsuario: Number(usuario.idUsuario),
+        },
+
+        observaciones: form.comentario,
+
+        detalles: [
+          {
+            // El grano utilizado
+            insumoUtilizado: {
+              idProducto:
+                granoSeleccionado.idProducto,
+            },
+
+            // Se utiliza la misma cantidad
+            // que se registra como producida
+            cantidadUtilizada: Number(
+              form.kgsEnvasados
+            ),
+          },
+        ],
+      };
+
+      if (editando !== null) {
+        await api.put(
+          `/elaboraciones/${editando}`,
+          elaboracion
+        );
+
+        alert("Molienda actualizada correctamente.");
+      } else {
+        await api.post(
+          "/elaboraciones",
+          elaboracion
+        );
+
+        alert("Molienda registrada correctamente.");
+      }
+
+      limpiarFormulario();
+      await cargarElaboraciones();
+
+    } catch (error) {
+      console.error(
+        "Error al guardar la molienda:",
+        error
+      );
+
+      console.error(
+        "Respuesta del backend:",
+        error.response?.data
+      );
+
+      alert(
+        "No se pudo guardar la molienda."
+      );
+    }
+  }
+
+  // =========================
+  // LIMPIAR FORMULARIO
+  // =========================
+
+  function limpiarFormulario() {
     setForm({
       fecha: "",
       grano: "",
@@ -42,151 +240,271 @@ export default function Molienda() {
       kgsEnvasados: "",
       comentario: "",
     });
+
+    setEditando(null);
   }
 
-  function guardarRegistro() {
-    if (editando !== null) {
-      const nuevos = [...registros];
-      nuevos[editando] = form;
-      setRegistros(nuevos);
-      setEditando(null);
-    } else {
-      setRegistros([...registros, form]);
+  // =========================
+  // EDITAR
+  // =========================
+
+  function editarRegistro(registro) {
+    const detalleGrano =
+      registro.detalles?.find(
+        (detalle) =>
+          detalle.insumoUtilizado?.categoria ===
+          "GRANOS"
+      );
+
+    setForm({
+      fecha: registro.fechaElaboracion || "",
+
+      grano:
+        detalleGrano?.insumoUtilizado?.idProducto || "",
+
+      tiempoElaboracion:
+        registro.tiempoElaboracion || "",
+
+      kgsEnvasados:
+        registro.cantidadProducida || "",
+
+      comentario:
+        registro.observaciones || "",
+    });
+
+    setEditando(registro.idElaboracion);
+  }
+
+  // =========================
+  // ELIMINAR
+  // =========================
+
+  async function eliminarRegistro(id) {
+    const confirmar = window.confirm(
+      "¿Está seguro de eliminar esta molienda?"
+    );
+
+    if (!confirmar) {
+      return;
     }
 
-    setForm({
-      fecha: "",
-      grano: "",
-      tiempoElaboracion: "",
-      kgsEnvasados: "",
-      comentario: "",
-    });
-  }
+    try {
+      await api.delete(
+        `/elaboraciones/${id}`
+      );
 
-  function editarRegistro(indice) {
-    setForm(registros[indice]);
-    setEditando(indice);
-  }
+      alert("Molienda eliminada correctamente.");
 
-  function eliminarRegistro(indice) {
-    setRegistros(registros.filter((_, i) => i !== indice));
+      await cargarElaboraciones();
+
+    } catch (error) {
+      console.error(
+        "Error al eliminar molienda:",
+        error
+      );
+
+      alert(
+        "No se pudo eliminar la molienda."
+      );
+    }
   }
 
   return (
     <div className="pagina">
       <Card title="· REGISTRO DE MOLIENDA ·">
-        <form onSubmit={guardar} className="form-field columns-2">
-<div className="input-group">
-          <label>Fecha</label>
-          <Input
-            type="date"
-            name="fecha"
-            value={form.fecha}
-            onChange={handleChange}
-            required
-          />
-          </div>
-          <div className="input-group">
-          <label>Grano</label>
-          {/* <Select
-            name="grano"
-            value={form.grano}
-            onChange={handleChange}
-            options={opcionesGranos}
-            placeholder="Seleccione tipo de grano"
-          /> */}
-          </div>
-          <div className="input-group">
 
-          <label>Tiempo de elaboracion</label>
-          <Input
-            type="number"
-            name="tiempoElaboracion"
-            value={form.tiempoElaboracion}
-            onChange={handleChange}
-            required
-          />
-          </div>
-          <div className="input-group">
+        <form
+          onSubmit={guardar}
+          className="form-field columns-2"
+        >
 
-          <label>Kgs envasados</label>
-          <Input
-            type="number"
-            name="kgsEnvasados"
-            value={form.kgsEnvasados}
-            onChange={handleChange}
-            required
-          />
-          </div>
           <div className="input-group">
-          
-          <label>Comentario</label>
-          <Textarea
-            name="comentario"
-            value={form.comentario}
-            onChange={handleChange}
-            placeholder="Ingrese observaciones..."
-          />
+            <label>Fecha</label>
+
+            <Input
+              type="date"
+              name="fecha"
+              value={form.fecha}
+              onChange={handleChange}
+              required
+            />
           </div>
-    <div className="form-button-container">
-          <Button
-            type={"submit"}
-            className={`btn btn-${"primary"}`}>
-            Guardar
-          </Button>
-     </div>
+
+          <div className="input-group">
+            <label>Grano</label>
+
+            <Select
+              name="grano"
+              value={form.grano}
+              onChange={handleChange}
+              options={opcionesGranos}
+              placeholder="Seleccione tipo de grano"
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Tiempo de elaboracion</label>
+
+            <Input
+              type="number"
+              name="tiempoElaboracion"
+              value={form.tiempoElaboracion}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Kgs envasados</label>
+
+            <Input
+              type="number"
+              step="0.01"
+              name="kgsEnvasados"
+              value={form.kgsEnvasados}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Comentario</label>
+
+            <Textarea
+              name="comentario"
+              value={form.comentario}
+              onChange={handleChange}
+              placeholder="Ingrese observaciones..."
+            />
+          </div>
+
+          <div className="form-button-container">
+
+            <Button
+              type="submit"
+              className="btn btn-primary"
+            >
+              {editando !== null
+                ? "Actualizar"
+                : "Guardar"}
+            </Button>
+
+            {editando !== null && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={limpiarFormulario}
+              >
+                Cancelar
+              </Button>
+            )}
+
+          </div>
+
         </form>
+
         <br />
         <hr />
 
         <div className="table-container">
+
           <table className="table">
+
             <thead>
               <tr>
                 <th>Fecha</th>
                 <th>Grano</th>
+                <th>Harina obtenida</th>
                 <th>Tiempo de elaboracion</th>
                 <th>Kgs envasados</th>
                 <th>Comentario</th>
+                <th>Acciones</th>
               </tr>
             </thead>
 
             <tbody>
-              {registros.map((r, i) => (
-                <tr key={i}>
-                  <td>{r.fecha}</td>
-                  <td>{opcionesGranos.find(o => String(o.value) === String(r.grano))?.label}</td>
-                  <td>{r.tiempoElaboracion}</td>
-                  <td>{r.kgsEnvasados}</td>
-                  <td>{r.comentario}</td>
-                  <td>
-                    <div className="table-actions">
-                      <Button
-                        variant="secondary"
-                        onClick={() => editarRegistro(i)}
-                      >
-                        Editar
-                      </Button>
 
-                      <Button
-                        variant="danger"
-                        onClick={() => eliminarRegistro(i)}
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {registros.map((r) => {
+
+                const detalleGrano =
+                  r.detalles?.find(
+                    (detalle) =>
+                      detalle.insumoUtilizado
+                        ?.categoria === "GRANOS"
+                  );
+
+                return (
+                  <tr key={r.idElaboracion}>
+
+                    <td>
+                      {r.fechaElaboracion}
+                    </td>
+
+                    <td>
+                      {
+                        detalleGrano
+                          ?.insumoUtilizado
+                          ?.nombreProducto
+                      }
+                    </td>
+
+                    <td>
+                      {
+                        r.productoElaborado
+                          ?.nombreProducto
+                      }
+                    </td>
+
+                    <td>
+                      {r.tiempoElaboracion}
+                    </td>
+
+                    <td>
+                      {r.cantidadProducida}
+                    </td>
+
+                    <td>
+                      {r.observaciones}
+                    </td>
+
+                    <td>
+                      <div className="table-actions">
+
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            editarRegistro(r)
+                          }
+                        >
+                          Editar
+                        </Button>
+
+                        <Button
+                          variant="danger"
+                          onClick={() =>
+                            eliminarRegistro(
+                              r.idElaboracion
+                            )
+                          }
+                        >
+                          Eliminar
+                        </Button>
+
+                      </div>
+                    </td>
+
+                  </tr>
+                );
+              })}
+
             </tbody>
+
           </table>
+
         </div>
+
       </Card>
     </div>
-
   );
 }
-
-
-
-
