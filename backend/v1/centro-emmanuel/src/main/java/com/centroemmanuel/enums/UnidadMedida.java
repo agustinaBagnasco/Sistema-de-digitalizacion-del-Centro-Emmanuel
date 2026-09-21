@@ -3,7 +3,7 @@ package com.centroemmanuel.enums;
 public enum UnidadMedida {
     KG,
     LT,
-    MG,
+    GRS,
     ML,
     UNIDAD,
     ATADO,

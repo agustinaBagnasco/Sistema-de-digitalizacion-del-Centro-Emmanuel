@@ -43,7 +43,7 @@ export const categorias = [
 export const unidadesMedida = [
     { value: "KG", label: "Kilogramos (KG)" },
     { value: "LT", label: "Litros (LT)" },
-    { value: "MG", label: "Miligramos (MG)" },
+    { value: "GRS", label: "Gramos (GRS)" },
     { value: "ML", label: "Mililitros (ML)" },
     { value: "UN", label: "Unidades (UN)" },
     { value: "ATADO", label: "Atados (ATADO)" }
