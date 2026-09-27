@@ -4,6 +4,7 @@ import java.util.List;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
@@ -40,7 +41,13 @@ public class Usuario {
     @Column(name = "activo")
     private boolean activo;
    
-   @Transient
+   @ManyToMany(fetch = FetchType.LAZY)
+   @JoinTable(
+       name = "usuario_permiso",
+       joinColumns = @JoinColumn(name = "id_usuario"),
+       inverseJoinColumns = @JoinColumn(name = "id_permiso")
+   )
+   @JsonIgnoreProperties({"usuarioCreacion", "usuarioModificacion"})
     private List<Permiso> permisos;
 
     public Usuario(){this.permisos = new ArrayList<>();}

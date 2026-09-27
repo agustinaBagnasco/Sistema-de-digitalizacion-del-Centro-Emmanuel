@@ -45,6 +45,7 @@ export const unidadesMedida = [
     { value: "LT", label: "Litros (LT)" },
     { value: "GRS", label: "Gramos (GRS)" },
     { value: "ML", label: "Mililitros (ML)" },
-    { value: "UN", label: "Unidades (UN)" },
-    { value: "ATADO", label: "Atados (ATADO)" }
+    { value: "UNIDAD", label: "Unidades" },
+    { value: "ATADO", label: "Atados (ATADO)" },
+    { value: "HORMA", label: "Hormas (HORMA)" }
 ];

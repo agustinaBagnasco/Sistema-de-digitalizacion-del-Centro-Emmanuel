@@ -41,6 +41,9 @@ public class DetalleVenta {
         this.precioUnitario = precioUnitario;
     }
 
+    public Venta getVenta(){return venta;}
+    public void setVenta(Venta venta){this.venta = venta;}
+
     //region Getters y Setters
     public int getIdDetalleVenta(){return idDetalleVenta;}
     public void setIdDetalleVenta(int pIdDetalleVenta){this.idDetalleVenta = pIdDetalleVenta;}

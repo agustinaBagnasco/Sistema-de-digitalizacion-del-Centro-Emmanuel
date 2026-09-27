@@ -1,11 +1,14 @@
 package com.centroemmanuel.dto;
 
+import java.util.List;
+
 public class LoginResponse {
 
     private boolean success;
     private String mensaje;
     private Integer idUsuario;
     private String nombre;
+    private List<Integer> permisos;
 
     public LoginResponse() {
     }
@@ -14,12 +17,14 @@ public class LoginResponse {
             boolean success,
             String mensaje,
             Integer idUsuario,
-            String nombre) {
+            String nombre,
+            List<Integer> permisos) {
 
         this.success = success;
         this.mensaje = mensaje;
         this.idUsuario = idUsuario;
         this.nombre = nombre;
+        this.permisos = permisos;
     }
 
     public boolean isSuccess() {
@@ -36,5 +41,9 @@ public class LoginResponse {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public List<Integer> getPermisos() {
+        return permisos;
     }
 }

@@ -94,10 +94,17 @@ import { menuItems } from "./menuItems";
 import "./Sidebar.css";
 import logo from "../../../assets/logoCe.png";
 import { useState } from "react";
+import { obtenerUsuarioActual, tienePermisoParaPagina } from "../../../routes/permisoPagina";
 
 export default function Sidebar({ open, onClose }) {
 
   const [openMenu, setOpenMenu] = useState(null);
+  const usuario = obtenerUsuarioActual();
+  const menuFiltrado = menuItems
+    .map((item) => item.children
+      ? { ...item, children: item.children.filter((sub) => tienePermisoParaPagina(usuario, sub.path)) }
+      : item)
+    .filter((item) => !item.children || item.children.length > 0);
 
   const handleClose = () => {
     setOpenMenu(null);
@@ -135,7 +142,7 @@ export default function Sidebar({ open, onClose }) {
 
         <nav>
 
-          {menuItems.map((item, index) => (
+          {menuFiltrado.map((item, index) => (
 
             <div key={index}>
 

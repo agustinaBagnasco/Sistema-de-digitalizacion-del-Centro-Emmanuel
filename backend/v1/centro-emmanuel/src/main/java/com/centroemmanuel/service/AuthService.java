@@ -2,10 +2,7 @@ package com.centroemmanuel.service;
 import javax.security.auth.login.LoginException;
 
 import org.springframework.stereotype.Service;
-import com.centroemmanuel.repository.UsuarioRepository;
-import com.centroemmanuel.service.UsuarioService;
 import com.centroemmanuel.entity.Usuario;
-import com.centroemmanuel.entity.Permiso;
 
 @Service
 public class AuthService {

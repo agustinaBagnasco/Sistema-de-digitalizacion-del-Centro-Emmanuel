@@ -21,6 +21,7 @@ export const menuItems = [
   { label: "Administración", 
     children: [
       { label: "Usuarios", path: "/administracion/usuarios" },
+      { label: "Permisos", path: "/administracion/permisos" },
       { label: "Ventas", path: "/administracion/Ventas" },
       { label: "Producción", path: "/administracion/Produccion" },
       { label: "Mano de obra", path: "/administracion/ManoDeObra" },

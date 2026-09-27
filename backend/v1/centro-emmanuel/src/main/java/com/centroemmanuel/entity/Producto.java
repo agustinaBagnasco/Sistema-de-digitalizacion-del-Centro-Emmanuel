@@ -39,7 +39,7 @@ public class Producto {
     private Tipo tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "categoria", nullable = false)
+    @Column(name = "categoria")
     private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
@@ -53,6 +53,18 @@ public class Producto {
     private Producto productoResultado;
 
     public Producto() {
+    }
+
+    public Producto(String nombreProducto, String descripcion, Double stockActual,
+                    Double stockMinimo, boolean activo, Tipo tipo,
+                    UnidadMedida unidadMedida) {
+        this.nombreProducto = nombreProducto;
+        this.descripcion = descripcion;
+        this.stockActual = stockActual;
+        this.stockMinimo = stockMinimo;
+        this.activo = activo;
+        this.tipo = tipo;
+        this.unidadMedida = unidadMedida;
     }
 
     public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, Double pStockActual, Double pStockMinimo, Double pCosto, boolean pActivo, Categoria pCategoria, Tipo pTipo, UnidadMedida pUnidadMedida){

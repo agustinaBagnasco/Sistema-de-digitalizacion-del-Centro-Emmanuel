@@ -10,8 +10,8 @@ import Textarea from "../../components/ui/Textarea";
 function Insumos() {
 
   const [insumos, setInsumos] = useState([]);
-  const [categorias, setCategorias] = useState([]);
   const [unidadesMedida, setUnidadesMedida] = useState([]);
+  const [resumenStock, setResumenStock] = useState({});
 
   const [mostrarModal, setMostrarModal] = useState(false);
 
@@ -22,9 +22,12 @@ function Insumos() {
   const [descripcion, setDescripcion] = useState("");
   const [stockActual, setStockActual] = useState("");
   const [stockMinimo, setStockMinimo] = useState("");
-  const [categoria, setCategoria] = useState("");
   const [unidadMedida, setUnidadMedida] = useState("");
   const [activo, setActivo] = useState(true);
+  const [movimientoInsumo, setMovimientoInsumo] = useState(null);
+  const [tipoMovimiento, setTipoMovimiento] = useState("ENTRADA");
+  const [cantidadMovimiento, setCantidadMovimiento] = useState("");
+  const [motivoMovimiento, setMotivoMovimiento] = useState("");
 
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -36,19 +39,21 @@ function Insumos() {
 
   useEffect(() => {
     cargarInsumos();
-    cargarCategorias();
     cargarUnidadesMedida();
   }, []);
 
 
-  const cargarInsumos = async () => {
+  async function cargarInsumos() {
 
     try {
 
       setCargando(true);
       setError("");
 
-      const respuesta = await api.get("/productos");
+      const [respuesta, resumen] = await Promise.all([
+        api.get("/productos"),
+        api.get("/stock/resumen-insumos")
+      ]);
 
       // Solo mostramos los que son INSUMOS
       const datosInsumos = respuesta.data.filter(
@@ -56,6 +61,9 @@ function Insumos() {
       );
 
       setInsumos(datosInsumos);
+      setResumenStock(Object.fromEntries(
+        resumen.data.map((item) => [item.idProducto, item])
+      ));
 
     } catch (error) {
 
@@ -66,25 +74,10 @@ function Insumos() {
 
       setCargando(false);
     }
-  };
+  }
 
 
-  const cargarCategorias = async () => {
-
-    try {
-
-      const respuesta = await api.get("/categorias");
-      setCategorias(respuesta.data);
-
-    } catch (error) {
-
-      console.error("Error al cargar categorías:", error);
-
-    }
-  };
-
-
-  const cargarUnidadesMedida = async () => {
+  async function cargarUnidadesMedida() {
 
     try {
 
@@ -96,7 +89,7 @@ function Insumos() {
       console.error("Error al cargar unidades de medida:", error);
 
     }
-  };
+  }
 
 
   // ==========================================================
@@ -109,7 +102,6 @@ function Insumos() {
     setDescripcion("");
     setStockActual("");
     setStockMinimo("");
-    setCategoria("");
     setUnidadMedida("");
     setActivo(true);
 
@@ -158,17 +150,7 @@ function Insumos() {
         : ""
     );
 
-    setCategoria(
-      insumo.categoria?.idCategoria
-        ? insumo.categoria.idCategoria
-        : ""
-    );
-
-    setUnidadMedida(
-      insumo.unidadMedida?.idUnidadMedida
-        ? insumo.unidadMedida.idUnidadMedida
-        : ""
-    );
+    setUnidadMedida(insumo.unidadMedida || "");
 
     setActivo(insumo.activo);
 
@@ -208,13 +190,6 @@ function Insumos() {
 
     }
 
-    if (!categoria) {
-
-      setError("Debe seleccionar una categoría.");
-      return;
-
-    }
-
     if (!unidadMedida) {
 
       setError("Debe seleccionar una unidad de medida.");
@@ -244,13 +219,7 @@ function Insumos() {
       // IMPORTANTE
       tipo: "INSUMO",
 
-      categoria: {
-        idCategoria: Number(categoria)
-      },
-
-      unidadMedida: {
-        idUnidadMedida: Number(unidadMedida)
-      }
+      unidadMedida: unidadMedida
     };
 
 
@@ -310,22 +279,11 @@ function Insumos() {
         stockActual: insumo.stockActual,
 
         stockMinimo: insumo.stockMinimo,
-
         activo: !insumo.activo,
 
         tipo: "INSUMO",
 
-        categoria: insumo.categoria
-          ? {
-            idCategoria: insumo.categoria.idCategoria
-          }
-          : null,
-
-        unidadMedida: insumo.unidadMedida
-          ? {
-            idUnidadMedida: insumo.unidadMedida.idUnidadMedida
-          }
-          : null
+        unidadMedida: insumo.unidadMedida || null
       };
 
 
@@ -386,43 +344,198 @@ function Insumos() {
     }
   };
 
+  const abrirMovimiento = (insumo, tipo) => {
+    setMovimientoInsumo(insumo);
+    setTipoMovimiento(tipo);
+    setCantidadMovimiento("");
+    setMotivoMovimiento("");
+    setError("");
+  };
+
+  const cerrarMovimiento = () => {
+    setMovimientoInsumo(null);
+    setCantidadMovimiento("");
+    setMotivoMovimiento("");
+  };
+
+  const registrarMovimiento = async (e) => {
+    e.preventDefault();
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+    const cantidad = Number(cantidadMovimiento);
+
+    if (!usuario?.idUsuario) {
+      setError("No se pudo identificar el usuario conectado.");
+      return;
+    }
+    if (!Number.isFinite(cantidad) || cantidad <= 0) {
+      setError("La cantidad debe ser mayor que cero.");
+      return;
+    }
+
+    try {
+      await api.post("/stock/movimientos", {
+        idProducto: movimientoInsumo.idProducto,
+        idUsuario: usuario.idUsuario,
+        cantidad,
+        tipo: tipoMovimiento,
+        motivo: motivoMovimiento.trim() || "Movimiento manual"
+      });
+      cerrarMovimiento();
+      await cargarInsumos();
+    } catch (error) {
+      setError(error.response?.data?.mensaje || "No se pudo registrar el movimiento de stock.");
+    }
+  };
+
 
   // ==========================================================
   // VISTA
   // ==========================================================
 
+  const opcionesUnidadesMedida = unidadesMedida.map((valor) => ({
+    value: valor,
+    label: valor,
+  }));
+
   return (
 
     <div className="pagina">
+      <Card title="· INSUMOS ·">
+        <Button className="btn btn-primary" onClick={abrirNuevoInsumo}>
+          + Nuevo insumo
+        </Button>
 
-      <Card title="· INSUMOS ·">      
-        
+        {error && <div className="mensaje-error">{error}</div>}
+
         <div className="table-container">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Insumo</th>
-                <th>Entradas</th>
-                <th>Salidas</th>
-                <th>Stock actual</th>
-                <th>Minimo</th>
-                <th>Estado</th>
-                <th>Ver movimientos</th>
-              </tr>
-            </thead>
-          </table>
-
+          {cargando ? <p>Cargando insumos...</p> : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Insumo</th>
+                  <th>Descripción</th>
+                  <th>Unidad</th>
+                  <th>Entradas</th>
+                  <th>Salidas</th>
+                  <th>Stock actual</th>
+                  <th>Stock mínimo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {insumos.map((insumo) => (
+                  <tr key={insumo.idProducto}>
+                    <td>{insumo.nombreProducto}</td>
+                    <td>{insumo.descripcion || "-"}</td>
+                    <td>{insumo.unidadMedida || "-"}</td>
+                    <td>+{resumenStock[insumo.idProducto]?.entradas ?? 0}</td>
+                    <td>-{resumenStock[insumo.idProducto]?.salidas ?? 0}</td>
+                    <td>{insumo.stockActual ?? 0}</td>
+                    <td>{insumo.stockMinimo ?? 0}</td>
+                    <td>{insumo.activo ? "Activo" : "Inactivo"}</td>
+                    <td>
+                      <Button variant="secondary" onClick={() => abrirEditarInsumo(insumo)}>
+                        Editar
+                      </Button>
+                      <Button variant="primary" onClick={() => abrirMovimiento(insumo, "ENTRADA")}>
+                        + Entrada
+                      </Button>
+                      <Button variant="warning" onClick={() => abrirMovimiento(insumo, "SALIDA")}>
+                        - Salida
+                      </Button>
+                      <Button
+                        variant={insumo.activo ? "warning" : "primary"}
+                        onClick={() => cambiarEstado(insumo)}
+                      >
+                        {insumo.activo ? "Desactivar" : "Activar"}
+                      </Button>
+                      <Button variant="danger" onClick={() => eliminarInsumo(insumo)}>
+                        Eliminar
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        <div className="form-button-container">
-          <Button
-            className={`btn btn-${"primary"}`}>
-            Exportar
-          </Button>
-        </div>
+        {mostrarModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>{modoEdicion ? "Editar insumo" : "Nuevo insumo"}</h2>
+              <form onSubmit={guardarInsumo} className="form-field columns-2">
+                <div className="form-group">
+                  <label>Nombre del insumo *</label>
+                  <Input value={nombreInsumo} onChange={(e) => setNombreInsumo(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label>Descripción</label>
+                  <Textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows="3" />
+                </div>
+                <div className="form-group">
+                  <label>Unidad de medida *</label>
+                  <Select value={unidadMedida} onChange={(e) => setUnidadMedida(e.target.value)} options={opcionesUnidadesMedida} placeholder="Seleccione una unidad" />
+                </div>
+                <div className="form-group">
+                  <label>Stock actual</label>
+                  <Input type="number" min="0" step="0.01" value={stockActual} onChange={(e) => setStockActual(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Stock mínimo</label>
+                  <Input type="number" min="0" step="0.01" value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)} />
+                </div>
+                <label className="checkbox-group">
+                  <Input type="checkbox" checked={activo} onChange={(e) => setActivo(e.target.checked)} />
+                  Insumo activo
+                </label>
+                {error && <div className="modal-error">{error}</div>}
+                <div className="modal-footer">
+                  <Button type="button" variant="secondary" onClick={cerrarModal}>Cancelar</Button>
+                  <Button type="submit" className="btn btn-primary">
+                    {modoEdicion ? "Guardar cambios" : "Crear insumo"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
+        {movimientoInsumo && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>{tipoMovimiento === "ENTRADA" ? "Registrar entrada" : "Registrar salida"}</h2>
+              <p>{movimientoInsumo.nombreProducto}</p>
+              <form onSubmit={registrarMovimiento} className="form-field">
+                <div className="form-group">
+                  <label>Cantidad *</label>
+                  <Input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={cantidadMovimiento}
+                    onChange={(e) => setCantidadMovimiento(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Motivo</label>
+                  <Input
+                    value={motivoMovimiento}
+                    onChange={(e) => setMotivoMovimiento(e.target.value)}
+                    placeholder="Ej. Compra, consumo, ajuste"
+                  />
+                </div>
+                <div className="modal-footer">
+                  <Button type="button" variant="secondary" onClick={cerrarMovimiento}>Cancelar</Button>
+                  <Button type="submit" className="btn btn-primary">Confirmar</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </Card>
-
     </div>
   );
 }

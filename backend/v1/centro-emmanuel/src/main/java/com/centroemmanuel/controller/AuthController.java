@@ -1,5 +1,6 @@
 package com.centroemmanuel.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,8 @@ public class AuthController {
                             false,
                             "Usuario o contraseña incorrectos.",
                             null,
-                            null
+                            null,
+                            List.of()
                         )
                     );
         }
@@ -55,7 +57,8 @@ public class AuthController {
                             false,
                             "Usuario o contraseña incorrectos.",
                             null,
-                            null
+                            null,
+                            List.of()
                         )
                     );
         }
@@ -65,7 +68,10 @@ public class AuthController {
                         true,
                         "Inicio de sesión correcto.",
                         usuario.get().getIdUsuario(),
-                        usuario.get().getNombre()
+                        usuario.get().getNombre(),
+                        usuario.get().getPermisos().stream()
+                            .map(permiso -> permiso.getIdPermiso())
+                            .toList()
                 )
         );
     }

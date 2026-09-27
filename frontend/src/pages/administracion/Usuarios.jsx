@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
 
 function Usuarios() {
 
-  const navigate = useNavigate();
-
   const [usuarios, setUsuarios] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [permisos, setPermisos] = useState([]);
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
@@ -22,7 +18,7 @@ function Usuarios() {
   const [clave, setClave] = useState("");
   const [email, setEmail] = useState("");
   const [activo, setActivo] = useState(true);
-  const [rolesSeleccionados, setRolesSeleccionados] = useState([]);
+  const [permisosSeleccionados, setPermisosSeleccionados] = useState([]);
 
 
   // ========================= CARGAR USUARIOS =========================
@@ -43,9 +39,19 @@ function Usuarios() {
 
   };
 
+  const cargarPermisos = async () => {
+    try {
+      const respuesta = await api.get("/permisos");
+      setPermisos(respuesta.data);
+    } catch (error) {
+      console.error("Error al cargar permisos:", error);
+    }
+  };
+
   useEffect(() => {
 
     cargarUsuarios();
+    cargarPermisos();
 
   }, []);
 
@@ -61,7 +67,7 @@ function Usuarios() {
     setClave("");
     setEmail("");
     setActivo(true);
-    //setRolesSeleccionados([]);
+    setPermisosSeleccionados([]);
 
     setMostrarFormulario(true);
   };
@@ -77,6 +83,7 @@ function Usuarios() {
     setClave("");
     setEmail(usuario.email || "");
     setActivo(usuario.activo);
+    setPermisosSeleccionados((usuario.permisos || []).map((permiso) => String(permiso.idPermiso)));
     setMostrarFormulario(true);
 
   };
@@ -104,6 +111,12 @@ function Usuarios() {
       email: email.trim(),
       activo: activo,
     };
+
+    if (usuarioEditando) {
+      datosUsuario.permisos = permisosSeleccionados.map((id) => ({
+        idPermiso: Number(id),
+      }));
+    }
 
 
     try {
@@ -267,26 +280,50 @@ function Usuarios() {
                 />
               </div>
 
-              {/* ========================= ESTADO ========================= */}
-              <div className="input-group">
-                <label>Estado</label>
-
-                <Select
-                  value={activo ? "true" : "false"}
-                  onChange={(e) =>
-                    setActivo(e.target.value === "true")
-                  }
-                >
-
-                  <option value="true">
-                    Activo
-                  </option>
-
-                  <option value="false">
-                    Inactivo
-                  </option>
-                </Select>
-              </div>
+              {usuarioEditando && (
+                <div className="input-group">
+                  <fieldset
+                    className="input-group"
+                    style={{
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "var(--radius-sm)",
+                      boxSizing: "border-box",
+                      gap: "8px",
+                      maxHeight: "240px",
+                      overflowY: "auto",
+                      padding: "12px",
+                    }}
+                  >
+                    <legend>Permisos</legend>
+                    {permisos.length === 0 ? (
+                      <span>No hay permisos disponibles.</span>
+                    ) : (
+                      permisos.map((permiso) => {
+                        const permisoId = String(permiso.idPermiso);
+                        return (
+                          <label
+                            key={permiso.idPermiso}
+                            style={{ alignItems: "center", display: "flex", gap: "8px" }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={permisosSeleccionados.includes(permisoId)}
+                              onChange={() =>
+                                setPermisosSeleccionados((seleccionados) =>
+                                  seleccionados.includes(permisoId)
+                                    ? seleccionados.filter((id) => id !== permisoId)
+                                    : [...seleccionados, permisoId]
+                                )
+                              }
+                            />
+                            <span>{permiso.idPermiso} - {permiso.nombrePermiso}</span>
+                          </label>
+                        );
+                      })
+                    )}
+                  </fieldset>
+                </div>
+              )}
 
               <br />
               {/* ========================= BOTONES ========================= */}
@@ -351,12 +388,12 @@ function Usuarios() {
                     </td>
 
                     <td>
-                      {usuario.roles &&
-                        usuario.roles.length > 0
-                        ? usuario.roles
-                          .map((rol) => rol.nombreRol)
+                      {usuario.permisos &&
+                        usuario.permisos.length > 0
+                        ? usuario.permisos
+                          .map((permiso) => `${permiso.idPermiso} - ${permiso.nombrePermiso}`)
                           .join(", ")
-                        : "Sin rol"
+                        : "Sin Permisos"
                       }
                     </td>
 

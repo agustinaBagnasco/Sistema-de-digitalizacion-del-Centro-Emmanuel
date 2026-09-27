@@ -2,372 +2,207 @@ import { useEffect, useState } from "react";
 import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import "../../styles/global.css"
-import FormField from "../../components/ui/FormField";
 import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
-import Textarea from "../../components/ui/Textarea";
+import "../../styles/global.css";
 
 function Produccion() {
-    const [productos, setProductos] = useState([]);
-    const [mostrarModal, setMostrarModal] = useState(false);
-
-    const [modoEdicion, setModoEdicion] = useState(false);
-    const [productoEditando, setProductoEditando] = useState(null);
-
-    const [nombreProducto, setNombreProducto] = useState("");
-    const [descripcion, setDescripcion] = useState("");
-    const [stockActual, setStockActual] = useState("");
-    const [stockMinimo, setStockMinimo] = useState("");
-    const [activo, setActivo] = useState(true);
-
-    const [error, setError] = useState("");
-    const [cargando, setCargando] = useState(false);
-
-    const categorias = [
-        { value: "LECHE", label: "Leche" },
-        { value: "HARINA", label: "Harina" },
-        { value: "MERMELADA", label: "Mermelada" },
-        { value: "DULCEDELECHE", label: "Dulce de leche" },
-        { value: "QUESO", label: "Queso" },
-        { value: "COSECHA", label: "Cosecha" }
-    ];
-
-    const unidadesMedida = [
-        { value: "KG", label: "Kilogramos (KG)" },
-        { value: "LT", label: "Litros (LT)" },
-        { value: "MG", label: "Miligramos (MG)" },
-        { value: "ML", label: "Mililitros (ML)" }
-    ];
-
-    const tipos = [
-        { value: "PRODUCTO", label: "Producto" },
-        { value: "INSUMO", label: "Insumo" }
-    ];
-
-    // ========================= CARGAR DATOS =========================
-
-    useEffect(() => {
-        cargarProductos();
-        cargarCategorias();
-        cargarUnidadesMedida();
-    }, []);
-
-    const cargarProductos = async () => {
-
-        try {
-            setCargando(true);
-            const respuesta = await api.get("/productos");
-            setProductos(respuesta.data);
-
-        } catch (error) {
-
-            console.error("Error al cargar productos:", error);
-            setError("No se pudieron cargar los productos.");
-
-        } finally {
-
-            setCargando(false);
-        }
-    };
-
-
-    const cargarCategorias = async () => {
-
-        try {
-            const respuesta = await api.get("/categorias");
-            setCategorias(respuesta.data);
-
-        } catch (error) {
-            console.error("Error al cargar categorías:", error);
-
-        }
-    };
-
-
-    const cargarUnidadesMedida = async () => {
-
-        try {
-            const respuesta = await api.get("/unidades-medida");
-            setUnidadesMedida(respuesta.data);
-
-        } catch (error) {
-            console.error("Error al cargar unidades de medida:", error);
-        }
-    };
-
-
-    // ========================= LIMPIAR FORMULARIO =========================
-
-    const limpiarFormulario = () => {
-
-        setNombreProducto("");
-        setDescripcion("");
-        setStockActual("");
-        setStockMinimo("");
-        setTipo("");
-        setCategoria("");
-        setUnidadMedida("");
-        setActivo(true);
-
-        setProductoEditando(null);
-        setModoEdicion(false);
-
-        setError("");
-    };
-
-
-    // ========================= ABRIR MODAL NUEVO =========================
-
-    const abrirNuevoProducto = () => {
-        limpiarFormulario();
-        setMostrarModal(true);
-    };
-
-
-    // ========================= ABRIR MODAL EDITAR =========================
-
-    const abrirEditarProducto = (producto) => {
-
-        setModoEdicion(true);
-        setProductoEditando(producto);
-
-        setNombreProducto(producto.nombreProducto || "");
-        setDescripcion(producto.descripcion || "");
-
-        setStockActual(
-            producto.stockActual !== null &&
-                producto.stockActual !== undefined
-                ? producto.stockActual
-                : ""
-        );
-
-        setStockMinimo(
-            producto.stockMinimo !== null &&
-                producto.stockMinimo !== undefined
-                ? producto.stockMinimo
-                : ""
-        );
-        setTipo(producto.tipo || "");
-
-        setCategoria(producto.categoria || "");
-
-        setUnidadMedida(producto.unidadMedida || "");
-
-
-        setActivo(producto.activo);
-
-        setError("");
-
-        setMostrarModal(true);
-    };
-
-    // ========================= CERRAR MODAL =========================
-
-    // const cerrarModal = () => {
-    //     setMostrarModal(false);
-    //     limpiarFormulario();
-    // };
-
-    // ========================= GUARDAR PRODUCTO =========================
-
-    const guardarProducto = async (e) => {
-
-        e.preventDefault();
-        setError("");
-
-        // Validaciones
-
-        if (!nombreProducto.trim()) {
-
-            setError("El nombre del producto es obligatorio.");
-            return;
-        }
-
-        if (!categoria) {
-
-            setError("Debe seleccionar una categoría.");
-            return;
-        }
-
-        if (!unidadMedida) {
-
-            setError("Debe seleccionar una unidad de medida.");
-            return;
-        }
-
-
-        const producto = {
-
-            nombreProducto: nombreProducto.trim(),
-            descripcion: descripcion.trim(),
-            stockActual: stockActual === ""
-                ? 0
-                : Number(stockActual),
-
-            stockMinimo: stockMinimo === ""
-                ? 0
-                : Number(stockMinimo),
-
-            activo: activo,
-
-            tipo: tipo,
-            categoria: categoria,
-            unidadMedida: unidadMedida,
-
-        };
-
-        try {
-            if (modoEdicion) {
-
-                await api.put(
-                    `/productos/${productoEditando.idProducto}`,
-                    producto
-                );
-
-            } else {
-
-                await api.post("/productos", producto);
-
-            }
-
-            await cargarProductos();
-            cerrarModal();
-
-        } catch (error) {
-
-            console.error("Error al guardar producto:", error);
-            if (error.response?.data?.message) {
-
-                setError(error.response.data.message);
-
-            } else {
-
-                setError("No se pudo guardar el producto.");
-
-            }
-        }
-    };
-
-
-    // ========================= ACTIVAR / DESACTIVAR =========================
-
-    const cambiarEstado = async (producto) => {
-
-        try {
-            const productoActualizado = {
-
-                nombreProducto: producto.nombreProducto,
-                descripcion: producto.descripcion,
-                stockActual: producto.stockActual,
-                stockMinimo: producto.stockMinimo,
-                activo: !producto.activo,
-                categoria: producto.categoria
-                    ? {
-                        idCategoria: producto.categoria.idCategoria
-                    }
-                    : null,
-                unidadMedida: producto.unidadMedida
-                    ? {
-                        idUnidadMedida: producto.unidadMedida.idUnidadMedida
-                    }
-                    : null
-            };
-
-            await api.put(
-                `/productos/${producto.idProducto}`,
-                productoActualizado
-            );
-
-            await cargarProductos();
-
-        } catch (error) {
-
-            console.error("Error al cambiar estado:", error);
-            setError("No se pudo cambiar el estado del producto.");
-        }
-    };
-
-    // ========================= ELIMINAR =========================
-
-    const eliminarProducto = async (producto) => {
-
-        const confirmar = window.confirm(
-            `¿Está seguro que desea eliminar el producto "${producto.nombreProducto}"?`
-        );
-
-        if (!confirmar) {
-            return;
-        }
-
-        try {
-
-            await api.delete(
-                `/productos/${producto.idProducto}`
-            );
-
-            await cargarProductos();
-
-        } catch (error) {
-
-            console.error("Error al eliminar producto:", error);
-            setError("No se pudo eliminar el producto.");
-        }
-    };
-
-    return (
-
-        <div className="pagina">
-            <Card title="· PRODUCCIÓN ·">
-
-                <div className="table-container">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Entradas</th>
-                                <th>Salidas</th>
-                                <th>Stock actual</th>
-                                <th>Minimo</th>
-                                <th>Estado</th>
-                                <th>Ver movimientos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {productos.map((producto) => (
-                                <tr key={producto.idProducto}>
-                                    <td>{producto.nombre}</td>
-                                    <td>{producto.entradas}</td>
-                                    <td>{producto.salidas}</td>
-                                    <td>{producto.stockActual}</td>
-                                    <td>{producto.minimo}</td>
-                                    <td>{producto.estado}</td>
-                                    <td>
-                                        <Button
-                                            variant="outline-primary"
-                                            size="sm"
-                                            onClick={() => verMovimientos(producto.idProducto)}
-                                        >
-                                            Ver movimientos
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-
-                </div>
-
-                <div className="form-button-container">
-                    <Button
-                        className={`btn btn-${"primary"}`}>
-                        Exportar
-                    </Button>
-                </div>
-
-            </Card>
+  const [productos, setProductos] = useState([]);
+  const [resumenStock, setResumenStock] = useState({});
+  const [movimientos, setMovimientos] = useState([]);
+  const [productoMovimientos, setProductoMovimientos] = useState(null);
+  const [movimientoProducto, setMovimientoProducto] = useState(null);
+  const [tipoMovimiento, setTipoMovimiento] = useState("ENTRADA");
+  const [cantidadMovimiento, setCantidadMovimiento] = useState("");
+  const [motivoMovimiento, setMotivoMovimiento] = useState("");
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    cargarProductos();
+  }, []);
+
+  async function cargarProductos() {
+    try {
+      setCargando(true);
+      setError("");
+      const [respuesta, resumen] = await Promise.all([
+        api.get("/productos"),
+        api.get("/stock/resumen-productos")
+      ]);
+      setProductos(respuesta.data.filter((producto) => producto.tipo === "PRODUCTO"));
+      setResumenStock(Object.fromEntries(
+        resumen.data.map((item) => [item.idProducto, item])
+      ));
+    } catch (errorCarga) {
+      console.error("Error al cargar productos de producción:", errorCarga);
+      setError("No se pudieron cargar los productos de producción.");
+    } finally {
+      setCargando(false);
+    }
+  }
+
+  async function verMovimientos(producto) {
+    try {
+      setError("");
+      const respuesta = await api.get(`/stock/movimientos/${producto.idProducto}`);
+      setProductoMovimientos(producto);
+      setMovimientos(respuesta.data);
+    } catch (errorMovimientos) {
+      console.error("Error al cargar movimientos:", errorMovimientos);
+      setError("No se pudieron cargar los movimientos del producto.");
+    }
+  }
+
+  function abrirMovimiento(producto, tipo) {
+    setMovimientoProducto(producto);
+    setTipoMovimiento(tipo);
+    setCantidadMovimiento("");
+    setMotivoMovimiento("");
+    setError("");
+  }
+
+  function cerrarMovimiento() {
+    setMovimientoProducto(null);
+    setCantidadMovimiento("");
+    setMotivoMovimiento("");
+  }
+
+  async function registrarMovimiento(evento) {
+    evento.preventDefault();
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+    const cantidad = Number(cantidadMovimiento);
+
+    if (!usuario?.idUsuario) {
+      setError("No se pudo identificar el usuario conectado.");
+      return;
+    }
+    if (!Number.isFinite(cantidad) || cantidad <= 0) {
+      setError("La cantidad debe ser mayor que cero.");
+      return;
+    }
+
+    try {
+      await api.post("/stock/movimientos", {
+        idProducto: movimientoProducto.idProducto,
+        idUsuario: usuario.idUsuario,
+        cantidad,
+        tipo: tipoMovimiento,
+        motivo: motivoMovimiento.trim() || "Movimiento manual"
+      });
+      cerrarMovimiento();
+      await cargarProductos();
+    } catch (errorMovimiento) {
+      setError(errorMovimiento.response?.data?.mensaje || "No se pudo registrar el movimiento.");
+    }
+  }
+
+  return (
+    <div className="pagina">
+      <Card title="· PRODUCCIÓN ·">
+        {error && <div className="mensaje-error">{error}</div>}
+        <div className="table-container">
+          {cargando ? <p>Cargando productos...</p> : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Entradas</th>
+                  <th>Salidas</th>
+                  <th>Stock actual</th>
+                  <th>Stock mínimo</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productos.map((producto) => (
+                  <tr key={producto.idProducto}>
+                    <td>{producto.nombreProducto}</td>
+                    <td>+{resumenStock[producto.idProducto]?.entradas ?? 0}</td>
+                    <td>-{resumenStock[producto.idProducto]?.salidas ?? 0}</td>
+                    <td>{producto.stockActual ?? 0}</td>
+                    <td>{producto.stockMinimo ?? 0}</td>
+                    <td>{producto.activo ? "Activo" : "Inactivo"}</td>
+                    <td>
+                      <Button variant="primary" onClick={() => abrirMovimiento(producto, "ENTRADA")}>
+                        + Entrada
+                      </Button>
+                      <Button variant="warning" onClick={() => abrirMovimiento(producto, "SALIDA")}>
+                        - Salida
+                      </Button>
+                      <Button variant="secondary" onClick={() => verMovimientos(producto)}>
+                        Ver movimientos
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
-    );
+
+        {movimientoProducto && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>{tipoMovimiento === "ENTRADA" ? "Registrar entrada" : "Registrar salida"}</h2>
+              <p>{movimientoProducto.nombreProducto}</p>
+              <form onSubmit={registrarMovimiento} className="form-field">
+                <label>Cantidad *</label>
+                <Input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={cantidadMovimiento}
+                  onChange={(evento) => setCantidadMovimiento(evento.target.value)}
+                  required
+                />
+                <label>Motivo</label>
+                <Input
+                  value={motivoMovimiento}
+                  onChange={(evento) => setMotivoMovimiento(evento.target.value)}
+                  placeholder="Ej. Elaboración, ajuste, venta"
+                />
+                <div className="modal-footer">
+                  <Button type="button" variant="secondary" onClick={cerrarMovimiento}>Cancelar</Button>
+                  <Button type="submit" className="btn btn-primary">Confirmar</Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {productoMovimientos && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>Movimientos: {productoMovimientos.nombreProducto}</h2>
+              <div className="table-container">
+                <table className="table">
+                  <thead>
+                    <tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr>
+                  </thead>
+                  <tbody>
+                    {movimientos.length === 0 ? (
+                      <tr><td colSpan="4">No hay movimientos registrados.</td></tr>
+                    ) : movimientos.map((movimiento) => (
+                      <tr key={movimiento.id}>
+                        <td>{movimiento.fecha}</td>
+                        <td>{movimiento.tipo}</td>
+                        <td>{movimiento.tipo === "ENTRADA" ? "+" : "-"}{movimiento.cantidad}</td>
+                        <td>{movimiento.motivo || "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="modal-footer">
+                <Button type="button" variant="secondary" onClick={() => setProductoMovimientos(null)}>Cerrar</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
 }
 
 export default Produccion;

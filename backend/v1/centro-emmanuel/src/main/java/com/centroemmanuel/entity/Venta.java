@@ -72,6 +72,10 @@ public class Venta {
         return fechaVenta;
     }
 
+    public void setFechaVenta(LocalDate fechaVenta) {
+        this.fechaVenta = fechaVenta;
+    }
+
     public Usuario getUsuario() {
         return usuario;
     }

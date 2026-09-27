@@ -1,6 +1,7 @@
 package com.centroemmanuel.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -59,18 +60,21 @@ public class UsuarioController {
 
     // PUT /api/usuarios/1
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> modificar(
+    public ResponseEntity<?> modificar(
             @PathVariable int id,
             @RequestBody Usuario usuario) {
 
-        Usuario usuarioModificado =
-                usuarioService.modificar(id, usuario);
+        try {
+            Usuario usuarioModificado = usuarioService.modificar(id, usuario);
 
-        if (usuarioModificado == null) {
-            return ResponseEntity.notFound().build();
+            if (usuarioModificado == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(usuarioModificado);
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("message", error.getMessage()));
         }
-
-        return ResponseEntity.ok(usuarioModificado);
     }
 
     // DELETE /api/usuarios/1

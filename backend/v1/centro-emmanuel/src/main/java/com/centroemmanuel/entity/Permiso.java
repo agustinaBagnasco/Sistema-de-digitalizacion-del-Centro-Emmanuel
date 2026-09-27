@@ -1,11 +1,7 @@
 package com.centroemmanuel.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "permiso")
@@ -24,6 +20,16 @@ public class Permiso {
 
     @Column(name = "descripcion")
     private String descripcion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_creacion")
+    @JsonIgnoreProperties({"clave", "permisos"})
+    private Usuario usuarioCreacion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_modificacion")
+    @JsonIgnoreProperties({"clave", "permisos"})
+    private Usuario usuarioModificacion;
 
     public Permiso(){}
 
@@ -64,5 +70,21 @@ public class Permiso {
 
     public void setDescripcion(String descripcion){
         this.descripcion = descripcion;
+    }
+
+    public Usuario getUsuarioCreacion() {
+        return usuarioCreacion;
+    }
+
+    public void setUsuarioCreacion(Usuario usuarioCreacion) {
+        this.usuarioCreacion = usuarioCreacion;
+    }
+
+    public Usuario getUsuarioModificacion() {
+        return usuarioModificacion;
+    }
+
+    public void setUsuarioModificacion(Usuario usuarioModificacion) {
+        this.usuarioModificacion = usuarioModificacion;
     }
 }

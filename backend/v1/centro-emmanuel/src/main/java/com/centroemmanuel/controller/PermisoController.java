@@ -1,10 +1,16 @@
 package com.centroemmanuel.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.centroemmanuel.entity.Permiso;
+import com.centroemmanuel.dto.PermisoRequest;
+import com.centroemmanuel.dto.PermisoResponse;
 import com.centroemmanuel.service.PermisoService;
 
 
@@ -22,51 +28,59 @@ public class PermisoController {
     }
 
 
-    // GET /api/permisos
     @GetMapping
-    public List<Permiso> listar() {
-
-        return permisoService.listarTodos();
-
+    public ResponseEntity<List<PermisoResponse>> listar() {
+        return ResponseEntity.ok(permisoService.listarTodos());
     }
 
-
-    // GET /api/permisos/1
     @GetMapping("/{id}")
-    public Permiso buscar(@PathVariable int id) {
-
-        return permisoService.buscarPorId(id);
-
+    public ResponseEntity<PermisoResponse> buscar(@PathVariable int id) {
+        return permisoService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    // POST /api/permisos
     @PostMapping
-    public Permiso crear(@RequestBody Permiso permiso) {
-
-        return permisoService.guardar(permiso);
-
+    public ResponseEntity<?> crear(
+            @RequestBody PermisoRequest request,
+            @RequestParam int idUsuario) {
+        return ejecutarGuardado(() -> permisoService.crear(request, idUsuario), HttpStatus.CREATED);
     }
 
-
-    // PUT /api/permisos/1
     @PutMapping("/{id}")
-    public Permiso modificar(
+    public ResponseEntity<?> modificar(
             @PathVariable int id,
-            @RequestBody Permiso permiso) {
-
-        permiso.setIdPermiso(id);
-
-        return permisoService.guardar(permiso);
-
+            @RequestBody PermisoRequest request,
+            @RequestParam int idUsuario) {
+        try {
+            return permisoService.actualizar(id, request, idUsuario)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("message", error.getMessage()));
+        } catch (DataIntegrityViolationException error) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Ya existe un permiso con ese nombre."));
+        }
     }
 
-
-    // DELETE /api/permisos/1
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable int id) {
+    public ResponseEntity<Void> eliminar(@PathVariable int id) {
+        return permisoService.eliminar(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
 
-        permisoService.eliminar(id);
-
+    private ResponseEntity<?> ejecutarGuardado(
+            Supplier<PermisoResponse> operacion,
+            HttpStatus estadoExito) {
+        try {
+            return ResponseEntity.status(estadoExito).body(operacion.get());
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("message", error.getMessage()));
+        } catch (DataIntegrityViolationException error) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "Ya existe un permiso con ese nombre."));
+        }
     }
 }

@@ -33,6 +33,7 @@ public class MovimientoStock {
     private Usuario usuario;
 
     public MovimientoStock() {
+        this.fechaMov = LocalDate.now();
     }
 
     public MovimientoStock(Integer idMovStock,

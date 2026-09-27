@@ -229,9 +229,9 @@ function Productos() {
         } catch (error) {
 
             console.error("Error al guardar producto:", error);
-            if (error.response?.data?.message) {
+            if (error.response?.data?.mensaje || error.response?.data?.message) {
 
-                setError(error.response.data.message);
+                setError(error.response.data.mensaje || error.response.data.message);
 
             } else {
 
@@ -269,7 +269,7 @@ function Productos() {
         } catch (error) {
 
             console.error("Error al cambiar estado:", error);
-            setError("No se pudo cambiar el estado del producto.");
+            setError(error.response?.data?.mensaje || "No se pudo cambiar el estado del producto.");
         }
     };
 
@@ -325,7 +325,7 @@ function Productos() {
         } catch (error) {
 
             console.error("Error al eliminar producto:", error);
-            setError("No se pudo eliminar el producto.");
+            setError(error.response?.data?.mensaje || "No se pudo eliminar el producto.");
         }
     };
 
