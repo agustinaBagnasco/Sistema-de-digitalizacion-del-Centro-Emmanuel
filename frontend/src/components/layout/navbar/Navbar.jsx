@@ -107,12 +107,15 @@ import { useState, useRef, useEffect } from "react";
 import {
   Menu,
   ChevronDown,
-  LogOut
+  LogOut,
+  Bell
 } from "lucide-react";
 
 import logo from "../../../assets/logoCe.png";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
+import api from "../../../services/api";
+import { formatearNumero } from "../../../utils/formatNumber";
 
 export default function Navbar({ onMenuClick }) {
 
@@ -129,20 +132,59 @@ export default function Navbar({ onMenuClick }) {
     : "Invitado";
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
+  const [alertasStock, setAlertasStock] = useState([]);
+  const [errorAlertas, setErrorAlertas] = useState(false);
 
   const menuRef = useRef(null);
+  const notificacionesRef = useRef(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let activo = true;
+    const horasAlertas = new Map();
+
+    async function cargarAlertasStock() {
+      try {
+        const respuesta = await api.get("/stock/alertas-stock-minimo");
+        if (activo) {
+          const alertasActivas = respuesta.data
+            .filter((producto) => producto.activo)
+            .map((producto) => {
+              const horaDeteccion = horasAlertas.get(producto.idProducto) || new Date();
+              horasAlertas.set(producto.idProducto, horaDeteccion);
+              return { ...producto, horaDeteccion };
+            });
+
+          setErrorAlertas(false);
+          setAlertasStock(alertasActivas);
+        }
+      } catch (errorCarga) {
+        console.error("Error al cargar alertas de stock:", errorCarga);
+        if (activo) setErrorAlertas(true);
+      }
+    }
+
+    void cargarAlertasStock();
+    const intervalo = window.setInterval(cargarAlertasStock, 60000);
+
+    return () => {
+      activo = false;
+      window.clearInterval(intervalo);
+    };
+  }, []);
 
   useEffect(() => {
 
     function handleClickOutside(event) {
 
       if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
+        menuRef.current && !menuRef.current.contains(event.target) &&
+        notificacionesRef.current && !notificacionesRef.current.contains(event.target)
       ) {
         setMenuOpen(false);
+        setNotificacionesAbiertas(false);
       }
 
     }
@@ -168,6 +210,19 @@ export default function Navbar({ onMenuClick }) {
       replace: true
     });
 
+  };
+
+  const productosBajoStock = alertasStock.filter((producto) => producto.tipo === "PRODUCTO");
+  const insumosBajoStock = alertasStock.filter((producto) => producto.tipo === "INSUMO");
+
+  const mostrarHora = (fecha) => new Intl.DateTimeFormat("es-UY", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(fecha);
+
+  const abrirNotificaciones = () => {
+    setNotificacionesAbiertas((abiertas) => !abiertas);
+    setMenuOpen(false);
   };
 
   return (
@@ -203,6 +258,53 @@ export default function Navbar({ onMenuClick }) {
           {fecha}
         </span>
 
+        <div className="navbar-notifications" ref={notificacionesRef}>
+          <button
+            className={`notification-button${alertasStock.length ? " has-alerts" : ""}`}
+            onClick={abrirNotificaciones}
+            aria-label={`Ver alertas de stock${alertasStock.length ? ` (${alertasStock.length})` : ""}`}
+            aria-expanded={notificacionesAbiertas}
+          >
+            <Bell size={20} />
+            {alertasStock.length > 0 && <span className="notification-count">{alertasStock.length}</span>}
+          </button>
+
+          {notificacionesAbiertas && (
+            <div className="notification-menu">
+              <div className="notification-header">
+                <strong>Alertas de stock</strong>
+                <span>{alertasStock.length}</span>
+              </div>
+
+              {errorAlertas ? (
+                <p className="notification-empty">No se pudieron cargar las alertas.</p>
+              ) : alertasStock.length === 0 ? (
+                <p className="notification-empty">No hay productos ni insumos bajo stock.</p>
+              ) : (
+                <div className="notification-list">
+                  {[{ titulo: "Productos", elementos: productosBajoStock, ruta: "/administracion/Movimientos" }, { titulo: "Insumos", elementos: insumosBajoStock, ruta: "/administracion/Movimientos" }]
+                    .filter((grupo) => grupo.elementos.length > 0)
+                    .map((grupo) => (
+                      <div className="notification-group" key={grupo.titulo}>
+                        <span className="notification-group-title">{grupo.titulo}</span>
+                        {grupo.elementos.map((producto) => (
+                          <button
+                            className="notification-item"
+                            key={producto.idProducto}
+                            onClick={() => navigate(grupo.ruta)}
+                          >
+                            <span>{producto.nombreProducto}</span>
+                            <small>{formatearNumero(producto.stockActual)} / {formatearNumero(producto.stockMinimo)} {producto.unidadMedida || ""}</small>
+                            <time dateTime={producto.horaDeteccion.toISOString()}>Detectada a las {mostrarHora(producto.horaDeteccion)}</time>
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         <div
           className="navbar-user"

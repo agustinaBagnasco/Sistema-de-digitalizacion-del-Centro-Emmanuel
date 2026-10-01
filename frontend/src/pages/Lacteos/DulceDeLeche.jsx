@@ -5,6 +5,13 @@ import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
 import api from "../../services/api";
 
+function normalizarTexto(texto) {
+  return texto
+    ?.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 export default function DulceDeLeche() {
 
   const formularioInicial = {
@@ -22,9 +29,9 @@ export default function DulceDeLeche() {
 
   const [registros, setRegistros] = useState([]);
 
-  const [productos, setProductos] = useState([]);
-
   const [productoDulce, setProductoDulce] = useState(null);
+  const [productoDulce1kg, setProductoDulce1kg] = useState(null);
+  const [productoDulce420g, setProductoDulce420g] = useState(null);
   const [productoLeche, setProductoLeche] = useState(null);
   const [productoAzucar, setProductoAzucar] = useState(null);
   const [productoBicarbonato, setProductoBicarbonato] = useState(null);
@@ -67,18 +74,23 @@ export default function DulceDeLeche() {
           : [];
 
 
-      setProductos(listaProductos);
-
-
       // =================================================
       // BUSCAR PRODUCTOS
       // =================================================
 
-      const dulce = listaProductos.find(
+      const productosDulce = listaProductos.filter(
         p =>
           p.categoria === "DULCEDELECHE" &&
           p.activo === true
       );
+
+      const dulce1kg = productosDulce.find((producto) =>
+        /(?:^|\D)(?:1\s*kg|1000\s*g)(?:\D|$)/i.test(producto.nombreProducto || "")
+      );
+      const dulce420g = productosDulce.find((producto) =>
+        /(?:420\s*g|0[,.]?420\s*kg|1\s*\/\s*2\s*kg)/i.test(producto.nombreProducto || "")
+      );
+      const dulce = dulce1kg || dulce420g || productosDulce[0];
 
       const leche = listaProductos.find(
         p =>
@@ -88,8 +100,7 @@ export default function DulceDeLeche() {
 
       const azucar = listaProductos.find(
         p =>
-          p.nombreProducto?.toLowerCase().includes("azucar") ||
-          p.nombreProducto?.toLowerCase().includes("azúcar")
+          normalizarTexto(p.nombreProducto).includes("azucar")
       );
 
       const bicarbonato = listaProductos.find(
@@ -99,6 +110,8 @@ export default function DulceDeLeche() {
 
 
       setProductoDulce(dulce || null);
+      setProductoDulce1kg(dulce1kg || null);
+      setProductoDulce420g(dulce420g || null);
       setProductoLeche(leche || null);
       setProductoAzucar(azucar || null);
       setProductoBicarbonato(bicarbonato || null);
@@ -254,6 +267,24 @@ export default function DulceDeLeche() {
       return;
     }
 
+    const frascos1kg = Number(form.cantFrascos1kg) || 0;
+    const frascos420g = Number(form.cantFrascos420g) || 0;
+
+    if (frascos1kg > 0 && !productoDulce1kg) {
+      alert("No se encontró un producto activo de Dulce de Leche de 1 kg.");
+      return;
+    }
+
+    if (frascos420g > 0 && !productoDulce420g) {
+      alert("No se encontró un producto activo de Dulce de Leche de 420 g.");
+      return;
+    }
+
+    if (frascos1kg === 0 && frascos420g === 0) {
+      alert("Ingrese la cantidad producida de al menos una presentación.");
+      return;
+    }
+
 
     if (!productoLeche) {
 
@@ -302,13 +333,6 @@ export default function DulceDeLeche() {
     // CALCULAR CANTIDAD PRODUCIDA
     // =================================================
 
-    const frascos1kg =
-      Number(form.cantFrascos1kg) || 0;
-
-    const frascos420g =
-      Number(form.cantFrascos420g) || 0;
-
-
     const cantidadProducida =
       frascos1kg +
       (frascos420g * 0.420);
@@ -354,7 +378,7 @@ export default function DulceDeLeche() {
     const elaboracion = {
 
       productoElaborado: {
-        idProducto: productoDulce.idProducto
+        idProducto: (productoDulce1kg || productoDulce420g || productoDulce).idProducto
       },
 
       fechaElaboracion:
@@ -371,6 +395,14 @@ export default function DulceDeLeche() {
 
       cantidadFrascos420g:
         frascos420g,
+
+      productoElaborado1kg: frascos1kg > 0
+        ? { idProducto: productoDulce1kg.idProducto }
+        : null,
+
+      productoElaborado420g: frascos420g > 0
+        ? { idProducto: productoDulce420g.idProducto }
+        : null,
 
       usuario: {
         idUsuario: usuario.idUsuario

@@ -35,7 +35,7 @@ public class VentaRequest {
     public static class VentaImportada {
         private LocalDate fecha;
         private String concepto;
-        private Double cantidad;
+        private BigDecimal cantidad;
         private BigDecimal unitario;
         private BigDecimal total;
 
@@ -55,11 +55,11 @@ public class VentaRequest {
             this.concepto = concepto;
         }
 
-        public Double getCantidad() {
+        public BigDecimal getCantidad() {
             return cantidad;
         }
 
-        public void setCantidad(Double cantidad) {
+        public void setCantidad(BigDecimal cantidad) {
             this.cantidad = cantidad;
         }
 

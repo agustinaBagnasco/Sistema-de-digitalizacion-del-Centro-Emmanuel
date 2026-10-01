@@ -11,11 +11,10 @@ import MainLayout from "../components/layout/MainLayout";
 
 import Dashboard from "../pages/Dashboard";
 import Huerta from "../pages/huerta";
-import Produccion from "../pages/administracion/Produccion";
+import Movimientos from "../pages/administracion/Movimientos";
 import Ventas from "../pages/administracion/Ventas";
 import ManoDeObra from "../pages/administracion/ManoDeObra";
-import Insumos from "../pages/administracion/Insumos";
-import Productos from "../pages/administracion/Productos";
+import ProductoInsumo from "../pages/administracion/ProductoInsumo";
 
 import Leche from "../pages/Lacteos/Leche";
 import Quesos from "../pages/Lacteos/Quesos";
@@ -115,11 +114,12 @@ export default function AppRoutes() {
 
                 <Route path="/administracion/usuarios" element={protegerPagina("/administracion/usuarios", <Usuarios />)} />
                 <Route path="/administracion/permisos" element={protegerPagina("/administracion/permisos", <Permisos />)} />
-                <Route path="/administracion/Produccion" element={protegerPagina("/administracion/Produccion", <Produccion />)} />
+                <Route path="/administracion/Movimientos" element={protegerPagina("/administracion/Movimientos", <Movimientos />)} />
+                <Route path="/administracion/Produccion" element={<Navigate to="/administracion/Movimientos" replace />} />
                 <Route path="/administracion/ManoDeObra" element={protegerPagina("/administracion/ManoDeObra", <ManoDeObra />)} />
-                <Route path="/administracion/Insumos" element={protegerPagina("/administracion/Insumos", <Insumos />)} />
+                <Route path="/administracion/Insumos" element={<Navigate to="/administracion/ProductoInsumo" replace />} />
                 <Route path="/administracion/Ventas" element={protegerPagina("/administracion/Ventas", <Ventas />)} />
-                <Route path="/administracion/Productos" element={protegerPagina("/administracion/Productos", <Productos />)} />
+                <Route path="/administracion/ProductoInsumo" element={protegerPagina("/administracion/ProductoInsumo", <ProductoInsumo />)} />
 
             </Route> 
 

@@ -3,6 +3,7 @@ import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import { formatearNumero } from "../../utils/formatNumber";
 import "../../styles/global.css";
 
 function Movimientos() {
@@ -139,10 +140,10 @@ function Movimientos() {
                   <tr key={producto.idProducto}>
                     <td>{producto.nombreProducto}</td>
                     <td>{producto.tipo === "INSUMO" ? "Insumo" : "Producto"}</td>
-                    <td>+{resumenStock[producto.idProducto]?.entradas ?? 0}</td>
-                    <td>-{resumenStock[producto.idProducto]?.salidas ?? 0}</td>
-                    <td>{producto.stockActual ?? 0}</td>
-                    <td>{producto.stockMinimo ?? 0}</td>
+                    <td>+{formatearNumero(resumenStock[producto.idProducto]?.entradas)}</td>
+                    <td>-{formatearNumero(resumenStock[producto.idProducto]?.salidas)}</td>
+                    <td>{formatearNumero(producto.stockActual)}</td>
+                    <td>{formatearNumero(producto.stockMinimo)}</td>
                     <td>{producto.activo ? "Activo" : "Inactivo"}</td>
                     <td>
                       <div className="table-actions">
@@ -170,7 +171,7 @@ function Movimientos() {
             <div className="modal-content">
               <h2>{tipoMovimiento === "ENTRADA" ? "Registrar entrada" : "Registrar salida"}</h2>
               <p>{movimientoProducto.nombreProducto}</p>
-              <p>Stock actual: {movimientoProducto.stockActual ?? 0} {movimientoProducto.unidadMedida}</p>
+              <p>Stock actual: {formatearNumero(movimientoProducto.stockActual)} {movimientoProducto.unidadMedida}</p>
               <form onSubmit={registrarMovimiento} className="form-field">
                 {errorMovimiento && <div className="mensaje-error" role="alert">{errorMovimiento}</div>}
                 <label>Cantidad *</label>
@@ -206,11 +207,11 @@ function Movimientos() {
               <div className="table-container">
                 <table className="table">
                   <thead>
-                    <tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th></tr>
+                    <tr><th>Fecha</th><th>Tipo</th><th>Cantidad</th><th>Motivo</th><th>Usuario</th></tr>
                   </thead>
                   <tbody>
                     {movimientos.length === 0 ? (
-                      <tr><td colSpan="4">No hay movimientos registrados.</td></tr>
+                      <tr><td colSpan="5">No hay movimientos registrados.</td></tr>
                     ) : movimientos.map((movimiento) => (
                       <tr key={movimiento.id}>
                         <td>{new Intl.DateTimeFormat("es-UY", {
@@ -218,8 +219,9 @@ function Movimientos() {
                           timeStyle: "medium"
                         }).format(new Date(movimiento.fecha))}</td>
                         <td>{movimiento.tipo}</td>
-                        <td>{movimiento.tipo === "ENTRADA" ? "+" : "-"}{movimiento.cantidad}</td>
+                        <td>{movimiento.tipo === "ENTRADA" ? "+" : "-"}{formatearNumero(movimiento.cantidad)}</td>
                         <td>{movimiento.motivo || "-"}</td>
+                        <td>{movimiento.usuario || "-"}</td>
                       </tr>
                     ))}
                   </tbody>

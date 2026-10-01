@@ -47,7 +47,7 @@ public class VentaService {
                 .orElseThrow(() -> new IllegalArgumentException("El usuario de la sesión no existe."));
 
         List<VentaPreparada> ventasPreparadas = new ArrayList<>();
-        Map<Integer, Double> cantidadesPorProducto = new HashMap<>();
+        Map<Integer, BigDecimal> cantidadesPorProducto = new HashMap<>();
         for (int indice = 0; indice < request.getVentas().size(); indice++) {
             VentaRequest.VentaImportada fila = request.getVentas().get(indice);
             int numeroFila = indice + 2;
@@ -69,10 +69,10 @@ public class VentaService {
                 }
                 Producto producto = productosEncontrados.get(0);
 
-            double stockActual = producto.getStockActual() == null ? 0 : producto.getStockActual();
-                double cantidadAcumulada = cantidadesPorProducto.merge(
-                    producto.getIdProducto(), fila.getCantidad(), Double::sum);
-                if (stockActual < cantidadAcumulada) {
+            BigDecimal stockActual = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
+                BigDecimal cantidadAcumulada = cantidadesPorProducto.merge(
+                    producto.getIdProducto(), fila.getCantidad(), BigDecimal::add);
+                if (stockActual.compareTo(cantidadAcumulada) < 0) {
                 throw new IllegalArgumentException(
                         "Stock insuficiente para '" + producto.getNombreProducto() + "' (fila " + numeroFila + ").");
             }
@@ -110,7 +110,7 @@ public class VentaService {
         if (fila.getConcepto() == null || fila.getConcepto().trim().isEmpty()) {
             throw new IllegalArgumentException("El concepto de la fila " + (indice + 2) + " es obligatorio.");
         }
-        if (fila.getCantidad() == null || fila.getCantidad() <= 0
+        if (fila.getCantidad() == null || fila.getCantidad().signum() <= 0
                 || fila.getUnitario() == null || fila.getUnitario().compareTo(BigDecimal.ZERO) < 0
                 || fila.getTotal() == null || fila.getTotal().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Los importes de la fila " + (indice + 2) + " no son válidos.");

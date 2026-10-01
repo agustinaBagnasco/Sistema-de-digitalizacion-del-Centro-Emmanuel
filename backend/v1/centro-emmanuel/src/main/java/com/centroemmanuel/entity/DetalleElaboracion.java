@@ -25,11 +25,11 @@ public class DetalleElaboracion {
     private Producto insumoUtilizado;
 
     // Cantidad utilizada del insumo
-    @Column(name = "cantidad_utilizada", nullable = false)
-    private Double cantidadUtilizada;
+    @Column(name = "cantidad_utilizada", nullable = false, precision = 15, scale = 3)
+    private BigDecimal cantidadUtilizada;
 
     // Costo del insumo al momento de la elaboración
-    @Column(name = "costo_unitario", precision = 10, scale = 2)
+    @Column(name = "costo_unitario", precision = 15, scale = 3)
     private BigDecimal costoUnitario;
 
 
@@ -69,11 +69,11 @@ public class DetalleElaboracion {
         this.insumoUtilizado = insumoUtilizado;
     }
 
-    public Double getCantidadUtilizada() {
+    public BigDecimal getCantidadUtilizada() {
         return cantidadUtilizada;
     }
 
-    public void setCantidadUtilizada(Double cantidadUtilizada) {
+    public void setCantidadUtilizada(BigDecimal cantidadUtilizada) {
         this.cantidadUtilizada = cantidadUtilizada;
     }
 

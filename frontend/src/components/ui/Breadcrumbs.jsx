@@ -11,7 +11,9 @@ function Breadcrumbs() {
     const nombres = {
         admin: "Administración",
         productos: "Productos",
-        produccion: "Producción",
+        ProductoInsumo: "Productos/Insumos",
+        Produccion: "Movimientos",
+        Movimientos: "Movimientos",
         insumos: "Insumos",
         huerta: "Huerta",
         usuarios: "Usuarios",

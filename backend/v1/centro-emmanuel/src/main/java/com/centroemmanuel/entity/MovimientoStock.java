@@ -1,7 +1,8 @@
 package com.centroemmanuel.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "movimiento_stock")
@@ -16,14 +17,14 @@ public class MovimientoStock {
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto productoMov;
 
-    @Column(name = "cantidad_mov", nullable = false)
-    private double cantidadMov;
+    @Column(name = "cantidad_mov", nullable = false, precision = 15, scale = 3)
+    private BigDecimal cantidadMov;
 
     @Column(name = "tipo_mov", length = 20, nullable = false)
     private String tipoMov;
 
     @Column(name = "fecha_mov", nullable = false)
-    private LocalDate fechaMov;
+    private LocalDateTime fechaMov;
 
     @Column(name = "motivo_mov", length = 255)
     private String motivoMov;
@@ -33,12 +34,12 @@ public class MovimientoStock {
     private Usuario usuario;
 
     public MovimientoStock() {
-        this.fechaMov = LocalDate.now();
+        this.fechaMov = LocalDateTime.now();
     }
 
     public MovimientoStock(Integer idMovStock,
                            Producto productoMov,
-                           double cantidadMov,
+                           BigDecimal cantidadMov,
                            String tipoMov,
                            String motivoMov,
                            Usuario usuario) {
@@ -47,7 +48,7 @@ public class MovimientoStock {
         this.productoMov = productoMov;
         this.cantidadMov = cantidadMov;
         this.tipoMov = tipoMov; // Corregido
-        this.fechaMov = LocalDate.now();
+        this.fechaMov = LocalDateTime.now();
         this.motivoMov = motivoMov;
         this.usuario = usuario;
     }
@@ -70,11 +71,11 @@ public class MovimientoStock {
         this.productoMov = productoMov;
     }
 
-    public double getCantidadMov() {
+    public BigDecimal getCantidadMov() {
         return cantidadMov;
     }
 
-    public void setCantidadMov(double cantidadMov) {
+    public void setCantidadMov(BigDecimal cantidadMov) {
         this.cantidadMov = cantidadMov;
     }
 
@@ -86,7 +87,7 @@ public class MovimientoStock {
         this.tipoMov = tipoMov;
     }
 
-    public LocalDate getFechaMov() {
+    public LocalDateTime getFechaMov() {
         return fechaMov;
     }
 

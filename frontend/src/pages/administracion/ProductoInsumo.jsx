@@ -10,10 +10,10 @@ import {
 } from "../../services/producto";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
-import FormField from "../../components/ui/FormField";
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
 import Textarea from "../../components/ui/Textarea";
+import { formatearNumero } from "../../utils/formatNumber";
 import "../../styles/global.css"
 
 
@@ -30,7 +30,7 @@ function Productos() {
     const [stockMinimo, setStockMinimo] = useState("");
     const [costo, setCosto] = useState("");
     const [activo, setActivo] = useState(true);
-    const [tipo, setTipo] = useState("");
+    const [tipo, setTipo] = useState("PRODUCTO");
     const [categoria, setCategoria] = useState("");
     const [unidadMedida, setUnidadMedida] = useState("");
 
@@ -50,7 +50,6 @@ function Productos() {
             setCargando(true);
             const respuesta = await obtenerProductos();
             setProductos(respuesta.data);
-            console.log("PRODUCTOS:", respuesta.data);
 
         } catch (error) {
 
@@ -64,7 +63,7 @@ function Productos() {
     };
 
     useEffect(() => {
-        cargarProductos();
+        void Promise.resolve().then(cargarProductos);
     }, []);
 
     // ========================= LIMPIAR FORMULARIO =========================
@@ -76,7 +75,7 @@ function Productos() {
         setStockActual("");
         setStockMinimo("");
         setCosto("");
-        setTipo("");
+        setTipo("PRODUCTO");
         setCategoria("");
         setUnidadMedida("");
         setActivo(true);
@@ -90,8 +89,9 @@ function Productos() {
 
     // ========================= ABRIR MODAL NUEVO =========================
 
-    const abrirNuevoProducto = () => {
+    const abrirNuevoRegistro = (tipoNuevo) => {
         limpiarFormulario();
+        setTipo(tipoNuevo);
         setTimeout(() => {
             document.getElementById("formulario-producto")?.scrollIntoView({
                 behavior: "smooth",
@@ -131,7 +131,7 @@ function Productos() {
                 ? producto.costo
                 : ""
         );
-        setTipo(producto.tipo || "");
+        setTipo(producto.tipo || "PRODUCTO");
 
         setCategoria(producto.categoria || "");
 
@@ -165,27 +165,24 @@ function Productos() {
 
         e.preventDefault();
         setError("");
+        const nombreTipo = tipo === "INSUMO" ? "insumo" : "producto";
 
         // Validaciones
 
         if (!nombreProducto.trim()) {
 
-            setError("El nombre del producto es obligatorio.");
-            return;
-        }
-        if (!tipo) {
-            setError("Debe seleccionar un tipo.");
+            setError(`El nombre del ${nombreTipo} es obligatorio.`);
             return;
         }
         if (!categoria) {
 
-            setError("Debe seleccionar una categoría.");
+            setError(`Debe seleccionar una categoría para el ${nombreTipo}.`);
             return;
         }
 
         if (!unidadMedida) {
 
-            setError("Debe seleccionar una unidad de medida.");
+            setError(`Debe seleccionar una unidad de medida para el ${nombreTipo}.`);
             return;
         }
 
@@ -200,12 +197,12 @@ function Productos() {
             stockMinimo: stockMinimo === ""
                 ? 0
                 : Number(stockMinimo),
-            costo: costo === ""
-                ? 0
-                : Number(costo),
+            categoria,
+            ...(tipo === "PRODUCTO" && {
+                costo: costo === "" ? 0 : Number(costo),
+            }),
             activo: activo,
             tipo: tipo,
-            categoria: categoria,
             unidadMedida: unidadMedida,
 
         };
@@ -218,8 +215,8 @@ function Productos() {
                     producto)
 
             } else {
-
-                await crearProducto(producto);
+                const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+                await crearProducto(producto, usuario?.idUsuario);
 
             }
 
@@ -228,19 +225,12 @@ function Productos() {
 
         } catch (error) {
 
-            console.error("Error al guardar producto:", error);
-            if (error.response?.data?.mensaje || error.response?.data?.message) {
-
-                setError(error.response.data.mensaje || error.response.data.message);
-
-            } else {
-
-                setError("No se pudo guardar el producto.");
-
-            }
+            console.error(`Error al guardar ${nombreTipo}:`, error);
+            const mensajeServidor = error.response?.data?.mensaje || error.response?.data?.message;
+            const estadoHttp = error.response?.status ? ` (HTTP ${error.response.status})` : "";
+            setError(mensajeServidor || `No se pudo guardar el ${nombreTipo}${estadoHttp}.`);
         }
     };
-
 
     // ========================= ACTIVAR / DESACTIVAR =========================
 
@@ -253,7 +243,7 @@ function Productos() {
                 descripcion: producto.descripcion,
                 stockActual: producto.stockActual,
                 stockMinimo: producto.stockMinimo,
-                costo: producto.costo,
+                ...(producto.tipo === "PRODUCTO" && { costo: producto.costo }),
                 activo: !producto.activo,
                 tipo: producto.tipo,
                 categoria: producto.categoria,
@@ -331,12 +321,18 @@ function Productos() {
 
     return (
         <div className="pagina">
-            <Card title="· PRODUCTOS | INSUMOS ·">
+            <Card title="· PRODUCTOS / INSUMOS ·">
                 <Button
                     className={`btn btn-${"primary"}`}
-                    onClick={abrirNuevoProducto}
+                    onClick={() => abrirNuevoRegistro("PRODUCTO")}
                 >
                     + Nuevo producto
+                </Button>
+                <Button
+                    className="btn btn-secondary"
+                    onClick={() => abrirNuevoRegistro("INSUMO")}
+                >
+                    + Nuevo Insumo
                 </Button>
 
                 {/* =========================  ERROR  ========================= */}
@@ -403,7 +399,7 @@ function Productos() {
                             <p>No hay productos registrados </p>
                             <Button
                                 className={`btn btn-${"primary"}`}
-                                onClick={abrirNuevoProducto}
+                                onClick={() => abrirNuevoRegistro("PRODUCTO")}
                             >
                                 Agregar primer producto
                             </Button>
@@ -421,7 +417,7 @@ function Productos() {
                                         <th>Tipo</th>
                                         <th>Categoría</th>
                                         <th>Unidad</th>
-                                        <th>Stock inicial</th>
+                                        <th>Stock actual</th>
                                         <th>Stock mínimo</th>
                                         <th>Costo</th>
                                         <th>Estado</th>
@@ -443,10 +439,10 @@ function Productos() {
                                             <td>{producto.unidadMedida || "-"}</td>
 
 
-                                            <td>{producto.stockActual ?? 0}</td>
+                                            <td>{formatearNumero(producto.stockActual)}</td>
 
-                                            <td>{producto.stockMinimo ?? 0}</td>
-                                            <td>{producto.costo ?? 0}</td>
+                                            <td>{formatearNumero(producto.stockMinimo)}</td>
+                                            <td>{producto.tipo === "PRODUCTO" ? formatearNumero(producto.costo) : "-"}</td>
                                             <td>
                                                 <span
                                                     className={
@@ -516,15 +512,15 @@ function Productos() {
                                     <br />
                                     <h2>
                                         {modoEdicion
-                                            ? "Editar producto"
-                                            : "Nuevo producto"
+                                            ? `Editar ${tipo === "INSUMO" ? "insumo" : "producto"}`
+                                            : `Nuevo ${tipo === "INSUMO" ? "insumo" : "producto"}`
                                         }
                                     </h2>
                                     <hr />
                                     <p>
                                         {modoEdicion
-                                            ? "Modifique los datos del producto."
-                                            : "Ingrese los datos del nuevo producto."
+                                            ? `Modifique los datos del ${tipo === "INSUMO" ? "insumo" : "producto"}.`
+                                            : `Ingrese los datos del nuevo ${tipo === "INSUMO" ? "insumo" : "producto"}.`
                                         }
                                     </p>
                                     <Button
@@ -542,9 +538,7 @@ function Productos() {
                             <form onSubmit={guardarProducto} id="formulario-producto" className="form-field columns-2">
                                 {/* NOMBRE */}
                                 <div className="form-group">
-                                    <label>
-                                        Nombre del producto *
-                                    </label>
+                                    <label>Nombre del {tipo === "INSUMO" ? "insumo" : "producto"} *</label>
                                     <Input
                                         type="text"
                                         value={nombreProducto}
@@ -566,18 +560,6 @@ function Productos() {
                                         placeholder="Descripción del producto"
                                         rows="3"
                                     />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Tipo *</label>
-
-                                    <Select
-                                        value={tipo}
-                                        onChange={(e) => setTipo(e.target.value)}
-                                        options={tipos}
-                                        placeholder="Seleccione un tipo"
-                                    />
-
                                 </div>
 
                                 {/* CATEGORÍA */}
@@ -630,7 +612,7 @@ function Productos() {
                                             }
                                         />
                                     </div>
-                                    <div className="form-group">
+                                    {tipo === "PRODUCTO" && <div className="form-group">
                                         <label>Costo</label>
                                         <Input
                                             type="number"
@@ -641,7 +623,7 @@ function Productos() {
                                                 setCosto(e.target.value)
                                             }
                                         />
-                                    </div>
+                                    </div>}
 
                                 </div>
                                 {/* ACTIVO */}
@@ -654,7 +636,7 @@ function Productos() {
                                                 setActivo(e.target.checked)
                                             }
                                         />
-                                        Producto activo
+                                        {tipo === "INSUMO" ? "Insumo activo" : "Producto activo"}
                                     </label>
                                 </div>
 
@@ -682,7 +664,7 @@ function Productos() {
                                     >
                                         {modoEdicion
                                             ? "Guardar cambios"
-                                            : "Crear producto"
+                                            : `Crear ${tipo === "INSUMO" ? "insumo" : "producto"}`
                                         }
                                     </Button>
                                 </div>
@@ -690,7 +672,6 @@ function Productos() {
                         </div>
                     </div>
                 )}
-
 
             </Card>
         </div>

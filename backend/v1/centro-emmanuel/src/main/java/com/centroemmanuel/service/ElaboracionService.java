@@ -6,8 +6,8 @@ import com.centroemmanuel.entity.Producto;
 import com.centroemmanuel.repository.ElaboracionRepository;
 import com.centroemmanuel.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
-
 import java.util.List;
 
 @Service
@@ -15,13 +15,16 @@ public class ElaboracionService {
 
     private final ElaboracionRepository elaboracionRepository;
     private final ProductoRepository productoRepository;
+        private final StockService stockService;
 
     public ElaboracionService(
             ElaboracionRepository elaboracionRepository,
-            ProductoRepository productoRepository) {
+                        ProductoRepository productoRepository,
+                        StockService stockService) {
 
         this.elaboracionRepository = elaboracionRepository;
         this.productoRepository = productoRepository;
+                this.stockService = stockService;
     }
 
 
@@ -51,6 +54,7 @@ public class ElaboracionService {
     // CREAR ELABORACIÓN
     // =========================
 
+@Transactional
 public Elaboracion guardar(Elaboracion elaboracion) {
 
     /*
@@ -149,16 +153,112 @@ public Elaboracion guardar(Elaboracion elaboracion) {
                 if (detalle.getCostoUnitario() == null
                         && producto.getCosto() != null) {
 
-                    detalle.setCostoUnitario(
-                        BigDecimal.valueOf(
-                            producto.getCosto())
-                    );
+                                        detalle.setCostoUnitario(producto.getCosto());
                 }
             }
         }
     }
 
-    return elaboracionRepository.save(elaboracion);
+        if (elaboracion.getProductoElaborado() == null
+                        || elaboracion.getProductoElaborado().getIdProducto() == null) {
+                throw new IllegalArgumentException("No se indicó el producto elaborado.");
+        }
+        if (elaboracion.getCantidadProducida() == null
+                        || elaboracion.getCantidadProducida().signum() <= 0) {
+                throw new IllegalArgumentException("La cantidad producida debe ser mayor que cero.");
+        }
+        if (elaboracion.getUsuario() == null || elaboracion.getUsuario().getIdUsuario() == 0) {
+                throw new IllegalArgumentException("No se indicó el usuario que registra la elaboración.");
+        }
+
+        Integer idProducto = elaboracion.getProductoElaborado().getIdProducto();
+        Producto productoElaborado = productoRepository.findById(idProducto)
+                        .orElseThrow(() -> new IllegalArgumentException("El producto elaborado no existe."));
+        elaboracion.setProductoElaborado(productoElaborado);
+
+                prepararProductosSalida(elaboracion);
+
+        Elaboracion guardada = elaboracionRepository.save(elaboracion);
+                registrarConsumoInsumos(guardada);
+                registrarStockSalida(guardada, productoElaborado);
+        return guardada;
+}
+
+private void registrarConsumoInsumos(Elaboracion elaboracion) {
+        if (elaboracion.getDetalles() == null) {
+                return;
+        }
+
+        for (DetalleElaboracion detalle : elaboracion.getDetalles()) {
+                if (detalle.getInsumoUtilizado() == null
+                                || detalle.getInsumoUtilizado().getIdProducto() == null
+                                || detalle.getCantidadUtilizada() == null
+                                || detalle.getCantidadUtilizada().signum() <= 0) {
+                        continue;
+                }
+
+                Producto insumo = productoRepository.findById(
+                                detalle.getInsumoUtilizado().getIdProducto())
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "El insumo utilizado no existe."));
+                stockService.descontar(
+                                insumo,
+                                detalle.getCantidadUtilizada(),
+                                elaboracion.getUsuario(),
+                                "Insumo utilizado en elaboración");
+        }
+}
+
+private void prepararProductosSalida(Elaboracion elaboracion) {
+        if (elaboracion.getCantidadFrascos1kg() != null
+                        && elaboracion.getCantidadFrascos1kg() > 0) {
+                elaboracion.setProductoElaborado1kg(buscarProductoSalida(
+                                elaboracion.getProductoElaborado1kg(), "1 kg"));
+        }
+        if (elaboracion.getCantidadFrascos420g() != null
+                        && elaboracion.getCantidadFrascos420g() > 0) {
+                elaboracion.setProductoElaborado420g(buscarProductoSalida(
+                                elaboracion.getProductoElaborado420g(), "420 g"));
+        }
+}
+
+private Producto buscarProductoSalida(Producto producto, String presentacion) {
+        if (producto == null || producto.getIdProducto() == null) {
+                throw new IllegalArgumentException(
+                                "Debe indicar el producto de salida de " + presentacion + ".");
+        }
+        return productoRepository.findById(producto.getIdProducto())
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                        "El producto de salida de " + presentacion + " no existe."));
+}
+
+private void registrarStockSalida(Elaboracion elaboracion, Producto productoElaborado) {
+        boolean tieneSalidas = false;
+        if (elaboracion.getCantidadFrascos1kg() != null
+                        && elaboracion.getCantidadFrascos1kg() > 0) {
+                stockService.registrarEntrada(
+                                elaboracion.getProductoElaborado1kg(),
+                                BigDecimal.valueOf(elaboracion.getCantidadFrascos1kg()),
+                                elaboracion.getUsuario().getIdUsuario(),
+                                "Elaboración de " + elaboracion.getProductoElaborado1kg().getNombreProducto());
+                tieneSalidas = true;
+        }
+        if (elaboracion.getCantidadFrascos420g() != null
+                        && elaboracion.getCantidadFrascos420g() > 0) {
+                stockService.registrarEntrada(
+                                elaboracion.getProductoElaborado420g(),
+                                BigDecimal.valueOf(elaboracion.getCantidadFrascos420g()),
+                                elaboracion.getUsuario().getIdUsuario(),
+                                "Elaboración de " + elaboracion.getProductoElaborado420g().getNombreProducto());
+                tieneSalidas = true;
+        }
+        if (!tieneSalidas) {
+                stockService.registrarEntrada(
+                                productoElaborado,
+                                elaboracion.getCantidadProducida(),
+                                elaboracion.getUsuario().getIdUsuario(),
+                                "Elaboración de " + productoElaborado.getNombreProducto());
+        }
 }
 
 
@@ -248,6 +348,14 @@ public Elaboracion guardar(Elaboracion elaboracion) {
             elaboracion.getCantidadFrascos420g()
     );
 
+    existente.setProductoElaborado1kg(
+            elaboracion.getProductoElaborado1kg()
+    );
+
+    existente.setProductoElaborado420g(
+            elaboracion.getProductoElaborado420g()
+    );
+
     existente.setUsuario(
             elaboracion.getUsuario()
     );
@@ -267,6 +375,8 @@ public Elaboracion guardar(Elaboracion elaboracion) {
             existente.getDetalles().add(detalle);
         }
     }
+
+        prepararProductosSalida(existente);
 
     return elaboracionRepository.save(existente);
 }

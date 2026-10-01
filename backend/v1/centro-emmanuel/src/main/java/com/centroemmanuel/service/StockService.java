@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,20 +34,33 @@ public class StockService {
 	}
 
 	@Transactional
-	public void descontar(Producto producto, double cantidad, Usuario usuario, String motivo) {
-		double stockActual = producto.getStockActual() == null ? 0 : producto.getStockActual();
-		if (cantidad <= 0 || stockActual < cantidad) {
+	public void descontar(Producto producto, BigDecimal cantidad, Usuario usuario, String motivo) {
+		BigDecimal stockActual = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
+		if (cantidad == null || cantidad.signum() <= 0 || stockActual.compareTo(cantidad) < 0) {
 			throw new IllegalArgumentException("Stock insuficiente para '" + producto.getNombreProducto() + "'.");
 		}
-		producto.setStockActual(stockActual - cantidad);
+		producto.setStockActual(stockActual.subtract(cantidad));
 		productoRepository.save(producto);
 		registrarMovimiento(producto, cantidad, "SALIDA", motivo, usuario);
 	}
 
 	@Transactional
+	public void registrarEntrada(Producto producto, BigDecimal cantidad, Integer idUsuario, String motivo) {
+		if (cantidad == null || cantidad.signum() <= 0) {
+			return;
+		}
+		Usuario usuario = usuarioRepository.findById(idUsuario)
+				.orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
+		BigDecimal stockActual = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
+		producto.setStockActual(stockActual.add(cantidad));
+		productoRepository.save(producto);
+		registrarMovimiento(producto, cantidad, "ENTRADA", motivo, usuario);
+	}
+
+	@Transactional
 	public void registrarMovimiento(MovimientoStockRequest request) {
 		if (request == null || request.getIdProducto() == null || request.getIdUsuario() == null
-				|| request.getCantidad() == null || request.getCantidad() <= 0) {
+				|| request.getCantidad() == null || request.getCantidad().signum() <= 0) {
 			throw new IllegalArgumentException("Producto, usuario y una cantidad positiva son obligatorios.");
 		}
 		String tipo = request.getTipo() == null ? "" : request.getTipo().trim().toUpperCase();
@@ -54,19 +68,16 @@ public class StockService {
 			throw new IllegalArgumentException("El tipo de movimiento debe ser ENTRADA o SALIDA.");
 		}
 		Producto producto = productoRepository.findById(request.getIdProducto())
-				.orElseThrow(() -> new IllegalArgumentException("El insumo no existe."));
-		if (producto.getTipo() != Tipo.INSUMO) {
-			throw new IllegalArgumentException("El producto seleccionado no es un insumo.");
-		}
+				.orElseThrow(() -> new IllegalArgumentException("El producto no existe."));
 		Usuario usuario = usuarioRepository.findById(request.getIdUsuario())
 				.orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
-		double stockActual = producto.getStockActual() == null ? 0 : producto.getStockActual();
-		if (tipo.equals("SALIDA") && stockActual < request.getCantidad()) {
+		BigDecimal stockActual = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
+		if (tipo.equals("SALIDA") && stockActual.compareTo(request.getCantidad()) < 0) {
 			throw new IllegalArgumentException("Stock insuficiente para '" + producto.getNombreProducto() + "'.");
 		}
 		producto.setStockActual(tipo.equals("ENTRADA")
-				? stockActual + request.getCantidad()
-				: stockActual - request.getCantidad());
+				? stockActual.add(request.getCantidad())
+				: stockActual.subtract(request.getCantidad()));
 		productoRepository.save(producto);
 		registrarMovimiento(producto, request.getCantidad(), tipo, request.getMotivo(), usuario);
 	}
@@ -80,18 +91,18 @@ public class StockService {
 	}
 
 	private List<StockResumenResponse> resumenPorTipo(Tipo tipo) {
-		Map<Integer, double[]> resumen = new HashMap<>();
+		Map<Integer, BigDecimal[]> resumen = new HashMap<>();
 		productoRepository.findAll().stream()
 				.filter(producto -> producto.getTipo() == tipo)
-				.forEach(producto -> resumen.put(producto.getIdProducto(), new double[]{0, 0}));
+				.forEach(producto -> resumen.put(producto.getIdProducto(), new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO}));
 
 		for (MovimientoStock movimiento : movimientoStockRepository.findAll()) {
-			double[] totales = resumen.get(movimiento.getProductoMov().getIdProducto());
+			BigDecimal[] totales = resumen.get(movimiento.getProductoMov().getIdProducto());
 			if (totales == null) continue;
 			if ("ENTRADA".equalsIgnoreCase(movimiento.getTipoMov())) {
-				totales[0] += movimiento.getCantidadMov();
+				totales[0] = totales[0].add(movimiento.getCantidadMov());
 			} else if ("SALIDA".equalsIgnoreCase(movimiento.getTipoMov())) {
-				totales[1] += movimiento.getCantidadMov();
+				totales[1] = totales[1].add(movimiento.getCantidadMov());
 			}
 		}
 		List<StockResumenResponse> resultado = new ArrayList<>();
@@ -107,7 +118,10 @@ public class StockService {
 						movimiento.getCantidadMov(),
 						movimiento.getTipoMov(),
 						movimiento.getFechaMov(),
-						movimiento.getMotivoMov()))
+						movimiento.getMotivoMov(),
+						movimiento.getUsuario() == null
+								? null
+								: movimiento.getUsuario().getNombreUsuario()))
 				.toList();
 	}
 
@@ -115,11 +129,11 @@ public class StockService {
 	return productoRepository.findAll().stream()
 		.filter(producto -> producto.getStockActual() != null
 			&& producto.getStockMinimo() != null
-			&& producto.getStockActual() <= producto.getStockMinimo())
+			&& producto.getStockActual().compareTo(producto.getStockMinimo()) <= 0)
 		.toList();
     }
 
-	private void registrarMovimiento(Producto producto, double cantidad, String tipo,
+	private void registrarMovimiento(Producto producto, BigDecimal cantidad, String tipo,
 									 String motivo, Usuario usuario) {
 		MovimientoStock movimiento = new MovimientoStock();
 		movimiento.setProductoMov(producto);

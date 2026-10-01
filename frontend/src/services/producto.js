@@ -8,8 +8,8 @@ export const obtenerProductoPorId = (id) => {
     return api.get(`/productos/${id}`);
 };
 
-export const crearProducto = (producto) => {
-    return api.post("/productos", producto);
+export const crearProducto = (producto, idUsuario) => {
+    return api.post("/productos", producto, { params: { idUsuario } });
 };
 
 export const actualizarProducto = (id, producto) => {

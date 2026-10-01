@@ -1,9 +1,11 @@
 package com.centroemmanuel.dto;
 
+import java.math.BigDecimal;
+
 public class MovimientoStockRequest {
     private Integer idProducto;
     private Integer idUsuario;
-    private Double cantidad;
+    private BigDecimal cantidad;
     private String tipo;
     private String motivo;
 
@@ -11,7 +13,7 @@ public class MovimientoStockRequest {
     }
 
     public MovimientoStockRequest(Integer idProducto, Integer idUsuario,
-                                  Double cantidad, String tipo, String motivo) {
+                                  BigDecimal cantidad, String tipo, String motivo) {
         this.idProducto = idProducto;
         this.idUsuario = idUsuario;
         this.cantidad = cantidad;
@@ -25,8 +27,8 @@ public class MovimientoStockRequest {
     public Integer getIdUsuario() { return idUsuario; }
     public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
 
-    public Double getCantidad() { return cantidad; }
-    public void setCantidad(Double cantidad) { this.cantidad = cantidad; }
+    public BigDecimal getCantidad() { return cantidad; }
+    public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }

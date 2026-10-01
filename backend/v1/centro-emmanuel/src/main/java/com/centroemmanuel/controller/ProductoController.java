@@ -1,6 +1,7 @@
 package com.centroemmanuel.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Producto> buscarPorId(
-            @PathVariable Integer id) {
+            @PathVariable("id") Integer id) {
 
         Optional<Producto> producto =
                 productoService.buscarPorId(id);
@@ -44,21 +45,21 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<Producto> guardar(
-            @RequestBody Producto producto) {
-
-        Producto nuevoProducto =
-                productoService.guardar(producto);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(nuevoProducto);
+    public ResponseEntity<?> guardar(
+            @RequestBody Producto producto,
+            @RequestParam(name = "idUsuario", required = false) Integer idUsuario) {
+        try {
+            Producto nuevoProducto = productoService.guardar(producto, idUsuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", error.getMessage()));
+        }
     }
 
 
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizar(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @RequestBody Producto producto) {
 
         Producto actualizado =
@@ -74,7 +75,7 @@ public class ProductoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(
-            @PathVariable Integer id) {
+            @PathVariable("id") Integer id) {
 
         Optional<Producto> producto =
                 productoService.buscarPorId(id);

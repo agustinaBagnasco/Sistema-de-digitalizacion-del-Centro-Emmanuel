@@ -7,6 +7,36 @@ import Textarea from "../../components/ui/Textarea";
 import "../../components/ui/Forms.css";
 import api from "../../services/api";
 
+function normalizarTexto(texto) {
+  return texto
+    ?.toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function obtenerPresentacion(nombre) {
+  const texto = normalizarTexto(nombre) || "";
+  if (/(?:^|\D)(?:1\s*kg|1000\s*g)(?:\D|$)/i.test(texto)) {
+    return "1kg";
+  }
+  if (/(?:420\s*g|0[,.]?420\s*kg|1\s*\/\s*2\s*kg)/i.test(texto)) {
+    return "420g";
+  }
+  return null;
+}
+
+function obtenerNombreBase(nombre) {
+  return (nombre || "Producto")
+    .replace(/\s*(?:1\s*kg|1000\s*g|420\s*g|0[,.]?420\s*kg|1\s*\/\s*2\s*kg)\s*$/i, "")
+    .trim();
+}
+
+function obtenerNombreFruta(nombreProducto) {
+  return normalizarTexto(nombreProducto)
+    ?.replace(/^(?:dulce|mermelada)\s+de\s+/i, "")
+    .trim();
+}
+
 export default function Mermeladas() {
 
   const [form, setForm] = useState({
@@ -28,7 +58,6 @@ export default function Mermeladas() {
   const [productos, setProductos] = useState([]);
   const [insumosFruta, setInsumosFruta] = useState([]);
   const [insumosAzucar, setInsumosAzucar] = useState([]);
-  const [cantidadAzucar, setCantidadAzucar] = useState("");
 
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
@@ -70,7 +99,7 @@ export default function Mermeladas() {
         producto =>
           producto.activo &&
           producto.tipo === "INSUMO" &&
-          producto.nombreProducto?.toLowerCase().includes("azúcar")
+          normalizarTexto(producto.nombreProducto).includes("azucar")
       );
 
       setProductos(productosMermelada);
@@ -106,12 +135,38 @@ export default function Mermeladas() {
   // OPCIONES DE SELECT
   // =========================================================
 
-  const opcionesProductos = productos.map(producto => ({
-    value: producto.idProducto,
-    label: producto.nombreProducto,
+  const gruposMermelada = productos.reduce((grupos, producto) => {
+    const nombreBase = obtenerNombreBase(producto.nombreProducto);
+    const clave = normalizarTexto(nombreBase);
+    const grupo = grupos.get(clave) || {
+      clave,
+      nombre: nombreBase,
+      producto1kg: null,
+      producto420g: null,
+    };
+    const presentacion = obtenerPresentacion(producto.nombreProducto);
+    if (presentacion === "1kg") grupo.producto1kg = producto;
+    if (presentacion === "420g") grupo.producto420g = producto;
+    grupos.set(clave, grupo);
+    return grupos;
+  }, new Map());
+
+  const opcionesProductos = Array.from(gruposMermelada.values()).map(grupo => ({
+    value: grupo.clave,
+    label: grupo.nombre,
   }));
 
-  const opcionesFrutas = insumosFruta.map(insumo => ({
+  const grupoSeleccionado = gruposMermelada.get(form.productoElaborado);
+  const nombreFrutaEsperada = obtenerNombreFruta(grupoSeleccionado?.nombre);
+  const frutaAutomatica = insumosFruta.find((insumo) => {
+    const nombreFruta = normalizarTexto(insumo.nombreProducto);
+    return nombreFruta && nombreFrutaEsperada && (
+      nombreFruta === nombreFrutaEsperada ||
+      nombreFrutaEsperada.includes(nombreFruta)
+    );
+  });
+
+  const opcionesFrutas = (frutaAutomatica ? [frutaAutomatica] : insumosFruta).map(insumo => ({
     value: insumo.idProducto,
     label: insumo.nombreProducto,
   }));
@@ -120,6 +175,18 @@ export default function Mermeladas() {
     value: insumo.idProducto,
     label: insumo.nombreProducto,
   }));
+
+  const frutaUtilizadaKg = parseFloat(form.frutaUtilizada) || 0;
+  const frascos1kgActuales = parseFloat(form.cantidadFrascos1kg) || 0;
+  const frascos420Actuales = parseFloat(form.cantidadFrascos420) || 0;
+  const maxFrascos1kg = Math.max(
+    Math.floor((frutaUtilizadaKg - frascos420Actuales * 0.420) + 0.000001),
+    0
+  );
+  const maxFrascos420 = Math.max(
+    Math.floor(((frutaUtilizadaKg - frascos1kgActuales) / 0.420) + 0.000001),
+    0
+  );
 
   // =========================================================
   // CAMBIOS DEL FORMULARIO
@@ -133,6 +200,18 @@ export default function Mermeladas() {
         ...prev,
         [name]: value,
       };
+
+      if (name === "productoElaborado") {
+        const grupo = gruposMermelada.get(value);
+        const nombreFruta = obtenerNombreFruta(grupo?.nombre);
+        const fruta = insumosFruta.find((insumo) => {
+          const nombreInsumo = normalizarTexto(insumo.nombreProducto);
+          return nombreInsumo && nombreFruta && (
+            nombreInsumo === nombreFruta || nombreFruta.includes(nombreInsumo)
+          );
+        });
+        nuevoForm.fruta = fruta?.idProducto || "";
+      }
 
       if (
         name === "cantidadFrutaTotal" ||
@@ -148,6 +227,23 @@ export default function Mermeladas() {
           total - descartada,
           0
         );
+      }
+
+      if (name === "cantidadFrascos1kg" || name === "cantidadFrascos420") {
+        const frutaDisponible = parseFloat(nuevoForm.frutaUtilizada) || 0;
+        const frascos1kg = name === "cantidadFrascos1kg"
+          ? parseFloat(value) || 0
+          : parseFloat(nuevoForm.cantidadFrascos1kg) || 0;
+        const frascos420 = name === "cantidadFrascos420"
+          ? parseFloat(value) || 0
+          : parseFloat(nuevoForm.cantidadFrascos420) || 0;
+        const pesoSolicitado = frascos1kg + (frascos420 * 0.420);
+
+        if (pesoSolicitado > frutaDisponible) {
+          nuevoForm[name] = name === "cantidadFrascos1kg"
+            ? String(Math.max(Math.floor(frutaDisponible - frascos420 * 0.420), 0))
+            : String(Math.max(Math.floor((frutaDisponible - frascos1kg) / 0.420), 0));
+        }
       }
 
       return nuevoForm;
@@ -203,6 +299,12 @@ export default function Mermeladas() {
       return;
     }
 
+    const grupoMermelada = gruposMermelada.get(form.productoElaborado);
+    if (!grupoMermelada) {
+      alert("No se encontró la familia de productos elaborados seleccionada.");
+      return;
+    }
+
     try {
 
       setCargando(true);
@@ -212,6 +314,29 @@ export default function Mermeladas() {
 
       const cantidadFrascos420 =
         parseFloat(form.cantidadFrascos420) || 0;
+
+      if (cantidadFrascos1kg > 0 && !grupoMermelada.producto1kg) {
+        alert("No existe una presentación de 1 kg para este dulce.");
+        return;
+      }
+      if (cantidadFrascos420 > 0 && !grupoMermelada.producto420g) {
+        alert("No existe una presentación de 1/2 kg para este dulce.");
+        return;
+      }
+
+      const frutaUtilizada =
+        parseFloat(form.frutaUtilizada) || 0;
+
+      const frutaRequerida =
+        cantidadFrascos1kg + (cantidadFrascos420 * 0.420);
+
+      if (frutaRequerida > frutaUtilizada + 0.000001) {
+        alert(
+          `La producción requiere ${frutaRequerida.toFixed(3)} kg de fruta, ` +
+          `pero solo hay ${frutaUtilizada.toFixed(3)} kg utilizables.`
+        );
+        return;
+      }
 
       const cantidadProducida =
         cantidadFrascos1kg + cantidadFrascos420;
@@ -231,7 +356,7 @@ export default function Mermeladas() {
 Fruta total: ${form.cantidadFrutaTotal} kg.
 Fruta descartada: ${form.frutaDescartada} kg.
 Fruta utilizada: ${form.frutaUtilizada} kg.
-Azúcar: ${form.azucar} kg.
+Azúcar utilizada: ${form.cantidadAzucar || 0} kg.
 Frascos 1 kg: ${cantidadFrascos1kg}.
 Frascos 420 g: ${cantidadFrascos420}.
 ${form.comentario || ""}
@@ -240,14 +365,26 @@ ${form.comentario || ""}
       const elaboracion = {
 
         productoElaborado: {
-          idProducto: Number(form.productoElaborado)
+          idProducto: (grupoMermelada.producto1kg || grupoMermelada.producto420g).idProducto
         },
+
+        productoElaborado1kg: cantidadFrascos1kg > 0
+          ? { idProducto: grupoMermelada.producto1kg.idProducto }
+          : null,
+
+        productoElaborado420g: cantidadFrascos420 > 0
+          ? { idProducto: grupoMermelada.producto420g.idProducto }
+          : null,
 
         fechaElaboracion: form.fecha,
 
         tiempoElaboracion: tiempoTotalMinutos,
 
         cantidadProducida: cantidadProducida,
+
+        cantidadFrascos1kg: cantidadFrascos1kg,
+
+        cantidadFrascos420g: cantidadFrascos420,
 
         usuario: {
           idUsuario: usuarioId
@@ -391,9 +528,7 @@ ${form.comentario || ""}
     const detalleAzucar =
       registro.detalles?.find(
         detalle =>
-          detalle.insumoUtilizado?.nombreProducto
-            ?.toLowerCase()
-            .includes("azúcar")
+          normalizarTexto(detalle.insumoUtilizado?.nombreProducto).includes("azucar")
       );
 
     setForm({
@@ -401,7 +536,7 @@ ${form.comentario || ""}
         registro.fechaElaboracion || "",
 
       productoElaborado:
-        registro.productoElaborado?.idProducto || "",
+        normalizarTexto(obtenerNombreBase(registro.productoElaborado?.nombreProducto)) || "",
 
       fruta:
         detalleFruta?.insumoUtilizado?.idProducto || "",
@@ -524,7 +659,8 @@ ${form.comentario || ""}
               value={form.fruta}
               onChange={handleChange}
               options={opcionesFrutas}
-              placeholder="Seleccione una fruta"
+              placeholder={frutaAutomatica ? "Fruta seleccionada automáticamente" : "Seleccione una fruta"}
+              disabled={Boolean(frutaAutomatica)}
               required
             />
           </div>
@@ -671,7 +807,10 @@ ${form.comentario || ""}
               value={form.cantidadFrascos1kg}
               onChange={handleChange}
               min="0"
+              max={maxFrascos1kg}
             />
+
+            <small>Máximo disponible: {maxFrascos1kg} frascos</small>
 
           </div>
 
@@ -689,7 +828,10 @@ ${form.comentario || ""}
               value={form.cantidadFrascos420}
               onChange={handleChange}
               min="0"
+              max={maxFrascos420}
             />
+
+            <small>Máximo disponible: {maxFrascos420} frascos</small>
 
           </div>
 

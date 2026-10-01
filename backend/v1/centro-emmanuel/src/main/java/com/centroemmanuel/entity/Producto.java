@@ -6,6 +6,7 @@ import com.centroemmanuel.enums.UnidadMedida;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "producto")
@@ -22,14 +23,14 @@ public class Producto {
     @Column(name = "descripcion")
     private String descripcion;
 
-    @Column(name = "stock_actual")
-    private Double stockActual;
+    @Column(name = "stock_actual", precision = 15, scale = 3)
+    private BigDecimal stockActual;
 
-    @Column(name = "stock_minimo")
-    private Double stockMinimo;
+    @Column(name = "stock_minimo", precision = 15, scale = 3)
+    private BigDecimal stockMinimo;
 
-    @Column(name = "costo")
-    private Double costo;
+    @Column(name = "costo", precision = 15, scale = 3)
+    private BigDecimal costo;
 
     @Column(name = "activo")
     private boolean activo;
@@ -39,7 +40,7 @@ public class Producto {
     private Tipo tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "categoria")
+    @Column(name = "categoria", nullable = true)
     private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
@@ -54,20 +55,23 @@ public class Producto {
 
     public Producto() {
     }
-
-    public Producto(String nombreProducto, String descripcion, Double stockActual,
-                    Double stockMinimo, boolean activo, Tipo tipo,
-                    UnidadMedida unidadMedida) {
-        this.nombreProducto = nombreProducto;
-        this.descripcion = descripcion;
-        this.stockActual = stockActual;
-        this.stockMinimo = stockMinimo;
-        this.activo = activo;
-        this.tipo = tipo;
-        this.unidadMedida = unidadMedida;
+    //INSUMOS
+    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, BigDecimal pStockActual,
+                    BigDecimal pStockMinimo, boolean pActivo, Tipo pTipo,
+                    UnidadMedida pUnidadMedida) {
+        this.idProducto = pIdProducto;
+        this.nombreProducto = pNombreProducto;
+        this.descripcion = pDescripcion;
+        this.stockActual = pStockActual;
+        this.stockMinimo = pStockMinimo;
+        this.activo = pActivo;
+        this.tipo = pTipo;
+        this.unidadMedida = pUnidadMedida;
     }
-
-    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, Double pStockActual, Double pStockMinimo, Double pCosto, boolean pActivo, Categoria pCategoria, Tipo pTipo, UnidadMedida pUnidadMedida){
+    //PRODUCTOS
+    public Producto(int pIdProducto, String pNombreProducto, String pDescripcion, BigDecimal pStockActual,
+                    BigDecimal pStockMinimo, BigDecimal pCosto, boolean pActivo, Categoria pCategoria,
+                    Tipo pTipo, UnidadMedida pUnidadMedida){
         this.idProducto = pIdProducto;
         this.nombreProducto = pNombreProducto;
         this.descripcion = pDescripcion;
@@ -106,27 +110,27 @@ public void setDescripcion(String descripcion) {
     this.descripcion = descripcion;
 }
 
-public Double getStockActual() {
+public BigDecimal getStockActual() {
     return stockActual;
 }
 
-public void setStockActual(Double stockActual) {
+public void setStockActual(BigDecimal stockActual) {
     this.stockActual = stockActual;
 }
 
-public Double getStockMinimo() {
+public BigDecimal getStockMinimo() {
     return stockMinimo;
 }
 
-public void setStockMinimo(Double stockMinimo) {
+public void setStockMinimo(BigDecimal stockMinimo) {
     this.stockMinimo = stockMinimo;
 }
 
-public Double getCosto() {
+public BigDecimal getCosto() {
     return costo;
 }
 
-public void setCosto(Double costo) {
+public void setCosto(BigDecimal costo) {
     this.costo = costo;
 }
 public boolean isActivo() {

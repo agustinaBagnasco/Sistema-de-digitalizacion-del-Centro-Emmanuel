@@ -2,19 +2,24 @@ package com.centroemmanuel.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.centroemmanuel.entity.Producto;
+import com.centroemmanuel.enums.Tipo;
 import com.centroemmanuel.repository.ProductoRepository;
 
 @Service
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final StockService stockService;
 
-    public ProductoService(ProductoRepository productoRepository) {
+    public ProductoService(ProductoRepository productoRepository, StockService stockService) {
         this.productoRepository = productoRepository;
+        this.stockService = stockService;
     }
 
     // Listar productos
@@ -28,15 +33,24 @@ public class ProductoService {
     }
 
     // Guardar producto
-    public Producto guardar(Producto producto) {
-            if (producto.getStockActual() == null) {
-            producto.setStockActual(0.0);
+    @Transactional
+    public Producto guardar(Producto producto, Integer idUsuario) {
+        BigDecimal stockInicial = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
+        if (stockInicial.signum() < 0) {
+            throw new IllegalArgumentException("El stock inicial no puede ser negativo.");
+        }
+        if (stockInicial.signum() > 0 && idUsuario == null) {
+            throw new IllegalArgumentException("Se requiere el usuario para registrar el stock inicial.");
         }
 
+        producto.setStockActual(BigDecimal.ZERO);
         if (producto.getStockMinimo() == null) {
-            producto.setStockMinimo(0.0);
+            producto.setStockMinimo(BigDecimal.ZERO);
         }
-        return productoRepository.save(producto);
+        normalizarInsumo(producto);
+        Producto guardado = productoRepository.save(producto);
+        stockService.registrarEntrada(guardado, stockInicial, idUsuario, "Stock inicial");
+        return guardado;
     }
 
     // Actualizar producto
@@ -81,11 +95,18 @@ public class ProductoService {
             producto.setTipo(
                 datos.getTipo()
                 );
+            normalizarInsumo(producto);
 
             return productoRepository.save(producto);
         }
 
         return null;
+    }
+
+    private void normalizarInsumo(Producto producto) {
+        if (producto.getTipo() == Tipo.INSUMO) {
+            producto.setCosto(null);
+        }
     }
 
     // Eliminar producto

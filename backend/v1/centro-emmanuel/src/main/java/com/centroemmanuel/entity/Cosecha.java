@@ -2,6 +2,7 @@ package com.centroemmanuel.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cosecha")
@@ -16,8 +17,8 @@ public class Cosecha {
     @JoinColumn(name = "id_producto")
     private Producto productoCosecha;
 
-    @Column(name = "cantidad_cosecha", nullable = false)
-    private double cantidadCosecha;
+    @Column(name = "cantidad_cosecha", nullable = false, precision = 15, scale = 3)
+    private BigDecimal cantidadCosecha;
 
     @Column(name = "fecha_cosecha")
     private LocalDate fechaCosecha;
@@ -31,7 +32,7 @@ public class Cosecha {
 
     public Cosecha(){}
 
-    public Cosecha(Integer idCosecha, Producto productoCosecha, double cantidadCosecha,
+    public Cosecha(Integer idCosecha, Producto productoCosecha, BigDecimal cantidadCosecha,
                    String observaciones, Usuario usuario){
         this.idCosecha = idCosecha;
         this.productoCosecha = productoCosecha;
@@ -48,8 +49,8 @@ public class Cosecha {
     public Producto getProductoCosecha(){return productoCosecha;}
     public void setProductoCosecha(Producto pProductoCosecha){this.productoCosecha = pProductoCosecha;}
 
-    public double getCantidadCosecha(){return cantidadCosecha;}
-    public void setCantidadCosecha(double pCantidadCosecha){this.cantidadCosecha = pCantidadCosecha;}
+    public BigDecimal getCantidadCosecha(){return cantidadCosecha;}
+    public void setCantidadCosecha(BigDecimal pCantidadCosecha){this.cantidadCosecha = pCantidadCosecha;}
 
     public LocalDate getFechaCosecha(){return fechaCosecha;}
 

@@ -2,6 +2,7 @@ package com.centroemmanuel.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "produccion_leche")
@@ -15,23 +16,23 @@ public class ProduccionLeche {
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @Column(name = "litros_terneros", nullable = false)
-    private double litrosTerneros;
+    @Column(name = "litros_terneros", nullable = false, precision = 15, scale = 3)
+    private BigDecimal litrosTerneros;
 
-    @Column(name = "venta_directa", nullable = false)
-    private double ventaDirecta;
+    @Column(name = "venta_directa", nullable = false, precision = 15, scale = 3)
+    private BigDecimal ventaDirecta;
 
-    @Column(name = "consumo_cocina", nullable = false)
-    private double consumoCocina;
+    @Column(name = "consumo_cocina", nullable = false, precision = 15, scale = 3)
+    private BigDecimal consumoCocina;
 
-    @Column(name = "elaboracion_quesos", nullable = false)
-    private double elaboracionQuesos;
+    @Column(name = "elaboracion_quesos", nullable = false, precision = 15, scale = 3)
+    private BigDecimal elaboracionQuesos;
 
-    @Column(name = "elaboracion_dulce_de_leche", nullable = false)
-    private double elaboracionDulceDeLeche;
+    @Column(name = "elaboracion_dulce_de_leche", nullable = false, precision = 15, scale = 3)
+    private BigDecimal elaboracionDulceDeLeche;
 
-    @Column(name = "elaboracion_quark", nullable = false)
-    private double elaboracionQuark;
+    @Column(name = "elaboracion_quark", nullable = false, precision = 15, scale = 3)
+    private BigDecimal elaboracionQuark;
 
     @Column(length = 500)
     private String comentario;
@@ -59,51 +60,51 @@ public class ProduccionLeche {
         this.fecha = fecha;
     }
 
-    public double getLitrosTerneros() {
+    public BigDecimal getLitrosTerneros() {
         return litrosTerneros;
     }
 
-    public void setLitrosTerneros(double litrosTerneros) {
+    public void setLitrosTerneros(BigDecimal litrosTerneros) {
         this.litrosTerneros = litrosTerneros;
     }
 
-    public double getVentaDirecta() {
+    public BigDecimal getVentaDirecta() {
         return ventaDirecta;
     }
 
-    public void setVentaDirecta(double ventaDirecta) {
+    public void setVentaDirecta(BigDecimal ventaDirecta) {
         this.ventaDirecta = ventaDirecta;
     }
 
-    public double getConsumoCocina() {
+    public BigDecimal getConsumoCocina() {
         return consumoCocina;
     }
 
-    public void setConsumoCocina(double consumoCocina) {
+    public void setConsumoCocina(BigDecimal consumoCocina) {
         this.consumoCocina = consumoCocina;
     }
 
-    public double getElaboracionQuesos() {
+    public BigDecimal getElaboracionQuesos() {
         return elaboracionQuesos;
     }
 
-    public void setElaboracionQuesos(double elaboracionQuesos) {
+    public void setElaboracionQuesos(BigDecimal elaboracionQuesos) {
         this.elaboracionQuesos = elaboracionQuesos;
     }
 
-    public double getElaboracionDulceDeLeche() {
+    public BigDecimal getElaboracionDulceDeLeche() {
         return elaboracionDulceDeLeche;
     }
 
-    public void setElaboracionDulceDeLeche(double elaboracionDulceDeLeche) {
+    public void setElaboracionDulceDeLeche(BigDecimal elaboracionDulceDeLeche) {
         this.elaboracionDulceDeLeche = elaboracionDulceDeLeche;
     }
 
-    public double getElaboracionQuark() {
+    public BigDecimal getElaboracionQuark() {
         return elaboracionQuark;
     }
 
-    public void setElaboracionQuark(double elaboracionQuark) {
+    public void setElaboracionQuark(BigDecimal elaboracionQuark) {
         this.elaboracionQuark = elaboracionQuark;
     }
 

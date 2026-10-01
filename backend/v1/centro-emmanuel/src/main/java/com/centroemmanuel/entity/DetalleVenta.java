@@ -20,8 +20,8 @@ public class DetalleVenta {
     @JoinColumn(name = "id_producto")
     private Producto productoVendido;
 
-    @Column(name = "cantidad")
-    private double cantidadDV;
+    @Column(name = "cantidad", precision = 15, scale = 3)
+    private BigDecimal cantidadDV;
 
     @Column(name = "precio_unitario", precision = 10, scale = 2)
     private BigDecimal precioUnitario;
@@ -33,7 +33,7 @@ public class DetalleVenta {
 
     public DetalleVenta(Integer idDetalleVenta,
                         Producto productoVendido,
-                        double cantidadDV,
+                        BigDecimal cantidadDV,
                         BigDecimal precioUnitario){
         this.idDetalleVenta = idDetalleVenta;
         this.productoVendido = productoVendido;
@@ -51,8 +51,8 @@ public class DetalleVenta {
     public Producto getProductoVendido(){return productoVendido;}
     public void setProductoVendido(Producto pProductoVendido){this.productoVendido = pProductoVendido;}
 
-    public double getCantidadDV(){return cantidadDV;}
-    public void setCantidadDV(double pCantidadDV){this.cantidadDV = pCantidadDV;}
+    public BigDecimal getCantidadDV(){return cantidadDV;}
+    public void setCantidadDV(BigDecimal pCantidadDV){this.cantidadDV = pCantidadDV;}
 
     public BigDecimal getPrecioUnitario(){return precioUnitario;}
     public void setPrecioUnitario(BigDecimal pPrecioUnitario){this.precioUnitario = pPrecioUnitario;}
