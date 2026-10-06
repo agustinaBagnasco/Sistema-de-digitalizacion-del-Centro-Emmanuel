@@ -8,6 +8,7 @@ public class MovimientoStockRequest {
     private BigDecimal cantidad;
     private String tipo;
     private String motivo;
+    private String destinoLeche;
 
     public MovimientoStockRequest() {
     }
@@ -21,18 +22,23 @@ public class MovimientoStockRequest {
         this.motivo = motivo;
     }
 
-    public Integer getIdProducto() { return idProducto; }
-    public void setIdProducto(Integer idProducto) { this.idProducto = idProducto; }
+    //region Getters y Setters
+    public Integer getIdProducto(){return idProducto;}
+    public void setIdProducto(Integer pIdProducto){this.idProducto = pIdProducto;}
 
-    public Integer getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
+    public Integer getIdUsuario(){return idUsuario;}
+    public void setIdUsuario(Integer pIdUsuario){this.idUsuario = pIdUsuario;}
 
-    public BigDecimal getCantidad() { return cantidad; }
-    public void setCantidad(BigDecimal cantidad) { this.cantidad = cantidad; }
+    public BigDecimal getCantidad(){return cantidad;}
+    public void setCantidad(BigDecimal pCantidad){this.cantidad = pCantidad;}
 
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
+    public String getTipo(){return tipo;}
+    public void setTipo(String pTipo){this.tipo = pTipo;}
 
-    public String getMotivo() { return motivo; }
-    public void setMotivo(String motivo) { this.motivo = motivo; }
+    public String getMotivo(){return motivo;}
+    public void setMotivo(String pMotivo){this.motivo = pMotivo;}
+
+    public String getDestinoLeche(){return destinoLeche;}
+    public void setDestinoLeche(String pDestinoLeche){this.destinoLeche = pDestinoLeche;}
+    //endregion
 }

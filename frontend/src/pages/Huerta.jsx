@@ -5,12 +5,21 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Textarea from "../components/ui/Textarea";
 import api from "../services/api";
-import FormField from '../components/ui/FormField'
+import { mensajeError, puedeModificarRegistro } from "../utils/errores";
+import { etiquetaInsumo } from "../utils/formatNumber";
+import { categorias } from "../services/producto";
+
+const categoriasCosecha = categorias.filter(({ value }) => (
+  ["FRUTA", "FRUTASYHORTALIZAS", "GRANOS"].includes(value)
+)).map((categoria) => (
+  categoria.value === "FRUTA" ? { ...categoria, label: "Frutas" } : categoria
+));
 
 export default function Huerta() {
 
   const [form, setForm] = useState({
     fecha: "",
+    categoria: "",
     cultivo: "",
     cantidad: "",
     comentario: "",
@@ -19,6 +28,7 @@ export default function Huerta() {
   const [productos, setProductos] = useState([]);
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
+  const [guardando, setGuardando] = useState(false);
 
      useEffect(() => {
     cargarProductos();
@@ -41,33 +51,21 @@ export default function Huerta() {
 }
  
 const opcionesProductos = productos
-  .filter(
-    producto =>
-      producto.activo &&
-      producto.categoria === "FRUTASYHORTALIZAS"
-  )
+  .filter(producto => (
+    producto.activo
+    && producto.tipo === "INSUMO"
+    && categoriasCosecha.some(({ value }) => value === producto.categoria)
+    && (!form.categoria || producto.categoria === form.categoria)
+  ))
   .map(producto => ({
     value: producto.idProducto,
-    label: producto.nombreProducto,
+    label: etiquetaInsumo(producto),
   }));
 
 
 async function cargarProductos() {
   try {
     const respuesta = await api.get("/productos");
-
-    console.log("========== HUERTA ==========");
-    console.log("PRODUCTOS:", respuesta.data);
-
-    respuesta.data.forEach(producto => {
-      console.log(
-        producto.nombreProducto,
-        "| activo:", producto.activo,
-        "| tipo:", producto.tipo,
-        "| categoria:", producto.categoria
-      );
-    });
-
     setProductos(respuesta.data);
 
   } catch (error) {
@@ -76,19 +74,36 @@ async function cargarProductos() {
 }
 
   function handleChange(e) {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
-
   }
 
   async function guardar(e) {
 
     e.preventDefault();
 
+    const cantidad = Number(form.cantidad);
+    if (!Number.isFinite(cantidad) || cantidad <= 0) {
+      alert("La cantidad cosechada debe ser mayor que cero.");
+      return;
+    }
+
+    const insumoSeleccionado = productos.find((producto) => (
+      String(producto.idProducto) === String(form.cultivo)
+      && producto.activo
+      && producto.tipo === "INSUMO"
+      && categoriasCosecha.some(({ value }) => value === producto.categoria)
+      && producto.categoria === form.categoria
+    ));
+    if (!insumoSeleccionado) {
+      alert("Seleccione un insumo activo de la categoría elegida.");
+      return;
+    }
+
     try {
+      setGuardando(true);
 
       // Usuario que inició sesión
       const usuario = JSON.parse(
@@ -110,9 +125,7 @@ async function cargarProductos() {
 
         fechaCosecha: form.fecha,
 
-        cantidadCosecha: Number(
-          form.cantidad
-        ),
+        cantidadCosecha: cantidad,
 
         observaciones: form.comentario,
 
@@ -129,11 +142,6 @@ async function cargarProductos() {
         }
       };
 
-
-      console.log(
-        "Datos enviados:",
-        datos
-      );
 
 
       if (editando !== null) {
@@ -165,18 +173,32 @@ async function cargarProductos() {
         error
       );
 
+      alert(mensajeError(error, "No se pudo guardar la cosecha."));
+
+    } finally {
+      setGuardando(false);
     }
   }
 
   function editarRegistro(registro) {
+    const categoriaProducto = registro.productoCosecha?.categoria || "";
+    const categoriaPermitida = categoriasCosecha.some(
+      ({ value }) => value === categoriaProducto
+    );
 
     setForm({
 
       fecha:
         registro.fechaCosecha || "",
 
+      categoria:
+        categoriaPermitida ? categoriaProducto : "",
+
       cultivo:
-        registro.productoCosecha?.idProducto || "",
+        categoriaPermitida
+          && registro.productoCosecha?.tipo === "INSUMO"
+          ? registro.productoCosecha.idProducto
+          : "",
 
       cantidad:
         registro.cantidadCosecha || "",
@@ -194,6 +216,10 @@ async function cargarProductos() {
 
   async function eliminarRegistro(id) {
 
+    if (!window.confirm("¿Está seguro de eliminar esta cosecha? Se descontará del stock del insumo.")) {
+      return;
+    }
+
     try {
 
       await api.delete(
@@ -209,6 +235,8 @@ async function cargarProductos() {
         error
       );
 
+      alert(mensajeError(error, "No se pudo eliminar la cosecha."));
+
     }
 
   }
@@ -218,6 +246,7 @@ async function cargarProductos() {
     setForm({
 
       fecha: "",
+      categoria: "",
       cultivo: "",
       cantidad: "",
       comentario: "",
@@ -253,9 +282,28 @@ async function cargarProductos() {
           </div>
 
           <div className="input-group">
-
             <label>
-              Cultivo
+              Categoría
+            </label>
+            <Select
+              name="categoria"
+              value={form.categoria}
+              onChange={(evento) => {
+                setForm((formulario) => ({
+                  ...formulario,
+                  categoria: evento.target.value,
+                  cultivo: "",
+                }));
+              }}
+              options={categoriasCosecha}
+              placeholder="Seleccione una categoría"
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>
+              Insumo cosechado
             </label>
 
             <Select
@@ -263,7 +311,10 @@ async function cargarProductos() {
               value={form.cultivo}
               onChange={handleChange}
               options={opcionesProductos}
-              placeholder="Seleccione un cultivo"
+              placeholder={form.categoria
+                ? "Seleccione un insumo"
+                : "Primero seleccione una categoría"}
+              disabled={!form.categoria}
               required
             />
           </div>
@@ -275,6 +326,8 @@ async function cargarProductos() {
 
             <Input
               type="number"
+              min="0.01"
+              step="0.01"
               name="cantidad"
               value={form.cantidad}
               onChange={handleChange}
@@ -299,8 +352,11 @@ async function cargarProductos() {
             <Button
               type="submit"
               className="btn btn-primary"
+              disabled={guardando}
             >
-              {editando !== null
+              {guardando
+                ? "Guardando..."
+                : editando !== null
                 ? "Actualizar"
                 : "Guardar"}
             </Button>
@@ -320,9 +376,7 @@ async function cargarProductos() {
                   Fecha
                 </th>
 
-                <th>
-                  Producto
-                </th>
+                <th>Insumo</th>
 
                 <th>
                   Cantidad
@@ -356,16 +410,11 @@ async function cargarProductos() {
 
                   <td>
 
-                    {
-                      opcionesProductos.find(
-                        o =>
-                          String(o.value) ===
-                          String(
-                            r.productoCosecha
-                              ?.idProducto
-                          )
+                    {r.productoCosecha?.nombreProducto
+                      || opcionesProductos.find(
+                        opcion => String(opcion.value) === String(r.productoCosecha?.idProducto)
                       )?.label
-                    }
+                      || "Insumo no disponible"}
 
                   </td>
 
@@ -384,6 +433,7 @@ async function cargarProductos() {
 
                       <Button
                         variant="secondary"
+                        disabled={!puedeModificarRegistro(r)}
                         onClick={() =>
                           editarRegistro(r)
                         }
@@ -394,6 +444,7 @@ async function cargarProductos() {
 
                       <Button
                         variant="danger"
+                        disabled={!puedeModificarRegistro(r)}
                         onClick={() =>
                           eliminarRegistro(
                             r.idCosecha

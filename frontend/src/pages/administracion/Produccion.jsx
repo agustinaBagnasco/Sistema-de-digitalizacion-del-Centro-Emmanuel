@@ -3,6 +3,7 @@ import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import { sortActiveLast } from "../../utils/sortActiveLast";
 import "../../styles/global.css";
 
 function Movimientos() {
@@ -135,7 +136,7 @@ function Movimientos() {
                 </tr>
               </thead>
               <tbody>
-                {productos.map((producto) => (
+                {sortActiveLast(productos).map((producto) => (
                   <tr key={producto.idProducto}>
                     <td>{producto.nombreProducto}</td>
                     <td>{producto.tipo === "INSUMO" ? "Insumo" : "Producto"}</td>

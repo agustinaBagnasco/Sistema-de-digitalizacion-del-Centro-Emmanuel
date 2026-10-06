@@ -16,21 +16,13 @@ public class VentaRequest {
         this.ventas = ventas;
     }
 
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
+    //region Getters y Setters
+    public Integer getIdUsuario(){return idUsuario;}
+    public void setIdUsuario(Integer pIdUsuario){this.idUsuario = pIdUsuario;}
 
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public List<VentaImportada> getVentas() {
-        return ventas;
-    }
-
-    public void setVentas(List<VentaImportada> ventas) {
-        this.ventas = ventas;
-    }
+    public List<VentaImportada> getVentas(){return ventas;}
+    public void setVentas(List<VentaImportada> pVentas){this.ventas = pVentas;}
+    //endregion
 
     public static class VentaImportada {
         private LocalDate fecha;
@@ -39,44 +31,21 @@ public class VentaRequest {
         private BigDecimal unitario;
         private BigDecimal total;
 
-        public LocalDate getFecha() {
-            return fecha;
-        }
+        //region Getters y Setters
+        public LocalDate getFecha(){return fecha;}
+        public void setFecha(LocalDate pFecha){this.fecha = pFecha;}
 
-        public void setFecha(LocalDate fecha) {
-            this.fecha = fecha;
-        }
+        public String getConcepto(){return concepto;}
+        public void setConcepto(String pConcepto){this.concepto = pConcepto;}
 
-        public String getConcepto() {
-            return concepto;
-        }
+        public BigDecimal getCantidad(){return cantidad;}
+        public void setCantidad(BigDecimal pCantidad){this.cantidad = pCantidad;}
 
-        public void setConcepto(String concepto) {
-            this.concepto = concepto;
-        }
+        public BigDecimal getUnitario(){return unitario;}
+        public void setUnitario(BigDecimal pUnitario){this.unitario = pUnitario;}
 
-        public BigDecimal getCantidad() {
-            return cantidad;
-        }
-
-        public void setCantidad(BigDecimal cantidad) {
-            this.cantidad = cantidad;
-        }
-
-        public BigDecimal getUnitario() {
-            return unitario;
-        }
-
-        public void setUnitario(BigDecimal unitario) {
-            this.unitario = unitario;
-        }
-
-        public BigDecimal getTotal() {
-            return total;
-        }
-
-        public void setTotal(BigDecimal total) {
-            this.total = total;
-        }
+        public BigDecimal getTotal(){return total;}
+        public void setTotal(BigDecimal pTotal){this.total = pTotal;}
+        //endregion
     }
 }

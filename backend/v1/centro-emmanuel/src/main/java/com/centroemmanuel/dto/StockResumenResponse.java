@@ -16,12 +16,14 @@ public class StockResumenResponse {
                 this.salidas = salidas;
         }
 
-        public Integer getIdProducto() { return idProducto; }
-        public void setIdProducto(Integer idProducto) { this.idProducto = idProducto; }
+    //region Getters y Setters
+    public Integer getIdProducto(){return idProducto;}
+    public void setIdProducto(Integer pIdProducto){this.idProducto = pIdProducto;}
 
-        public BigDecimal getEntradas() { return entradas; }
-        public void setEntradas(BigDecimal entradas) { this.entradas = entradas; }
+    public BigDecimal getEntradas(){return entradas;}
+    public void setEntradas(BigDecimal pEntradas){this.entradas = pEntradas;}
 
-        public BigDecimal getSalidas() { return salidas; }
-        public void setSalidas(BigDecimal salidas) { this.salidas = salidas; }
+    public BigDecimal getSalidas(){return salidas;}
+    public void setSalidas(BigDecimal pSalidas){this.salidas = pSalidas;}
+    //endregion
 }

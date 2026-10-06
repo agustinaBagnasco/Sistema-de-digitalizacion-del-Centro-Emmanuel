@@ -43,13 +43,25 @@ function agruparElaboraciones(elaboraciones) {
             if (!producto) return;
 
             const id = producto.idProducto ?? producto.nombreProducto;
+            const esQueso = producto.categoria === "QUESO";
+            const porUnidad = producto.unidadMedida === "UNIDAD";
+            const soloKilos = esQueso && !porUnidad && Number(producto.pesoHorma) === 0;
             const grupo = grupos.get(id) || {
                 nombre: producto.nombreProducto || "Producto",
                 cantidad: 0,
-                unidad: producto.categoria === "QUESO" ? "hormas" : (producto.unidadMedida || ""),
+                kilos: null,
+                unidad: esQueso
+                    ? (porUnidad ? "unidades" : soloKilos ? "kg" : "hormas")
+                    : (producto.unidadMedida || ""),
                 categoria: producto.categoria,
             };
-            grupo.cantidad += Number(cantidad) || 0;
+            const cantidadQueso = esQueso && !soloKilos && !porUnidad
+                ? elaboracion.cantidadHormas ?? cantidad
+                : cantidad;
+            grupo.cantidad += Number(cantidadQueso) || 0;
+            if (esQueso && !soloKilos && !porUnidad && elaboracion.cantidadHormas != null) {
+                grupo.kilos = (grupo.kilos ?? 0) + (Number(elaboracion.cantidadProducida) || 0);
+            }
             grupos.set(id, grupo);
         });
     });
@@ -109,14 +121,14 @@ export default function Dashboard() {
         registro.fecha?.startsWith(claveMes)
     );
     const lecheProducida = produccionLecheMes
-        .reduce((total, registro) => total + [
+        .reduce((total, registro) => total + (Number(registro.litrosTotales) || [
             registro.litrosTerneros,
             registro.ventaDirecta,
             registro.consumoCocina,
             registro.elaboracionQuesos,
             registro.elaboracionDulceDeLeche,
             registro.elaboracionQuark,
-        ].reduce((suma, litros) => suma + (Number(litros) || 0), 0), 0);
+        ].reduce((suma, litros) => suma + (Number(litros) || 0), 0)), 0);
     const productosBajoStock = datos.alertasStock.filter((producto) =>
         producto.tipo === "PRODUCTO" && producto.activo
     );
@@ -162,11 +174,14 @@ export default function Dashboard() {
                             : <p>No hay registros de producción este mes.</p>
                     ))}
 
-                    {tarjeta("Hormas elaboradas", "/lacteos/Quesos", cargando ? <p>Cargando...</p> : hormasElaboradas.length ? (
+                    {tarjeta("Producción de quesos", "/lacteos/Quesos", cargando ? <p>Cargando...</p> : hormasElaboradas.length ? (
                         hormasElaboradas.slice(0, 5).map((producto) => (
-                            <p key={producto.nombre}>{producto.nombre}: {sumar(producto.cantidad)} hormas</p>
+                            <p key={producto.nombre}>
+                                {producto.nombre}: {sumar(producto.cantidad)} {producto.unidad}
+                                {producto.kilos != null && ` (${sumar(producto.kilos)} kg)`}
+                            </p>
                         ))
-                    ) : <p>No hay hormas registradas este mes.</p>)}
+                    ) : <p>No hay producción de queso registrada este mes.</p>)}
 
                     {tarjeta("Productos bajo stock", "/administracion/Movimientos", cargando ? <p>Cargando...</p> : productosBajoStock.length ? (
                         productosBajoStock.slice(0, 5).map((producto) => (
@@ -192,4 +207,3 @@ export default function Dashboard() {
         </div>
     );
 }
-

@@ -7,5 +7,17 @@ const api = axios.create({
 
 });
 
+// El backend usa este encabezado para validar quién modifica o elimina elaboraciones
+api.interceptors.request.use((config) => {
+    try {
+        const usuario = JSON.parse(localStorage.getItem("usuario"));
+        if (usuario?.idUsuario) {
+            config.headers["X-Usuario-Id"] = usuario.idUsuario;
+        }
+    } catch {
+        // sin sesión válida: el backend rechazará la operación
+    }
+    return config;
+});
 
 export default api;

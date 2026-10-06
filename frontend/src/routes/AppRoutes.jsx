@@ -10,16 +10,16 @@ import {
 import MainLayout from "../components/layout/MainLayout";
 
 import Dashboard from "../pages/Dashboard";
-import Huerta from "../pages/huerta";
+import Huerta from "../pages/Huerta";
 import Movimientos from "../pages/administracion/Movimientos";
 import Ventas from "../pages/administracion/Ventas";
 import ManoDeObra from "../pages/administracion/ManoDeObra";
 import ProductoInsumo from "../pages/administracion/ProductoInsumo";
+import Reportes from "../pages/administracion/Reportes";
 
 import Leche from "../pages/Lacteos/Leche";
 import Quesos from "../pages/Lacteos/Quesos";
 import DulceDeLeche from "../pages/Lacteos/DulceDeLeche";
-import Quark from "../pages/Lacteos/Quark";
 
 import Mermeladas from "../pages/Alimentos-procesados/Mermeladas";
 import Molienda from "../pages/Alimentos-procesados/Molienda";
@@ -106,7 +106,6 @@ export default function AppRoutes() {
                 <Route path="/lacteos/Leche" element={protegerPagina("/lacteos/Leche", <Leche />)} />
                 <Route path="/lacteos/Quesos" element={protegerPagina("/lacteos/Quesos", <Quesos />)} />
                 <Route path="/lacteos/DulceDeLeche" element={protegerPagina("/lacteos/DulceDeLeche", <DulceDeLeche />)} />
-                <Route path="/lacteos/Quark" element={protegerPagina("/lacteos/Quark", <Quark />)} />
 
                 <Route path="/alimentos-procesados/Mermeladas" element={protegerPagina("/alimentos-procesados/Mermeladas", <Mermeladas />)} />
                 <Route path="/alimentos-procesados/Molienda" element={protegerPagina("/alimentos-procesados/Molienda", <Molienda />)} />
@@ -120,6 +119,7 @@ export default function AppRoutes() {
                 <Route path="/administracion/Insumos" element={<Navigate to="/administracion/ProductoInsumo" replace />} />
                 <Route path="/administracion/Ventas" element={protegerPagina("/administracion/Ventas", <Ventas />)} />
                 <Route path="/administracion/ProductoInsumo" element={protegerPagina("/administracion/ProductoInsumo", <ProductoInsumo />)} />
+                <Route path="/administracion/reportes" element={protegerPagina("/administracion/reportes", <Reportes />)} />
 
             </Route> 
 

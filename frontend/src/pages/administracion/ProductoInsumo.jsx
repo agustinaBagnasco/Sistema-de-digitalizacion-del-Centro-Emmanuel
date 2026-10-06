@@ -14,11 +14,14 @@ import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
 import Textarea from "../../components/ui/Textarea";
 import { formatearNumero } from "../../utils/formatNumber";
-import "../../styles/global.css"
+import { sortActiveLast } from "../../utils/sortActiveLast";
+import "../../styles/global.css";
+import "./ProductoInsumo.css";
 
 
 function Productos() {
     const [productos, setProductos] = useState([]);
+    const [tipoActivo, setTipoActivo] = useState("PRODUCTO");
     const [mostrarModal, setMostrarModal] = useState(false);
 
     const [modoEdicion, setModoEdicion] = useState(false);
@@ -33,14 +36,21 @@ function Productos() {
     const [tipo, setTipo] = useState("PRODUCTO");
     const [categoria, setCategoria] = useState("");
     const [unidadMedida, setUnidadMedida] = useState("");
+    const [pesoHorma, setPesoHorma] = useState("");
+    const [productoResultadoId, setProductoResultadoId] = useState("");
+    const esGrano = categoria === "GRANOS";
+    const opcionesProductoResultado = productos
+        .filter((p) => p.categoria === "MOLIENDA" && p.tipo === "PRODUCTO" && p.activo)
+        .map((p) => ({ value: String(p.idProducto), label: p.nombreProducto }));
+    const manejaHorma = categoria === "QUESO" && unidadMedida !== "UNIDAD";
 
     const [error, setError] = useState("");
     const [cargando, setCargando] = useState(false);
 
-    const [busqueda, setBusqueda] = useState("");
-    const [filtroTipo, setFiltroTipo] = useState("");
-    const [filtroCategoria, setFiltroCategoria] = useState("");
-    const [filtroEstado, setFiltroEstado] = useState("");
+    const [filtros, setFiltros] = useState({
+        PRODUCTO: { busqueda: "", categoria: "", estado: "" },
+        INSUMO: { busqueda: "", categoria: "", estado: "" },
+    });
 
     // ========================= CARGAR DATOS =========================
 
@@ -78,6 +88,8 @@ function Productos() {
         setTipo("PRODUCTO");
         setCategoria("");
         setUnidadMedida("");
+        setPesoHorma("");
+        setProductoResultadoId("");
         setActivo(true);
 
         setProductoEditando(null);
@@ -92,6 +104,7 @@ function Productos() {
     const abrirNuevoRegistro = (tipoNuevo) => {
         limpiarFormulario();
         setTipo(tipoNuevo);
+        setTipoActivo(tipoNuevo);
         setTimeout(() => {
             document.getElementById("formulario-producto")?.scrollIntoView({
                 behavior: "smooth",
@@ -108,6 +121,7 @@ function Productos() {
 
         setModoEdicion(true);
         setProductoEditando(producto);
+        setTipoActivo(producto.tipo || "PRODUCTO");
 
         setNombreProducto(producto.nombreProducto || "");
         setDescripcion(producto.descripcion || "");
@@ -135,8 +149,17 @@ function Productos() {
 
         setCategoria(producto.categoria || "");
 
-        setUnidadMedida(producto.unidadMedida || "");
-
+        setUnidadMedida(producto.unidadMedida || (producto.categoria === "QUESO" ? "KG" : ""));
+        setPesoHorma(
+            producto.pesoHorma !== null && producto.pesoHorma !== undefined
+                ? String(producto.pesoHorma)
+                : ""
+        );
+        setProductoResultadoId(
+            producto.productoResultado?.idProducto != null
+                ? String(producto.productoResultado.idProducto)
+                : ""
+        );
 
         setActivo(producto.activo);
 
@@ -180,6 +203,16 @@ function Productos() {
             return;
         }
 
+        if (manejaHorma && (pesoHorma === "" || !Number.isFinite(Number(pesoHorma)))) {
+            setError("Debe indicar cuánto pesa la horma de queso. Ingrese 0 si se manejará solo en kilos.");
+            return;
+        }
+
+        if (manejaHorma && Number(pesoHorma) < 0) {
+            setError("El peso de la horma no puede ser negativo.");
+            return;
+        }
+
         if (!unidadMedida) {
 
             setError(`Debe seleccionar una unidad de medida para el ${nombreTipo}.`);
@@ -201,6 +234,10 @@ function Productos() {
             ...(tipo === "PRODUCTO" && {
                 costo: costo === "" ? 0 : Number(costo),
             }),
+            pesoHorma: manejaHorma ? Number(pesoHorma) : null,
+            productoResultado: esGrano && productoResultadoId
+                ? { idProducto: Number(productoResultadoId) }
+                : null,
             activo: activo,
             tipo: tipo,
             unidadMedida: unidadMedida,
@@ -247,6 +284,10 @@ function Productos() {
                 activo: !producto.activo,
                 tipo: producto.tipo,
                 categoria: producto.categoria,
+                pesoHorma: producto.pesoHorma ?? null,
+                productoResultado: producto.productoResultado
+                    ? { idProducto: producto.productoResultado.idProducto }
+                    : null,
                 unidadMedida: producto.unidadMedida
             };
 
@@ -265,31 +306,34 @@ function Productos() {
 
     // ========================= BUSQUEDA Y FILTROS =========================
 
-    const productosFiltrados = productos.filter((producto) => {
+    const filtrosActivos = filtros[tipoActivo];
+    const productosFiltrados = sortActiveLast(productos.filter((producto) => {
+        if (producto.tipo !== tipoActivo) {
+            return false;
+        }
 
-        const coincideBusqueda =
-            producto.nombreProducto
-                .toLowerCase()
-                .includes(busqueda.toLowerCase());
-
-        const coincideTipo =
-            !filtroTipo || producto.tipo === filtroTipo;
-
+        const coincideBusqueda = String(producto.nombreProducto || "")
+            .toLocaleLowerCase("es")
+            .includes(filtrosActivos.busqueda.trim().toLocaleLowerCase("es"));
         const coincideCategoria =
-            !filtroCategoria || producto.categoria === filtroCategoria;
-
+            !filtrosActivos.categoria || producto.categoria === filtrosActivos.categoria;
         const coincideEstado =
-            !filtroEstado ||
-            (filtroEstado === "ACTIVO" && producto.activo) ||
-            (filtroEstado === "INACTIVO" && !producto.activo);
+            !filtrosActivos.estado
+            || (filtrosActivos.estado === "ACTIVO" && producto.activo)
+            || (filtrosActivos.estado === "INACTIVO" && !producto.activo);
 
-        return (
-            coincideBusqueda &&
-            coincideTipo &&
-            coincideCategoria &&
-            coincideEstado
-        );
-    });
+        return coincideBusqueda && coincideCategoria && coincideEstado;
+    }));
+
+    const actualizarFiltro = (campo, valor) => {
+        setFiltros((filtrosActuales) => ({
+            ...filtrosActuales,
+            [tipoActivo]: {
+                ...filtrosActuales[tipoActivo],
+                [campo]: valor,
+            },
+        }));
+    };
 
 
 
@@ -322,17 +366,29 @@ function Productos() {
     return (
         <div className="pagina">
             <Card title="· PRODUCTOS / INSUMOS ·">
+                <div className="producto-insumo-tabs" role="tablist" aria-label="Tipo de registro">
+                    {tipos.map((opcion) => (
+                        <button
+                            key={opcion.value}
+                            id={`tab-${opcion.value.toLowerCase()}`}
+                            className={`producto-insumo-tab${tipoActivo === opcion.value ? " producto-insumo-tab--activo" : ""}`}
+                            type="button"
+                            role="tab"
+                            aria-selected={tipoActivo === opcion.value}
+                            aria-controls="panel-productos-insumos"
+                            onClick={() => setTipoActivo(opcion.value)}
+                        >
+                            {opcion.label}
+                            <span>{productos.filter((producto) => producto.tipo === opcion.value).length}</span>
+                        </button>
+                    ))}
+                </div>
+
                 <Button
-                    className={`btn btn-${"primary"}`}
-                    onClick={() => abrirNuevoRegistro("PRODUCTO")}
+                    className="btn btn-primary"
+                    onClick={() => abrirNuevoRegistro(tipoActivo)}
                 >
-                    + Nuevo producto
-                </Button>
-                <Button
-                    className="btn btn-secondary"
-                    onClick={() => abrirNuevoRegistro("INSUMO")}
-                >
-                    + Nuevo Insumo
+                    + Nuevo {tipoActivo === "INSUMO" ? "insumo" : "producto"}
                 </Button>
 
                 {/* =========================  ERROR  ========================= */}
@@ -350,27 +406,23 @@ function Productos() {
 
                 {/* ========================= TABLA ========================= */}
 
-                <div className="productos-filtros">
+                <div
+                    className="productos-filtros"
+                    role="tabpanel"
+                    id="panel-productos-insumos"
+                    aria-labelledby={`tab-${tipoActivo.toLowerCase()}`}
+                >
 
                     <Input
-                        type="text"
-                        placeholder="Buscar producto..."
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
+                        type="search"
+                        placeholder={`Buscar ${tipoActivo === "INSUMO" ? "insumo" : "producto"}...`}
+                        value={filtrosActivos.busqueda}
+                        onChange={(e) => actualizarFiltro("busqueda", e.target.value)}
                     />
 
                     <Select
-                        value={filtroTipo}
-                        onChange={(e) => setFiltroTipo(e.target.value)}
-                        options={[
-                            { value: "", label: "Todos los tipos" },
-                            ...tipos
-                        ]}
-                    />
-
-                    <Select
-                        value={filtroCategoria}
-                        onChange={(e) => setFiltroCategoria(e.target.value)}
+                        value={filtrosActivos.categoria}
+                        onChange={(e) => actualizarFiltro("categoria", e.target.value)}
                         options={[
                             { value: "", label: "Todas las categorías" },
                             ...categorias
@@ -378,8 +430,8 @@ function Productos() {
                     />
 
                     <Select
-                        value={filtroEstado}
-                        onChange={(e) => setFiltroEstado(e.target.value)}
+                        value={filtrosActivos.estado}
+                        onChange={(e) => actualizarFiltro("estado", e.target.value)}
                         options={[
                             { value: "", label: "Todos los estados" },
                             { value: "ACTIVO", label: "Activos" },
@@ -392,34 +444,35 @@ function Productos() {
                 <div className="productos-table-container">
                     {cargando ? (
                         <p className="mensaje-cargando">
-                            Cargando productos...
+                            Cargando {tipoActivo === "INSUMO" ? "insumos" : "productos"}...
                         </p>
-                    ) : productos.length === 0 ? (
+                    ) : productos.filter((producto) => producto.tipo === tipoActivo).length === 0 ? (
                         <div>
-                            <p>No hay productos registrados </p>
+                            <p>No hay {tipoActivo === "INSUMO" ? "insumos" : "productos"} registrados.</p>
                             <Button
-                                className={`btn btn-${"primary"}`}
-                                onClick={() => abrirNuevoRegistro("PRODUCTO")}
+                                className="btn btn-primary"
+                                onClick={() => abrirNuevoRegistro(tipoActivo)}
                             >
-                                Agregar primer producto
+                                Agregar {tipoActivo === "INSUMO" ? "primer insumo" : "primer producto"}
                             </Button>
 
                         </div>
 
+                    ) : productosFiltrados.length === 0 ? (
+                        <p>No hay {tipoActivo === "INSUMO" ? "insumos" : "productos"} que coincidan con los filtros.</p>
                     ) : (
 
                         <div className="table-container">
                             <table className="table">
                                 <thead style={{ backgroundColor: "#f2f2f2" }}>
                                     <tr>
-                                        <th>Producto</th>
+                                        <th>{tipoActivo === "INSUMO" ? "Insumo" : "Producto"}</th>
                                         <th>Descripción</th>
-                                        <th>Tipo</th>
                                         <th>Categoría</th>
                                         <th>Unidad</th>
                                         <th>Stock actual</th>
                                         <th>Stock mínimo</th>
-                                        <th>Costo</th>
+                                        {tipoActivo === "PRODUCTO" && <th>Costo</th>}
                                         <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -433,7 +486,6 @@ function Productos() {
                                             </td>
 
                                             <td>{producto.descripcion || "-"}</td>
-                                            <td>{producto.tipo || "-"}</td>
                                             <td>{producto.categoria || "-"}</td>
 
                                             <td>{producto.unidadMedida || "-"}</td>
@@ -442,7 +494,7 @@ function Productos() {
                                             <td>{formatearNumero(producto.stockActual)}</td>
 
                                             <td>{formatearNumero(producto.stockMinimo)}</td>
-                                            <td>{producto.tipo === "PRODUCTO" ? formatearNumero(producto.costo) : "-"}</td>
+                                            {tipoActivo === "PRODUCTO" && <td>{formatearNumero(producto.costo)}</td>}
                                             <td>
                                                 <span
                                                     className={
@@ -568,11 +620,58 @@ function Productos() {
 
                                     <Select
                                         value={categoria}
-                                        onChange={(e) => setCategoria(e.target.value)}
+                                        onChange={(e) => {
+                                            const nuevaCategoria = e.target.value;
+                                            setCategoria(nuevaCategoria);
+                                            if (nuevaCategoria === "QUESO" && categoria !== "QUESO") {
+                                                setUnidadMedida("KG");
+                                                setPesoHorma("");
+                                            } else if (categoria === "QUESO") {
+                                                setUnidadMedida("");
+                                                setPesoHorma("");
+                                            }
+                                        }}
                                         options={categorias}
                                         placeholder="Seleccione una categoría"
                                     />
                                 </div>
+
+                                {manejaHorma && (
+                                    <div className="form-group">
+                                        <label htmlFor="peso-horma">Peso de la horma (kg) *</label>
+                                        <Input
+                                            id="peso-horma"
+                                            type="number"
+                                            min="0"
+                                            step="0.001"
+                                            value={pesoHorma}
+                                            onChange={(e) => setPesoHorma(e.target.value)}
+                                            required
+                                        />
+                                        <small>
+                                            {pesoHorma === ""
+                                                ? "Ingrese 0 si este queso se manejará únicamente en kilogramos."
+                                                : Number(pesoHorma) === 0
+                                                    ? "Este queso se registrará y producirá únicamente en kilogramos."
+                                                    : "La producción se podrá registrar en hormas y se convertirá a kilogramos."}
+                                        </small>
+                                    </div>
+                                )}
+
+                                {esGrano && (
+                                    <div className="form-group">
+                                        <label>Producto de molienda resultante</label>
+                                        <Select
+                                            value={productoResultadoId}
+                                            onChange={(e) => setProductoResultadoId(e.target.value)}
+                                            options={opcionesProductoResultado}
+                                            placeholder="Seleccione el producto de molienda"
+                                        />
+                                        <small>
+                                            Es el producto que se obtiene al moler este grano en Molienda.
+                                        </small>
+                                    </div>
+                                )}
 
                                 {/* UNIDAD */}
                                 <div className="form-group">
@@ -583,6 +682,13 @@ function Productos() {
                                         options={unidadesMedida}
                                         placeholder="Seleccione una unidad"
                                     />
+                                    {categoria === "QUESO" && (
+                                        <small>
+                                            {unidadMedida === "UNIDAD"
+                                                ? "Este queso se maneja por unidades (por ejemplo, frascos)."
+                                                : "Elija Unidades para quesos que se manejan en frascos, como el Quark."}
+                                        </small>
+                                    )}
                                 </div>
 
                                 {/* STOCK */}

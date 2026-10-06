@@ -9,8 +9,7 @@ export const menuItems = [
     children: [
       { label: "Leche", path: "/lacteos/Leche" },
       { label: "Quesos", path: "/lacteos/quesos" },
-      { label: "Dulce de leche", path: "/lacteos/dulceDeLeche" },
-      { label: "Quark", path: "/lacteos/quark" }
+      { label: "Dulce de leche", path: "/lacteos/dulceDeLeche" }
     ]
   },
   { label: "Huerta", 
@@ -25,9 +24,9 @@ export const menuItems = [
       { label: "Ventas", path: "/administracion/Ventas" },
       { label: "Movimientos", path: "/administracion/Movimientos" },
       { label: "Mano de obra", path: "/administracion/ManoDeObra" },
-      {label: "Productos/Insumos", path: "/administracion/ProductoInsumo" }
+      {label: "Productos/Insumos", path: "/administracion/ProductoInsumo" },
+      { label: "Reportes", path: "/administracion/reportes" }
     
     ]
   }
 ];
-

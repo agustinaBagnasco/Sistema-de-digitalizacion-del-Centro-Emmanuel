@@ -1,40 +1,40 @@
 :root {
-  /* ===== Colores principales ===== */
+  /* Colores principales */
   --color-primary: #02A5B2;
   --color-primary-dark: #018994;
   --color-primary-light: #E6F7F9;
 
-  /* ===== Fondos ===== */
+  /* Fondos */
   --color-background: #F3F3F4;
   --color-surface: #FFFFFF;
   --color-sidebar: #FFFFFF;
   --color-navbar: #FFFFFF;
 
-  /* ===== Textos ===== */
+  /* Textos */
   --color-text: #212121;
   --color-text-secondary: #707070;
   --color-text-light: #9E9E9E;
 
-  /* ===== Bordes ===== */
+  /* Bordes */
   --color-border: #E5E7EB;
 
-  /* ===== Estados ===== */
+  /* Estados */
   --color-success: #3b9a8f;
   --color-warning: #dfbd82;
   --color-danger: #f98b89;
   --color-info: #6ab8f7;
 
-  /* ===== Sombras ===== */
+  /* Sombras */
   --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
   --shadow-md: 0 4px 12px rgba(0,0,0,.08);
   --shadow-lg: 0 10px 25px rgba(0,0,0,.10);
 
-  /* ===== Bordes ===== */
+  /* Bordes */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  /* ===== Espaciado ===== */
+  /* Espaciado */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -42,13 +42,13 @@
   --space-xl: 32px;
   --space-2xl: 48px;
 
-  /* ===== Layout ===== */
+  /* Layout */
   --sidebar-width: 260px;
   --sidebar-width-collapsed: 72px;
   --navbar-height: 64px;
   --container-padding: 24px;
 
-  /* ===== Tipografía ===== */
+  /* Tipografía */
   --font-family: "Open Sans", sans-serif;
 
   --font-xs: .75rem;
@@ -63,11 +63,11 @@
   --font-semibold: 600;
   --font-bold: 700;
 
-  /* ===== Animaciones ===== */
+  /* Animaciones */
   --transition: all .25s ease;
 }
 
-/* =============== TABLET 768px - 1023px ============ */
+/* TABLET 768px - 1023px */
 
 @media (max-width: 1023px) {
   :root {
@@ -76,7 +76,7 @@
   }
 }
 
-/* ================= MOBILE 0px - 767px  ============== */
+/* MOBILE 0px - 767px */
 
 @media (max-width: 767px) {
 

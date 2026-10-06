@@ -50,45 +50,20 @@ public class Venta {
     public void registrarVenta() {
     }
 
-    // Getters y Setters
+    //region Getters y Setters
+    public Integer getIdVenta(){return idVenta;}
+    public void setIdVenta(Integer pIdVenta){this.idVenta = pIdVenta;}
 
-    public Integer getIdVenta() {
-        return idVenta;
-    }
+    public BigDecimal getTotal(){return total;}
+    public void setTotal(BigDecimal pTotal){this.total = pTotal;}
 
-    public void setIdVenta(Integer idVenta) {
-        this.idVenta = idVenta;
-    }
+    public LocalDate getFechaVenta(){return fechaVenta;}
+    public void setFechaVenta(LocalDate pFechaVenta){this.fechaVenta = pFechaVenta;}
 
-    public BigDecimal getTotal() {
-        return total;
-    }
+    public Usuario getUsuario(){return usuario;}
+    public void setUsuario(Usuario pUsuario){this.usuario = pUsuario;}
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public LocalDate getFechaVenta() {
-        return fechaVenta;
-    }
-
-    public void setFechaVenta(LocalDate fechaVenta) {
-        this.fechaVenta = fechaVenta;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public List<DetalleVenta> getDetalleVenta() {
-        return detalles;
-    }
-
-    public void setDetalleVenta(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
+    public List<DetalleVenta> getDetalleVenta(){return detalles;}
+    public void setDetalleVenta(List<DetalleVenta> pDetalles){this.detalles = pDetalles;}
+    //endregion
 }

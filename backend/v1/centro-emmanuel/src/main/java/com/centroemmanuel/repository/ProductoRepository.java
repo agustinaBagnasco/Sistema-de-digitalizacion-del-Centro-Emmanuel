@@ -11,4 +11,5 @@ import java.util.List;
 public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 	Optional<Producto> findByNombreProductoIgnoreCase(String nombreProducto);
 	List<Producto> findAllByNombreProductoIgnoreCase(String nombreProducto);
+	boolean existsByProductoResultado_IdProducto(Integer idProducto);
 }

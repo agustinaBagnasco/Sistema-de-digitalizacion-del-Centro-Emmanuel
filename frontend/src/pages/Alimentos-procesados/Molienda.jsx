@@ -4,8 +4,9 @@ import Select from "../../components/ui/Select";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
-import FormField from '../../components/ui/FormField';
 import api from "../../services/api";
+import { mensajeError, puedeModificarRegistro } from "../../utils/errores";
+import { etiquetaInsumo } from "../../utils/formatNumber";
 
 export default function Molienda() {
   const [form, setForm] = useState({
@@ -19,16 +20,14 @@ export default function Molienda() {
   const [granos, setGranos] = useState([]);
   const [registros, setRegistros] = useState([]);
   const [editando, setEditando] = useState(null);
+  const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
     cargarGranos();
     cargarElaboraciones();
   }, []);
 
-  // =========================
   // CARGAR GRANOS
-  // =========================
-
   async function cargarGranos() {
     try {
       const response = await api.get("/productos");
@@ -46,10 +45,7 @@ export default function Molienda() {
     }
   }
 
-  // =========================
   // CARGAR ELABORACIONES
-  // =========================
-
   async function cargarElaboraciones() {
     try {
       const response = await api.get("/elaboraciones");
@@ -84,19 +80,20 @@ export default function Molienda() {
 
 
 
-  // =========================
   // OPCIONES DEL SELECT
-  // =========================
-
   const opcionesGranos = granos.map((grano) => ({
     value: grano.idProducto,
-    label: grano.nombreProducto,
+    label: etiquetaInsumo(grano),
   }));
+  const granoSeleccionado = granos.find(
+    (grano) => Number(grano.idProducto) === Number(form.grano)
+  );
+  const stockGranoDisponible = Math.max(
+    Number(granoSeleccionado?.stockActual) || 0,
+    0
+  );
 
-  // =========================
   // CAMBIAR CAMPOS
-  // =========================
-
   function handleChange(e) {
     setForm({
       ...form,
@@ -104,14 +101,27 @@ export default function Molienda() {
     });
   }
 
-  // =========================
   // GUARDAR
-  // =========================
-
   async function guardar(e) {
     e.preventDefault();
 
+    const cantidadEnvasada = Number(form.kgsEnvasados);
+    if (!Number.isFinite(cantidadEnvasada) || cantidadEnvasada <= 0) {
+      alert("Ingrese una cantidad de grano envasado mayor que cero.");
+      return;
+    }
+
+    const granoDelFormulario = granos.find(
+      (grano) => Number(grano.idProducto) === Number(form.grano)
+    );
+    const stockDisponible = Number(granoDelFormulario?.stockActual) || 0;
+    if (cantidadEnvasada > stockDisponible) {
+      alert(`Solo hay ${stockDisponible} kg disponibles del grano seleccionado.`);
+      return;
+    }
+
     try {
+      setGuardando(true);
       const granoSeleccionado = granos.find(
         (grano) =>
           Number(grano.idProducto) === Number(form.grano)
@@ -145,12 +155,6 @@ export default function Molienda() {
         return;
       }
 
-      // const usuarioId = localStorage.getItem("usuarioId");
-
-      // if (!usuarioId) {
-      //   alert("No se encontró el usuario logueado.");
-      //   return;
-      // }
 
       const elaboracion = {
         productoElaborado: {
@@ -165,9 +169,7 @@ export default function Molienda() {
         ),
 
         // Los kg envasados son la cantidad producida
-        cantidadProducida: Number(
-          form.kgsEnvasados
-        ),
+        cantidadProducida: cantidadEnvasada,
 
         usuario: {
           idUsuario: Number(usuario.idUsuario),
@@ -185,9 +187,7 @@ export default function Molienda() {
 
             // Se utiliza la misma cantidad
             // que se registra como producida
-            cantidadUtilizada: Number(
-              form.kgsEnvasados
-            ),
+            cantidadUtilizada: cantidadEnvasada,
           },
         ],
       };
@@ -222,16 +222,13 @@ export default function Molienda() {
         error.response?.data
       );
 
-      alert(
-        "No se pudo guardar la molienda."
-      );
+      alert(mensajeError(error, "No se pudo guardar la molienda."));
+    } finally {
+      setGuardando(false);
     }
   }
 
-  // =========================
   // LIMPIAR FORMULARIO
-  // =========================
-
   function limpiarFormulario() {
     setForm({
       fecha: "",
@@ -244,10 +241,7 @@ export default function Molienda() {
     setEditando(null);
   }
 
-  // =========================
   // EDITAR
-  // =========================
-
   function editarRegistro(registro) {
     const detalleGrano =
       registro.detalles?.find(
@@ -275,10 +269,7 @@ export default function Molienda() {
     setEditando(registro.idElaboracion);
   }
 
-  // =========================
   // ELIMINAR
-  // =========================
-
   async function eliminarRegistro(id) {
     const confirmar = window.confirm(
       "¿Está seguro de eliminar esta molienda?"
@@ -303,9 +294,7 @@ export default function Molienda() {
         error
       );
 
-      alert(
-        "No se pudo eliminar la molienda."
-      );
+      alert(mensajeError(error, "No se pudo eliminar la molienda."));
     }
   }
 
@@ -361,6 +350,8 @@ export default function Molienda() {
             <Input
               type="number"
               step="0.01"
+              min="0.01"
+              max={stockGranoDisponible}
               name="kgsEnvasados"
               value={form.kgsEnvasados}
               onChange={handleChange}
@@ -384,8 +375,11 @@ export default function Molienda() {
             <Button
               type="submit"
               className="btn btn-primary"
+              disabled={guardando}
             >
-              {editando !== null
+              {guardando
+                ? "Guardando..."
+                : editando !== null
                 ? "Actualizar"
                 : "Guardar"}
             </Button>
@@ -473,6 +467,7 @@ export default function Molienda() {
 
                         <Button
                           variant="secondary"
+                          disabled={!puedeModificarRegistro(r)}
                           onClick={() =>
                             editarRegistro(r)
                           }
@@ -482,6 +477,7 @@ export default function Molienda() {
 
                         <Button
                           variant="danger"
+                          disabled={!puedeModificarRegistro(r)}
                           onClick={() =>
                             eliminarRegistro(
                               r.idElaboracion

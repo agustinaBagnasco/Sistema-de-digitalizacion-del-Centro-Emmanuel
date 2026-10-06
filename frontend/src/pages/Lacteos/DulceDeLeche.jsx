@@ -4,6 +4,7 @@ import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Textarea from "../../components/ui/Textarea";
 import api from "../../services/api";
+import { mensajeError, puedeModificarRegistro } from "../../utils/errores";
 
 function normalizarTexto(texto) {
   return texto
@@ -35,16 +36,28 @@ export default function DulceDeLeche() {
   const [productoLeche, setProductoLeche] = useState(null);
   const [productoAzucar, setProductoAzucar] = useState(null);
   const [productoBicarbonato, setProductoBicarbonato] = useState(null);
+  const [inventarioLeche, setInventarioLeche] = useState(null);
 
   const [editando, setEditando] = useState(null);
 
   const [cargando, setCargando] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+
+  // 1 litro de leche rinde como máximo 1 kg de dulce de leche
+  const kilosIngredientes = Number(form.litrosLeche) || 0;
+  const frascos1kgActuales = Number(form.cantFrascos1kg) || 0;
+  const frascos420gActuales = Number(form.cantFrascos420g) || 0;
+  const maxFrascos1kg = Math.max(
+    Math.floor(kilosIngredientes - frascos420gActuales * 0.420 + 0.000001),
+    0
+  );
+  const maxFrascos420g = Math.max(
+    Math.floor((kilosIngredientes - frascos1kgActuales) / 0.420 + 0.000001),
+    0
+  );
 
 
-  // =====================================================
   // CARGAR DATOS INICIALES
-  // =====================================================
-
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -56,10 +69,11 @@ export default function DulceDeLeche() {
 
       setCargando(true);
 
-      const [respuestaProductos, respuestaElaboraciones] =
+      const [respuestaProductos, respuestaElaboraciones, respuestaInventario] =
         await Promise.all([
           api.get("/productos"),
-          api.get("/elaboraciones")
+          api.get("/elaboraciones"),
+          api.get("/produccion-leche/inventario")
         ]);
 
 
@@ -72,12 +86,10 @@ export default function DulceDeLeche() {
         Array.isArray(respuestaElaboraciones.data)
           ? respuestaElaboraciones.data
           : [];
+      setInventarioLeche(respuestaInventario.data);
 
 
-      // =================================================
       // BUSCAR PRODUCTOS
-      // =================================================
-
       const productosDulce = listaProductos.filter(
         p =>
           p.categoria === "DULCEDELECHE" &&
@@ -117,10 +129,7 @@ export default function DulceDeLeche() {
       setProductoBicarbonato(bicarbonato || null);
 
 
-      // =================================================
       // MOSTRAR SOLAMENTE ELABORACIONES DE DULCE DE LECHE
-      // =================================================
-
       const elaboracionesDulce = listaElaboraciones.filter(
         e =>
           e.productoElaborado?.idProducto === dulce?.idProducto
@@ -146,10 +155,7 @@ export default function DulceDeLeche() {
   }
 
 
-  // =====================================================
   // CONVERTIR ELABORACION DEL BACKEND AL FORMATO DEL FRONT
-  // =====================================================
-
   function convertirRegistro(elaboracion) {
 
     const detalles = elaboracion.detalles || [];
@@ -203,10 +209,7 @@ export default function DulceDeLeche() {
   }
 
 
-  // =====================================================
   // CAMBIAR CAMPOS
-  // =====================================================
-
   function handleChange(e) {
 
     setForm({
@@ -217,10 +220,7 @@ export default function DulceDeLeche() {
   }
 
 
-  // =====================================================
   // OBTENER USUARIO LOGUEADO
-  // =====================================================
-
   function obtenerUsuario() {
 
     try {
@@ -249,10 +249,7 @@ export default function DulceDeLeche() {
   }
 
 
-  // =====================================================
   // GUARDAR
-  // =====================================================
-
   async function guardar(e) {
 
     e.preventDefault();
@@ -269,6 +266,21 @@ export default function DulceDeLeche() {
 
     const frascos1kg = Number(form.cantFrascos1kg) || 0;
     const frascos420g = Number(form.cantFrascos420g) || 0;
+    const litrosLeche = Number(form.litrosLeche);
+    const cantidadAzucar = Number(form.cantidadAzucar);
+    const cantidadBicarbonato = Number(form.cantidadBicarbonato);
+    const disponibleDulce = Number(inventarioLeche?.areas
+      ?.find(area => area.destino === "DULCE_DE_LECHE")?.disponible) || 0;
+
+    if (
+      !Number.isFinite(litrosLeche) || litrosLeche <= 0 ||
+      !Number.isFinite(cantidadAzucar) || cantidadAzucar < 0 ||
+      !Number.isFinite(cantidadBicarbonato) || cantidadBicarbonato < 0 ||
+      frascos1kg < 0 || frascos420g < 0
+    ) {
+      alert("Revise las cantidades: la leche debe ser mayor que cero y los demás valores no pueden ser negativos.");
+      return;
+    }
 
     if (frascos1kg > 0 && !productoDulce1kg) {
       alert("No se encontró un producto activo de Dulce de Leche de 1 kg.");
@@ -285,6 +297,12 @@ export default function DulceDeLeche() {
       return;
     }
 
+    const masaProducida = frascos1kg + frascos420g * 0.420;
+    if (masaProducida > litrosLeche + 0.000001) {
+      alert(`Con ${litrosLeche} L de leche se pueden producir como máximo ${litrosLeche.toFixed(3)} kg de dulce de leche (${masaProducida.toFixed(3)} kg ingresados).`);
+      return;
+    }
+
 
     if (!productoLeche) {
 
@@ -292,6 +310,11 @@ export default function DulceDeLeche() {
         "No se encontró el producto Leche."
       );
 
+      return;
+    }
+
+    if (litrosLeche > disponibleDulce) {
+      alert(`Solo hay ${disponibleDulce} litros disponibles para dulce de leche.`);
       return;
     }
 
@@ -315,6 +338,15 @@ export default function DulceDeLeche() {
       return;
     }
 
+    if (
+      litrosLeche > (Number(productoLeche.stockActual) || 0) ||
+      cantidadAzucar > (Number(productoAzucar.stockActual) || 0) ||
+      cantidadBicarbonato > (Number(productoBicarbonato.stockActual) || 0)
+    ) {
+      alert("Una o más cantidades superan el stock disponible de los insumos.");
+      return;
+    }
+
 
     const usuario = obtenerUsuario();
 
@@ -329,19 +361,12 @@ export default function DulceDeLeche() {
     }
 
 
-    // =================================================
     // CALCULAR CANTIDAD PRODUCIDA
-    // =================================================
-
     const cantidadProducida =
-      frascos1kg +
-      (frascos420g * 0.420);
+      masaProducida;
 
 
-    // =================================================
     // CREAR DETALLES
-    // =================================================
-
     const detalles = [
 
       {
@@ -349,7 +374,7 @@ export default function DulceDeLeche() {
           idProducto: productoLeche.idProducto
         },
         cantidadUtilizada:
-          Number(form.litrosLeche)
+          litrosLeche
       },
 
       {
@@ -357,7 +382,7 @@ export default function DulceDeLeche() {
           idProducto: productoAzucar.idProducto
         },
         cantidadUtilizada:
-          Number(form.cantidadAzucar)
+          cantidadAzucar
       },
 
       {
@@ -365,16 +390,13 @@ export default function DulceDeLeche() {
           idProducto: productoBicarbonato.idProducto
         },
         cantidadUtilizada:
-          Number(form.cantidadBicarbonato)
+          cantidadBicarbonato
       }
 
     ];
 
 
-    // =================================================
     // OBJETO PARA BACKEND
-    // =================================================
-
     const elaboracion = {
 
       productoElaborado: {
@@ -417,6 +439,7 @@ export default function DulceDeLeche() {
 
 
     try {
+      setGuardando(true);
 
       if (editando !== null) {
 
@@ -465,21 +488,17 @@ export default function DulceDeLeche() {
       );
 
 
-      alert(
-        error.response?.data?.message ||
-        error.response?.data ||
-        "Error al guardar la elaboración."
-      );
+      alert(mensajeError(error, "Error al guardar la elaboración."));
+
+    } finally {
+      setGuardando(false);
 
     }
 
   }
 
 
-  // =====================================================
   // EDITAR
-  // =====================================================
-
   function editarRegistro(registro) {
 
     setForm({
@@ -501,10 +520,7 @@ export default function DulceDeLeche() {
   }
 
 
-  // =====================================================
   // ELIMINAR
-  // =====================================================
-
   async function eliminarRegistro(id) {
 
     const confirmar =
@@ -536,19 +552,14 @@ export default function DulceDeLeche() {
       );
 
 
-      alert(
-        "No se pudo eliminar la elaboración."
-      );
+      alert(mensajeError(error, "No se pudo eliminar la elaboración."));
 
     }
 
   }
 
 
-  // =====================================================
   // RENDER
-  // =====================================================
-
   return (
 
     <div className="pagina">
@@ -578,11 +589,19 @@ export default function DulceDeLeche() {
           <div className="input-group">
 
             <label>Leche (Litros)</label>
+            <small>
+              Disponibles para dulce de leche: {inventarioLeche?.areas
+                ?.find(area => area.destino === "DULCE_DE_LECHE")?.disponible ?? 0} L
+            </small>
 
             <Input
               type="number"
               step="0.01"
               min="0"
+              max={Math.min(
+                Number(productoLeche?.stockActual) || 0,
+                Number(inventarioLeche?.areas?.find(area => area.destino === "DULCE_DE_LECHE")?.disponible) || 0
+              )}
               name="litrosLeche"
               value={form.litrosLeche}
               onChange={handleChange}
@@ -600,6 +619,7 @@ export default function DulceDeLeche() {
               type="number"
               step="0.01"
               min="0"
+              max={productoAzucar?.stockActual ?? 0}
               name="cantidadAzucar"
               value={form.cantidadAzucar}
               onChange={handleChange}
@@ -617,6 +637,7 @@ export default function DulceDeLeche() {
               type="number"
               step="0.01"
               min="0"
+              max={productoBicarbonato?.stockActual ?? 0}
               name="cantidadBicarbonato"
               value={form.cantidadBicarbonato}
               onChange={handleChange}
@@ -647,10 +668,12 @@ export default function DulceDeLeche() {
           <div className="input-group">
 
             <label>Frascos 1 kg</label>
+            <small>Máximo según la leche utilizada: {maxFrascos1kg}</small>
 
             <Input
               type="number"
               min="0"
+              max={maxFrascos1kg}
               name="cantFrascos1kg"
               value={form.cantFrascos1kg}
               onChange={handleChange}
@@ -663,10 +686,12 @@ export default function DulceDeLeche() {
           <div className="input-group">
 
             <label>Frascos 420 g</label>
+            <small>Máximo según la leche utilizada: {maxFrascos420g}</small>
 
             <Input
               type="number"
               min="0"
+              max={maxFrascos420g}
               name="cantFrascos420g"
               value={form.cantFrascos420g}
               onChange={handleChange}
@@ -695,8 +720,11 @@ export default function DulceDeLeche() {
             <Button
               type="submit"
               className="btn btn-primary"
+              disabled={guardando}
             >
-              {editando !== null
+              {guardando
+                ? "Guardando..."
+                : editando !== null
                 ? "Actualizar"
                 : "Guardar"}
             </Button>
@@ -820,6 +848,7 @@ export default function DulceDeLeche() {
 
                         <Button
                           variant="secondary"
+                          disabled={!puedeModificarRegistro(r)}
                           onClick={() =>
                             editarRegistro(r)
                           }
@@ -830,6 +859,7 @@ export default function DulceDeLeche() {
 
                         <Button
                           variant="danger"
+                          disabled={!puedeModificarRegistro(r)}
                           onClick={() =>
                             eliminarRegistro(
                               r.idElaboracion
@@ -861,5 +891,3 @@ export default function DulceDeLeche() {
 
   );
 }
-
-

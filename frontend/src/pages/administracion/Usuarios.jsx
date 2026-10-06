@@ -3,11 +3,13 @@ import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import { sortActiveLast } from "../../utils/sortActiveLast";
 
 function Usuarios() {
 
   const [usuarios, setUsuarios] = useState([]);
   const [permisos, setPermisos] = useState([]);
+  const [busquedaUsuario, setBusquedaUsuario] = useState("");
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
@@ -107,10 +109,13 @@ function Usuarios() {
       nombreUsuario: nombreUsuario.trim(),
       nombre: nombre.trim(),
       apellido: apellido.trim(),
-      clave: clave,
       email: email.trim(),
       activo: activo,
     };
+
+    if (!usuarioEditando || clave.trim()) {
+      datosUsuario.clave = clave;
+    }
 
     if (usuarioEditando) {
       datosUsuario.permisos = permisosSeleccionados.map((id) => ({
@@ -184,6 +189,15 @@ function Usuarios() {
     }
 
   };
+
+  const consultaUsuario = busquedaUsuario.trim().toLocaleLowerCase("es");
+  const usuariosFiltrados = sortActiveLast(usuarios.filter((usuario) =>
+    [
+      usuario.nombreUsuario,
+      usuario.nombre,
+      usuario.apellido,
+    ].some((valor) => String(valor || "").toLocaleLowerCase("es").includes(consultaUsuario))
+  ));
 
   return (
 
@@ -282,6 +296,25 @@ function Usuarios() {
 
               {usuarioEditando && (
                 <div className="input-group">
+                  <label htmlFor="usuario-activo">Estado del usuario</label>
+                  <label
+                    className="usuario-estado-control"
+                    style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
+                    <input
+                      id="usuario-activo"
+                      type="checkbox"
+                      checked={activo}
+                      onChange={(evento) => setActivo(evento.target.checked)}
+                      style={{ width: "auto", margin: 0 }}
+                    />
+                    <span>{activo ? "Activo: puede iniciar sesión" : "Inactivo: acceso bloqueado"}</span>
+                  </label>
+                </div>
+              )}
+
+              {usuarioEditando && (
+                <div className="input-group">
                   <fieldset
                     className="input-group"
                     style={{
@@ -357,6 +390,16 @@ function Usuarios() {
         <br />
 
         {/* ========================= TABLA ========================= */}
+        <div className="input-group" style={{ maxWidth: "420px", marginBottom: "16px" }}>
+          <label htmlFor="buscar-usuario">Buscar usuario</label>
+          <Input
+            id="buscar-usuario"
+            type="search"
+            value={busquedaUsuario}
+            onChange={(evento) => setBusquedaUsuario(evento.target.value)}
+            placeholder="Nombre, apellido o cuenta"
+          />
+        </div>
         <div className="table-container">
           <table className="table">
             <thead style={{ backgroundColor: "#f2f2f2" }}>
@@ -369,16 +412,18 @@ function Usuarios() {
               </tr>
             </thead>
             <tbody>
-              {usuarios.length === 0 ? (
+              {usuariosFiltrados.length === 0 ? (
 
                 <tr>
                   <td colSpan="5">
-                    No hay usuarios registrados.
+                    {usuarios.length === 0
+                      ? "No hay usuarios registrados."
+                      : "No hay usuarios que coincidan con la búsqueda."}
                   </td>
                 </tr>
 
               ) : (
-                usuarios.map((usuario) => (
+                usuariosFiltrados.map((usuario) => (
                   <tr key={usuario.idUsuario}>
                     <td>
                       {usuario.nombreUsuario}
@@ -450,4 +495,3 @@ function Usuarios() {
 }
 
 export default Usuarios;
-

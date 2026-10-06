@@ -27,23 +27,15 @@ public class LoginResponse {
         this.permisos = permisos;
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
+    //region Getters y Setters
+    public boolean isSuccess(){return success;}
 
-    public String getMensaje() {
-        return mensaje;
-    }
+    public String getMensaje(){return mensaje;}
 
-    public Integer getIdUsuario() {
-        return idUsuario;
-    }
+    public Integer getIdUsuario(){return idUsuario;}
 
-    public String getNombre() {
-        return nombre;
-    }
+    public String getNombre(){return nombre;}
 
-    public List<Integer> getPermisos() {
-        return permisos;
-    }
+    public List<Integer> getPermisos(){return permisos;}
+    //endregion
 }

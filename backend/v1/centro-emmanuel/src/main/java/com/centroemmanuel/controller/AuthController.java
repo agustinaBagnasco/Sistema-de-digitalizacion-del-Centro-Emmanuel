@@ -63,6 +63,20 @@ public class AuthController {
                     );
         }
 
+        if (!usuario.get().isActivo()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        new LoginResponse(
+                            false,
+                            "Esta cuenta está inactiva. Contacte al administrador.",
+                            null,
+                            null,
+                            List.of()
+                        )
+                    );
+        }
+
         return ResponseEntity.ok(
                 new LoginResponse(
                         true,

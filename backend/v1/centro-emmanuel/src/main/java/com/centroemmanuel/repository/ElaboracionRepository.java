@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ElaboracionRepository extends JpaRepository<Elaboracion, Integer> {
+    boolean existsByProductoElaborado_IdProducto(Integer idProducto);
+    boolean existsByProductoElaborado1kg_IdProducto(Integer idProducto);
+    boolean existsByProductoElaborado420g_IdProducto(Integer idProducto);
 }
  

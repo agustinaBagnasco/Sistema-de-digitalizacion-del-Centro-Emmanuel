@@ -35,8 +35,11 @@ function Login() {
 }
 
         } catch (error) {
-
-            setError("Usuario o contraseña incorrectos.");
+            setError(
+                error.response?.data?.mensaje
+                || error.response?.data?.message
+                || "Usuario o contraseña incorrectos."
+            );
 
         }
     };
@@ -78,6 +81,7 @@ function Login() {
 
                 </form>
 
+                {error && <p className="login-error" role="alert">{error}</p>}
             </div>
 
         </div>

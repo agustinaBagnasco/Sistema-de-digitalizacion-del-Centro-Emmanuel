@@ -157,8 +157,15 @@ export default function Navbar({ onMenuClick }) {
               return { ...producto, horaDeteccion };
             });
 
+          alertasActivas.sort((a, b) => {
+            const nivel = (p) => Number(p.stockMinimo) > 0 ? Number(p.stockActual) / Number(p.stockMinimo) : 0;
+            return nivel(a) - nivel(b);
+          });
+          const firma = (lista) => lista
+            .map((p) => `${p.idProducto}:${p.stockActual}:${p.stockMinimo}`).join("|");
           setErrorAlertas(false);
-          setAlertasStock(alertasActivas);
+          setAlertasStock((anteriores) =>
+            firma(anteriores) === firma(alertasActivas) ? anteriores : alertasActivas);
         }
       } catch (errorCarga) {
         console.error("Error al cargar alertas de stock:", errorCarga);
@@ -166,12 +173,20 @@ export default function Navbar({ onMenuClick }) {
       }
     }
 
+    function cargarSiVisible() {
+      if (document.visibilityState === "visible") void cargarAlertasStock();
+    }
+
     void cargarAlertasStock();
-    const intervalo = window.setInterval(cargarAlertasStock, 60000);
+    const intervalo = window.setInterval(cargarSiVisible, 60000);
+    document.addEventListener("visibilitychange", cargarSiVisible);
+    window.addEventListener("alertas-stock:actualizar", cargarAlertasStock);
 
     return () => {
       activo = false;
       window.clearInterval(intervalo);
+      document.removeEventListener("visibilitychange", cargarSiVisible);
+      window.removeEventListener("alertas-stock:actualizar", cargarAlertasStock);
     };
   }, []);
 
@@ -221,6 +236,7 @@ export default function Navbar({ onMenuClick }) {
   }).format(fecha);
 
   const abrirNotificaciones = () => {
+    if (!notificacionesAbiertas) window.dispatchEvent(new Event("alertas-stock:actualizar"));
     setNotificacionesAbiertas((abiertas) => !abiertas);
     setMenuOpen(false);
   };

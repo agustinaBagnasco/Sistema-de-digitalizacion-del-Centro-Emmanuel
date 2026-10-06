@@ -32,6 +32,9 @@ public class Producto {
     @Column(name = "costo", precision = 15, scale = 3)
     private BigDecimal costo;
 
+    @Column(name = "peso_horma", precision = 15, scale = 3)
+    private BigDecimal pesoHorma;
+
     @Column(name = "activo")
     private boolean activo;
 
@@ -84,89 +87,41 @@ public class Producto {
         this.unidadMedida = pUnidadMedida;
     }
 
-    // Getters y Setters
+    //region Getters y Setters
+    public Integer getIdProducto(){return idProducto;}
+    public void setIdProducto(Integer pIdProducto){this.idProducto = pIdProducto;}
 
-    public Integer getIdProducto() {
-    return idProducto;
-}
+    public String getNombreProducto(){return nombreProducto;}
+    public void setNombreProducto(String pNombreProducto){this.nombreProducto = pNombreProducto;}
 
-public void setIdProducto(Integer idProducto) {
-    this.idProducto = idProducto;
-}
+    public String getDescripcion(){return descripcion;}
+    public void setDescripcion(String pDescripcion){this.descripcion = pDescripcion;}
 
-public String getNombreProducto() {
-    return nombreProducto;
-}
+    public BigDecimal getStockActual(){return stockActual;}
+    public void setStockActual(BigDecimal pStockActual){this.stockActual = pStockActual;}
 
-public void setNombreProducto(String nombreProducto) {
-    this.nombreProducto = nombreProducto;
-}
+    public BigDecimal getStockMinimo(){return stockMinimo;}
+    public void setStockMinimo(BigDecimal pStockMinimo){this.stockMinimo = pStockMinimo;}
 
-public String getDescripcion() {
-    return descripcion;
-}
+    public BigDecimal getCosto(){return costo;}
+    public void setCosto(BigDecimal pCosto){this.costo = pCosto;}
 
-public void setDescripcion(String descripcion) {
-    this.descripcion = descripcion;
-}
+    public BigDecimal getPesoHorma(){return pesoHorma;}
+    public void setPesoHorma(BigDecimal pPesoHorma){this.pesoHorma = pPesoHorma;}
 
-public BigDecimal getStockActual() {
-    return stockActual;
-}
+    public boolean isActivo(){return activo;}
+    public void setActivo(boolean pActivo){this.activo = pActivo;}
 
-public void setStockActual(BigDecimal stockActual) {
-    this.stockActual = stockActual;
-}
+    public Tipo getTipo(){return tipo;}
+    public void setTipo(Tipo pTipo){this.tipo = pTipo;}
 
-public BigDecimal getStockMinimo() {
-    return stockMinimo;
-}
+    public Categoria getCategoria(){return categoria;}
+    public void setCategoria(Categoria pCategoria){this.categoria = pCategoria;}
 
-public void setStockMinimo(BigDecimal stockMinimo) {
-    this.stockMinimo = stockMinimo;
-}
+    public UnidadMedida getUnidadMedida(){return unidadMedida;}
+    public void setUnidadMedida(UnidadMedida pUnidadMedida){this.unidadMedida = pUnidadMedida;}
 
-public BigDecimal getCosto() {
-    return costo;
-}
-
-public void setCosto(BigDecimal costo) {
-    this.costo = costo;
-}
-public boolean isActivo() {
-    return activo;
-}
-
-public void setActivo(boolean activo) {
-    this.activo = activo;
-}
-public Tipo getTipo() {
-    return tipo;
-}
-public void setTipo(Tipo tipo) {
-    this.tipo = tipo;
-}
-
-public Categoria getCategoria() {
-    return categoria;
-}
-
-public void setCategoria(Categoria categoria) {
-    this.categoria = categoria;
-}
-
-public UnidadMedida getUnidadMedida() {
-    return unidadMedida;
-}
-
-public void setUnidadMedida(UnidadMedida unidadMedida) {
-    this.unidadMedida = unidadMedida;
-}
-
-public Producto getProductoResultado() { 
-    return productoResultado; 
-    } 
-public void setProductoResultado(Producto productoResultado) {
-     this.productoResultado = productoResultado; 
-     }
+    public Producto getProductoResultado(){return productoResultado;}
+    public void setProductoResultado(Producto pProductoResultado){this.productoResultado = pProductoResultado;}
+    //endregion
 }

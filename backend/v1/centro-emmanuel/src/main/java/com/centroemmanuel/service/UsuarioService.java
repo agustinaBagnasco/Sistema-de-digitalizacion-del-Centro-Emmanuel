@@ -62,10 +62,6 @@ public class UsuarioService {
         return true;
     }
 
-    // =========================
-    // CRUD
-    // =========================
-
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
@@ -93,7 +89,9 @@ public class UsuarioService {
         usuario.setNombreUsuario(datos.getNombreUsuario());
         usuario.setNombre(datos.getNombre());
         usuario.setApellido(datos.getApellido());
-        usuario.setClave(datos.getClave());
+        if (datos.getClave() != null && !datos.getClave().isBlank()) {
+            usuario.setClave(datos.getClave());
+        }
         usuario.setEmail(datos.getEmail());
         usuario.setActivo(datos.isActivo());
 

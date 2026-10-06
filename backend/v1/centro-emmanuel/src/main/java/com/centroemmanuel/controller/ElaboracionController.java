@@ -3,10 +3,12 @@ package com.centroemmanuel.controller;
 import com.centroemmanuel.entity.Elaboracion;
 import com.centroemmanuel.service.ElaboracionService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/elaboraciones")
@@ -37,30 +39,40 @@ public class ElaboracionController {
     }
 
     @PostMapping
-    public ResponseEntity<Elaboracion> crear(
+    public ResponseEntity<?> crear(
             @RequestBody Elaboracion elaboracion) {
-
-        return ResponseEntity.ok(
-                elaboracionService.guardar(elaboracion)
-        );
+        try {
+            return ResponseEntity.ok(elaboracionService.guardar(elaboracion));
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", error.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Elaboracion> actualizar(
+    public ResponseEntity<?> actualizar(
             @PathVariable Integer id,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Integer idActor,
             @RequestBody Elaboracion elaboracion) {
-
-        return ResponseEntity.ok(
-                elaboracionService.actualizar(id, elaboracion)
-        );
+        try {
+            return ResponseEntity.ok(elaboracionService.actualizar(id, elaboracion, idActor));
+        } catch (SecurityException error) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("mensaje", error.getMessage()));
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", error.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @PathVariable Integer id) {
-
-        elaboracionService.eliminar(id);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> eliminar(
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Integer idActor) {
+        try {
+            elaboracionService.eliminar(id, idActor);
+            return ResponseEntity.noContent().build();
+        } catch (SecurityException error) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("mensaje", error.getMessage()));
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", error.getMessage()));
+        }
     }
 }

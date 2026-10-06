@@ -7,19 +7,11 @@ public class PermisoRequest {
     public PermisoRequest() {
     }
 
-    public String getNombrePermiso() {
-        return nombrePermiso;
-    }
+    //region Getters y Setters
+    public String getNombrePermiso(){return nombrePermiso;}
+    public void setNombrePermiso(String pNombrePermiso){this.nombrePermiso = pNombrePermiso;}
 
-    public void setNombrePermiso(String nombrePermiso) {
-        this.nombrePermiso = nombrePermiso;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public String getDescripcion(){return descripcion;}
+    public void setDescripcion(String pDescripcion){this.descripcion = pDescripcion;}
+    //endregion
 }

@@ -1,4 +1,4 @@
-/* ============== FORMULARIOS ======================= */
+/* FORMULARIOS */
 
 .input-group,
 .select-group,
@@ -30,7 +30,7 @@
   font-size: 13px;
 }
 
-/* ====================== CONTROLES ======================= */
+/* CONTROLES */
 
 .input,
 .select,
@@ -66,7 +66,7 @@
   border-color: var(--color-primary);
 }
 
-/* ====================== CARD ======================= */
+/* CARD */
 
 .card {
   background: var(--color-surface);
@@ -92,7 +92,7 @@
   padding: 22px;
 }
 
-/* ============= BOTONES ======================= */
+/* BOTONES */
 
 .btn {
   min-width: 120px;
@@ -135,7 +135,7 @@
   width: auto;
 }
 
-/* ============= GRID PARA FORMULARIOS =================== */
+/* GRID PARA FORMULARIOS */
 
 .form-field {
   display: grid;
@@ -172,7 +172,7 @@
   }
 }
 
-/* =============== SECCIONES DE FORMULARIO =========================== */
+/* SECCIONES DE FORMULARIO */
 
 .form-section {
   margin-bottom: 32px;
@@ -206,7 +206,7 @@
   gap: 20px;
 }
 
-/* ================== TABLAS ================= */
+/* TABLAS */
 
 .table-container {
     width: 100%;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import { mensajeError, puedeModificarRegistro } from "../../utils/errores";
 import Card from "../../components/ui/Card";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
@@ -7,6 +8,7 @@ import Textarea from "../../components/ui/Textarea";
 
 const formularioInicial = {
   fecha: "",
+  litrosTotales: "",
   litrosTerneros: "",
   ventaDirecta: "",
   consumoCocina: "",
@@ -20,32 +22,58 @@ export default function Leche() {
 
   const [form, setForm] = useState(formularioInicial);
   const [registros, setRegistros] = useState([]);
+  const [inventario, setInventario] = useState(null);
   const [editando, setEditando] = useState(null);
   const [cargando, setCargando] = useState(false);
-
-  // ============ CARGAR REGISTROS DESDE LA BASE DE DATOS ================
+  const [guardando, setGuardando] = useState(false);
+  const [errorCarga, setErrorCarga] = useState("");
 
   useEffect(() => {
     cargarRegistros();
   }, []);
 
   async function cargarRegistros() {
+    setCargando(true);
+    let huboError = false;
     try {
-      setCargando(true);
-
       const response = await api.get("/produccion-leche");
-
       setRegistros(response.data);
-
     } catch (error) {
-      console.error("Error al cargar producción de leche:", error);
-      alert("No se pudieron cargar los registros de producción de leche.");
+      console.error("Error al cargar registros de producción de leche:", error);
+      huboError = true;
+    }
+    try {
+      const respuestaInventario = await api.get("/produccion-leche/inventario");
+      setInventario(respuestaInventario.data);
+    } catch (error) {
+      console.error("Error al cargar el inventario de leche:", error);
+      huboError = true;
     } finally {
+      setErrorCarga(huboError ? "No se pudieron cargar todos los datos de leche." : "");
       setCargando(false);
     }
   }
 
-  // ============== MANEJAR CAMBIOS DEL FORMULARIO ====================
+  const camposDestino = [
+    "litrosTerneros",
+    "ventaDirecta",
+    "consumoCocina",
+    "elaboracionQuesos",
+    "elaboracionDulceDeLeche",
+    "elaboracionQuark",
+  ];
+  const sumaAsignada = camposDestino.reduce(
+    (total, campo) => total + (Number(form[campo]) || 0), 0);
+  const litrosRestantes = Math.max(
+    (Number(form.litrosTotales) || 0) - sumaAsignada, 0);
+
+  function maximoPara(campo) {
+    return Math.max(litrosRestantes + (Number(form[campo]) || 0), 0);
+  }
+
+  function formatearLitros(valor) {
+    return Number(valor.toFixed(2));
+  }
 
   function handleChange(e) {
     setForm({
@@ -54,18 +82,39 @@ export default function Leche() {
     });
   }
 
-  // ============== GUARDAR / ACTUALIZAR ====================
-
-  const usuarioGuardado = localStorage.getItem("usuario");
-const usuario = usuarioGuardado
-  ? JSON.parse(usuarioGuardado)
-  : null;
-
 
   async function guardar(e) {
   e.preventDefault();
 
   try {
+    setGuardando(true);
+
+    const cantidades = [
+      form.litrosTerneros,
+      form.ventaDirecta,
+      form.consumoCocina,
+      form.elaboracionQuesos,
+      form.elaboracionDulceDeLeche,
+      form.elaboracionQuark,
+    ].map(Number);
+    const litrosTotales = Number(form.litrosTotales);
+    const litrosAsignados = cantidades.reduce((total, cantidad) => total + cantidad, 0);
+
+    if (!Number.isFinite(litrosTotales) || litrosTotales <= 0) {
+      alert("Los litros totales producidos deben ser mayores que cero.");
+      return;
+    }
+
+    if (!cantidades.every((cantidad) => Number.isFinite(cantidad) && cantidad >= 0)) {
+      alert("Los litros destinados deben ser números válidos y no pueden ser negativos.");
+      return;
+    }
+
+    if (litrosAsignados > litrosTotales) {
+      alert("Los litros asignados no pueden superar el total producido.");
+      return;
+    }
+
     const usuarioGuardado = localStorage.getItem("usuario");
 
     if (!usuarioGuardado) {
@@ -82,6 +131,7 @@ const usuario = usuarioGuardado
 
     const datos = {
       fecha: form.fecha,
+      litrosTotales,
       litrosTerneros: Number(form.litrosTerneros),
       ventaDirecta: Number(form.ventaDirecta),
       consumoCocina: Number(form.consumoCocina),
@@ -131,19 +181,26 @@ const usuario = usuarioGuardado
       error.response?.data
     );
 
-    alert(
-      error.response?.data?.message ||
-      "No se pudo guardar el registro."
-    );
+    alert(mensajeError(error, "No se pudo guardar el registro."));
+  } finally {
+    setGuardando(false);
   }
 }
 
-  // ============= EDITAR ====================
 
   function editarRegistro(registro) {
 
     setForm({
       fecha: registro.fecha ?? "",
+      litrosTotales: registro.litrosTotales
+        ?? [
+          registro.litrosTerneros,
+          registro.ventaDirecta,
+          registro.consumoCocina,
+          registro.elaboracionQuesos,
+          registro.elaboracionDulceDeLeche,
+          registro.elaboracionQuark,
+        ].reduce((total, litros) => total + (Number(litros) || 0), 0),
       litrosTerneros: registro.litrosTerneros ?? "",
       ventaDirecta: registro.ventaDirecta ?? "",
       consumoCocina: registro.consumoCocina ?? "",
@@ -157,8 +214,6 @@ const usuario = usuarioGuardado
 
     setEditando(registro.idProduccionLeche);
   }
-
-  // ================== ELIMINAR ==================
 
   async function eliminarRegistro(id) {
 
@@ -185,11 +240,9 @@ const usuario = usuarioGuardado
         error
       );
 
-      alert("No se pudo eliminar el registro.");
+      alert(mensajeError(error, "No se pudo eliminar el registro."));
     }
   }
-
-  // ================= CANCELAR EDICIÓN ===================
 
   function cancelarEdicion() {
     setForm(formularioInicial);
@@ -199,7 +252,8 @@ const usuario = usuarioGuardado
   return (
     <div className="pagina">
 
-      <Card title="· REGISTRO DE PRODUCCION DE LECHE ·">
+      <Card title="· DISTRIBUCION DE LECHE ·">
+        {errorCarga && <p className="mensaje-error" role="alert">{errorCarga}</p>}
 
         <div className="form-button-container">
 
@@ -238,6 +292,19 @@ const usuario = usuarioGuardado
           </div>
 
           {/* TERNEROS */}
+          <div className="input-group">
+            <label>Litros totales producidos</label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0.01"
+              name="litrosTotales"
+ value={form.litrosTotales}
+ onChange={handleChange}
+ required
+ />
+ <small>Litros restantes para asignar: {formatearLitros(litrosRestantes)} L</small>
+          </div>
 
           <div className="input-group">
 
@@ -252,11 +319,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="litrosTerneros"
-              value={form.litrosTerneros}
-              onChange={handleChange}
-              required
-            />
+ value={form.litrosTerneros}
+ onChange={handleChange}
+ max={maximoPara("litrosTerneros")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("litrosTerneros"))} L</small>
 
           </div>
 
@@ -269,11 +339,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="ventaDirecta"
-              value={form.ventaDirecta}
-              onChange={handleChange}
-              required
-            />
+ value={form.ventaDirecta}
+ onChange={handleChange}
+ max={maximoPara("ventaDirecta")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("ventaDirecta"))} L</small>
 
           </div>
 
@@ -286,11 +359,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="consumoCocina"
-              value={form.consumoCocina}
-              onChange={handleChange}
-              required
-            />
+ value={form.consumoCocina}
+ onChange={handleChange}
+ max={maximoPara("consumoCocina")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("consumoCocina"))} L</small>
 
           </div>
 
@@ -303,11 +379,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="elaboracionQuesos"
-              value={form.elaboracionQuesos}
-              onChange={handleChange}
-              required
-            />
+ value={form.elaboracionQuesos}
+ onChange={handleChange}
+ max={maximoPara("elaboracionQuesos")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("elaboracionQuesos"))} L</small>
 
           </div>
 
@@ -320,11 +399,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="elaboracionDulceDeLeche"
-              value={form.elaboracionDulceDeLeche}
-              onChange={handleChange}
-              required
-            />
+ value={form.elaboracionDulceDeLeche}
+ onChange={handleChange}
+ max={maximoPara("elaboracionDulceDeLeche")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("elaboracionDulceDeLeche"))} L</small>
 
           </div>
 
@@ -337,11 +419,14 @@ const usuario = usuarioGuardado
             <Input
               type="number"
               step="0.01"
+              min="0"
               name="elaboracionQuark"
-              value={form.elaboracionQuark}
-              onChange={handleChange}
-              required
-            />
+ value={form.elaboracionQuark}
+ onChange={handleChange}
+ max={maximoPara("elaboracionQuark")}
+ required
+ />
+ <small>Máximo disponible: {formatearLitros(maximoPara("elaboracionQuark"))} L</small>
 
           </div>
 
@@ -367,8 +452,11 @@ const usuario = usuarioGuardado
             <Button
               type="submit"
               className="btn btn-primary"
+              disabled={guardando}
             >
-              {editando !== null
+              {guardando
+                ? "Guardando..."
+                : editando !== null
                 ? "Actualizar"
                 : "Guardar"}
             </Button>
@@ -393,6 +481,37 @@ const usuario = usuarioGuardado
 
         <hr />
 
+        <h3>Inventario de leche por destino</h3>
+        {inventario && (
+          <>
+            <p>
+              Producidos: {inventario.litrosTotales} L · Asignados: {inventario.litrosAsignados} L ·
+              Utilizados: {inventario.litrosUtilizados} L
+            </p>
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr><th>Destino</th><th>Asignados (L)</th><th>Utilizados (L)</th><th>Disponibles (L)</th></tr>
+                </thead>
+                <tbody>
+                  {inventario.areas.map((area) => (
+                    <tr key={area.destino}>
+                      <td>{area.etiqueta}</td>
+                      <td>{area.asignado}</td>
+                      <td>{area.utilizado}</td>
+                      <td>{area.disponible}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        <br />
+
+        <hr />
+
         {/* TABLA */}
 
         <div className="table-container">
@@ -409,6 +528,7 @@ const usuario = usuarioGuardado
 
                 <tr>
                   <th>Fecha</th>
+                  <th>Total producido</th>
                   <th>Terneros</th>
                   <th>Venta directa</th>
                   <th>Consumo cocina</th>
@@ -426,7 +546,7 @@ const usuario = usuarioGuardado
                 {registros.length === 0 ? (
 
                   <tr>
-                    <td colSpan="9">
+                    <td colSpan="10">
                       No hay registros de producción de leche.
                     </td>
                   </tr>
@@ -438,6 +558,16 @@ const usuario = usuarioGuardado
                     <tr key={r.idProduccionLeche}>
 
                       <td>{r.fecha}</td>
+                      <td>
+                        {r.litrosTotales ?? [
+                          r.litrosTerneros,
+                          r.ventaDirecta,
+                          r.consumoCocina,
+                          r.elaboracionQuesos,
+                          r.elaboracionDulceDeLeche,
+                          r.elaboracionQuark,
+                        ].reduce((total, litros) => total + (Number(litros) || 0), 0)} L
+                      </td>
 
                       <td>{r.litrosTerneros}</td>
 
@@ -459,6 +589,7 @@ const usuario = usuarioGuardado
 
                           <Button
                             variant="secondary"
+                            disabled={!puedeModificarRegistro(r)}
                             onClick={() =>
                               editarRegistro(r)
                             }
@@ -468,6 +599,7 @@ const usuario = usuarioGuardado
 
                           <Button
                             variant="danger"
+                            disabled={!puedeModificarRegistro(r)}
                             onClick={() =>
                               eliminarRegistro(
                                 r.idProduccionLeche
@@ -500,5 +632,3 @@ const usuario = usuarioGuardado
     </div>
   );
 }
-
-

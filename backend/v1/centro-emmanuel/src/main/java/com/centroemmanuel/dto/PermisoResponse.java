@@ -19,44 +19,20 @@ public class PermisoResponse {
         this.nombreUsuarioCreacion = nombreUsuarioCreacion;
     }
 
-    public Integer getIdPermiso() {
-        return idPermiso;
-    }
+    //region Getters y Setters
+    public Integer getIdPermiso(){return idPermiso;}
+    public void setIdPermiso(Integer pIdPermiso){this.idPermiso = pIdPermiso;}
 
-    public void setIdPermiso(Integer idPermiso) {
-        this.idPermiso = idPermiso;
-    }
+    public String getNombrePermiso(){return nombrePermiso;}
+    public void setNombrePermiso(String pNombrePermiso){this.nombrePermiso = pNombrePermiso;}
 
-    public String getNombrePermiso() {
-        return nombrePermiso;
-    }
+    public String getDescripcion(){return descripcion;}
+    public void setDescripcion(String pDescripcion){this.descripcion = pDescripcion;}
 
-    public void setNombrePermiso(String nombrePermiso) {
-        this.nombrePermiso = nombrePermiso;
-    }
+    public Integer getIdUsuarioCreacion(){return idUsuarioCreacion;}
+    public void setIdUsuarioCreacion(Integer pIdUsuarioCreacion){this.idUsuarioCreacion = pIdUsuarioCreacion;}
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public Integer getIdUsuarioCreacion() {
-        return idUsuarioCreacion;
-    }
-
-    public void setIdUsuarioCreacion(Integer idUsuarioCreacion) {
-        this.idUsuarioCreacion = idUsuarioCreacion;
-    }
-
-    public String getNombreUsuarioCreacion() {
-        return nombreUsuarioCreacion;
-    }
-
-    public void setNombreUsuarioCreacion(String nombreUsuarioCreacion) {
-        this.nombreUsuarioCreacion = nombreUsuarioCreacion;
-    }
-
+    public String getNombreUsuarioCreacion(){return nombreUsuarioCreacion;}
+    public void setNombreUsuarioCreacion(String pNombreUsuarioCreacion){this.nombreUsuarioCreacion = pNombreUsuarioCreacion;}
+    //endregion
 }

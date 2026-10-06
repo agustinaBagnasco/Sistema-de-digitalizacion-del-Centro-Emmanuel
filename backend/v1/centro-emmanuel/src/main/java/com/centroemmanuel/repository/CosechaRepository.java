@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CosechaRepository extends JpaRepository<Cosecha, Integer> {
+    boolean existsByProductoCosecha_IdProducto(Integer idProducto);
 }

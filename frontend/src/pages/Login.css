@@ -36,6 +36,12 @@
 
 }
 
+.login-card .login-error {
+    margin: 0 0 16px;
+    color: #b42318;
+    font-size: 14px;
+}
+
 
 .login-card input {
 

@@ -16,6 +16,9 @@ public class ProduccionLeche {
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
+    @Column(name = "litros_totales", precision = 15, scale = 3)
+    private BigDecimal litrosTotales;
+
     @Column(name = "litros_terneros", nullable = false, precision = 15, scale = 3)
     private BigDecimal litrosTerneros;
 
@@ -44,84 +47,38 @@ public class ProduccionLeche {
     public ProduccionLeche() {
     }
 
-    public Integer getIdProduccionLeche() {
-        return idProduccionLeche;
-    }
+    //region Getters y Setters
+    public Integer getIdProduccionLeche(){return idProduccionLeche;}
+    public void setIdProduccionLeche(Integer pIdProduccionLeche){this.idProduccionLeche = pIdProduccionLeche;}
 
-    public void setIdProduccionLeche(Integer idProduccionLeche) {
-        this.idProduccionLeche = idProduccionLeche;
-    }
+    public LocalDate getFecha(){return fecha;}
+    public void setFecha(LocalDate pFecha){this.fecha = pFecha;}
 
-    public LocalDate getFecha() {
-        return fecha;
-    }
+    public BigDecimal getLitrosTotales(){return litrosTotales;}
+    public void setLitrosTotales(BigDecimal pLitrosTotales){this.litrosTotales = pLitrosTotales;}
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
+    public BigDecimal getLitrosTerneros(){return litrosTerneros;}
+    public void setLitrosTerneros(BigDecimal pLitrosTerneros){this.litrosTerneros = pLitrosTerneros;}
 
-    public BigDecimal getLitrosTerneros() {
-        return litrosTerneros;
-    }
+    public BigDecimal getVentaDirecta(){return ventaDirecta;}
+    public void setVentaDirecta(BigDecimal pVentaDirecta){this.ventaDirecta = pVentaDirecta;}
 
-    public void setLitrosTerneros(BigDecimal litrosTerneros) {
-        this.litrosTerneros = litrosTerneros;
-    }
+    public BigDecimal getConsumoCocina(){return consumoCocina;}
+    public void setConsumoCocina(BigDecimal pConsumoCocina){this.consumoCocina = pConsumoCocina;}
 
-    public BigDecimal getVentaDirecta() {
-        return ventaDirecta;
-    }
+    public BigDecimal getElaboracionQuesos(){return elaboracionQuesos;}
+    public void setElaboracionQuesos(BigDecimal pElaboracionQuesos){this.elaboracionQuesos = pElaboracionQuesos;}
 
-    public void setVentaDirecta(BigDecimal ventaDirecta) {
-        this.ventaDirecta = ventaDirecta;
-    }
+    public BigDecimal getElaboracionDulceDeLeche(){return elaboracionDulceDeLeche;}
+    public void setElaboracionDulceDeLeche(BigDecimal pElaboracionDulceDeLeche){this.elaboracionDulceDeLeche = pElaboracionDulceDeLeche;}
 
-    public BigDecimal getConsumoCocina() {
-        return consumoCocina;
-    }
+    public BigDecimal getElaboracionQuark(){return elaboracionQuark;}
+    public void setElaboracionQuark(BigDecimal pElaboracionQuark){this.elaboracionQuark = pElaboracionQuark;}
 
-    public void setConsumoCocina(BigDecimal consumoCocina) {
-        this.consumoCocina = consumoCocina;
-    }
+    public String getComentario(){return comentario;}
+    public void setComentario(String pComentario){this.comentario = pComentario;}
 
-    public BigDecimal getElaboracionQuesos() {
-        return elaboracionQuesos;
-    }
-
-    public void setElaboracionQuesos(BigDecimal elaboracionQuesos) {
-        this.elaboracionQuesos = elaboracionQuesos;
-    }
-
-    public BigDecimal getElaboracionDulceDeLeche() {
-        return elaboracionDulceDeLeche;
-    }
-
-    public void setElaboracionDulceDeLeche(BigDecimal elaboracionDulceDeLeche) {
-        this.elaboracionDulceDeLeche = elaboracionDulceDeLeche;
-    }
-
-    public BigDecimal getElaboracionQuark() {
-        return elaboracionQuark;
-    }
-
-    public void setElaboracionQuark(BigDecimal elaboracionQuark) {
-        this.elaboracionQuark = elaboracionQuark;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public Usuario getUsuario(){return usuario;}
+    public void setUsuario(Usuario pUsuario){this.usuario = pUsuario;}
+    //endregion
 }
-

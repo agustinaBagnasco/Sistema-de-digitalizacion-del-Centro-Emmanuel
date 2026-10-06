@@ -13,75 +13,38 @@ public class DetalleElaboracion {
     @Column(name = "id_detalle_elaboracion")
     private Integer idDetalleElaboracion;
 
-    // Elaboración a la que pertenece este detalle
     @ManyToOne
     @JoinColumn(name = "id_elaboracion", nullable = false)
     @JsonIgnore
     private Elaboracion elaboracion;
 
-    // Producto utilizado como insumo
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto insumoUtilizado;
 
-    // Cantidad utilizada del insumo
     @Column(name = "cantidad_utilizada", nullable = false, precision = 15, scale = 3)
     private BigDecimal cantidadUtilizada;
 
-    // Costo del insumo al momento de la elaboración
     @Column(name = "costo_unitario", precision = 15, scale = 3)
     private BigDecimal costoUnitario;
-
-
-    // =========================
-    // CONSTRUCTORES
-    // =========================
 
     public DetalleElaboracion() {
     }
 
+    //region Getters y Setters
+    public Integer getIdDetalleElaboracion(){return idDetalleElaboracion;}
+    public void setIdDetalleElaboracion(Integer pIdDetalleElaboracion){this.idDetalleElaboracion = pIdDetalleElaboracion;}
 
-    // =========================
-    // GETTERS Y SETTERS
-    // =========================
+    public Elaboracion getElaboracion(){return elaboracion;}
+    public void setElaboracion(Elaboracion pElaboracion){this.elaboracion = pElaboracion;}
 
-    public Integer getIdDetalleElaboracion() {
-        return idDetalleElaboracion;
-    }
+    public Producto getInsumoUtilizado(){return insumoUtilizado;}
+    public void setInsumoUtilizado(Producto pInsumoUtilizado){this.insumoUtilizado = pInsumoUtilizado;}
 
-    public void setIdDetalleElaboracion(Integer idDetalleElaboracion) {
-        this.idDetalleElaboracion = idDetalleElaboracion;
-    }
+    public BigDecimal getCantidadUtilizada(){return cantidadUtilizada;}
+    public void setCantidadUtilizada(BigDecimal pCantidadUtilizada){this.cantidadUtilizada = pCantidadUtilizada;}
 
-    public Elaboracion getElaboracion() {
-        return elaboracion;
-    }
-
-    public void setElaboracion(Elaboracion elaboracion) {
-        this.elaboracion = elaboracion;
-    }
-
-    public Producto getInsumoUtilizado() {
-        return insumoUtilizado;
-    }
-
-    public void setInsumoUtilizado(Producto insumoUtilizado) {
-        this.insumoUtilizado = insumoUtilizado;
-    }
-
-    public BigDecimal getCantidadUtilizada() {
-        return cantidadUtilizada;
-    }
-
-    public void setCantidadUtilizada(BigDecimal cantidadUtilizada) {
-        this.cantidadUtilizada = cantidadUtilizada;
-    }
-
-    public BigDecimal getCostoUnitario() {
-        return costoUnitario;
-    }
-
-    public void setCostoUnitario(BigDecimal costoUnitario) {
-        this.costoUnitario = costoUnitario;
-    }
+    public BigDecimal getCostoUnitario(){return costoUnitario;}
+    public void setCostoUnitario(BigDecimal pCostoUnitario){this.costoUnitario = pCostoUnitario;}
+    //endregion
 }

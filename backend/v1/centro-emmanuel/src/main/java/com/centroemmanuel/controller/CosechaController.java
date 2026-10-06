@@ -31,7 +31,8 @@ public class CosechaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Cosecha> buscarPorId(
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Integer idActor) {
 
         Optional<Cosecha> cosecha =
                 cosechaService.buscarPorId(id);
@@ -58,10 +59,11 @@ public class CosechaController {
     @PutMapping("/{id}")
     public ResponseEntity<Cosecha> actualizar(
             @PathVariable Integer id,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Integer idActor,
             @RequestBody Cosecha cosecha) {
 
         Cosecha actualizada =
-                cosechaService.actualizar(id, cosecha);
+                cosechaService.actualizar(id, cosecha, idActor);
 
         if (actualizada == null) {
             return ResponseEntity.notFound().build();
@@ -72,7 +74,8 @@ public class CosechaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar( 
-            @PathVariable Integer id) {
+            @PathVariable Integer id,
+            @RequestHeader(value = "X-Usuario-Id", required = false) Integer idActor) {
 
         Optional<Cosecha> cosecha =
                 cosechaService.buscarPorId(id);
@@ -81,7 +84,7 @@ public class CosechaController {
             return ResponseEntity.notFound().build();
         }
 
-        cosechaService.eliminar(id);
+        cosechaService.eliminar(id, idActor);
 
         return ResponseEntity.noContent().build();
     }

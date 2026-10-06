@@ -26,8 +26,14 @@ public class MovimientoStock {
     @Column(name = "fecha_mov", nullable = false)
     private LocalDateTime fechaMov;
 
-    @Column(name = "motivo_mov", length = 255)
+    @Column(name = "motivo_mov", length = 1000)
     private String motivoMov;
+
+    @Column(name = "destino_leche", length = 32)
+    private String destinoLeche;
+
+    @Column(name = "consumo_leche_automatico", nullable = false)
+    private boolean consumoLecheAutomatico;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
@@ -53,57 +59,31 @@ public class MovimientoStock {
         this.usuario = usuario;
     }
 
-    // Getters y Setters
+    //region Getters y Setters
+    public Integer getIdMovStock(){return idMovStock;}
+    public void setIdMovStock(Integer pIdMovStock){this.idMovStock = pIdMovStock;}
 
-    public Integer getIdMovStock() {
-        return idMovStock;
-    }
+    public Producto getProductoMov(){return productoMov;}
+    public void setProductoMov(Producto pProductoMov){this.productoMov = pProductoMov;}
 
-    public void setIdMovStock(Integer idMovStock) {
-        this.idMovStock = idMovStock;
-    }
+    public BigDecimal getCantidadMov(){return cantidadMov;}
+    public void setCantidadMov(BigDecimal pCantidadMov){this.cantidadMov = pCantidadMov;}
 
-    public Producto getProductoMov() {
-        return productoMov;
-    }
+    public String getTipoMov(){return tipoMov;}
+    public void setTipoMov(String pTipoMov){this.tipoMov = pTipoMov;}
 
-    public void setProductoMov(Producto productoMov) {
-        this.productoMov = productoMov;
-    }
+    public LocalDateTime getFechaMov(){return fechaMov;}
 
-    public BigDecimal getCantidadMov() {
-        return cantidadMov;
-    }
+    public String getMotivoMov(){return motivoMov;}
+    public void setMotivoMov(String pMotivoMov){this.motivoMov = pMotivoMov;}
 
-    public void setCantidadMov(BigDecimal cantidadMov) {
-        this.cantidadMov = cantidadMov;
-    }
+    public String getDestinoLeche(){return destinoLeche;}
+    public void setDestinoLeche(String pDestinoLeche){this.destinoLeche = pDestinoLeche;}
 
-    public String getTipoMov() {
-        return tipoMov;
-    }
+    public boolean isConsumoLecheAutomatico(){return consumoLecheAutomatico;}
+    public void setConsumoLecheAutomatico(boolean pConsumoLecheAutomatico){this.consumoLecheAutomatico = pConsumoLecheAutomatico;}
 
-    public void setTipoMov(String tipoMov) {
-        this.tipoMov = tipoMov;
-    }
-
-    public LocalDateTime getFechaMov() {
-        return fechaMov;
-    }
-
-    public String getMotivoMov() {
-        return motivoMov;
-    }
-
-    public void setMotivoMov(String motivoMov) {
-        this.motivoMov = motivoMov;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public Usuario getUsuario(){return usuario;}
+    public void setUsuario(Usuario pUsuario){this.usuario = pUsuario;}
+    //endregion
 }

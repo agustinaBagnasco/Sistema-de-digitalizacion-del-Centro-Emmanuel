@@ -8,19 +8,11 @@ public class LoginRequest {
     public LoginRequest() {
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
-    }
+    //region Getters y Setters
+    public String getNombreUsuario(){return nombreUsuario;}
+    public void setNombreUsuario(String pNombreUsuario){this.nombreUsuario = pNombreUsuario;}
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
-    }
-
-    public String getClave() {
-        return clave;
-    }
-
-    public void setClave(String clave) {
-        this.clave = clave;
-    }
+    public String getClave(){return clave;}
+    public void setClave(String pClave){this.clave = pClave;}
+    //endregion
 }

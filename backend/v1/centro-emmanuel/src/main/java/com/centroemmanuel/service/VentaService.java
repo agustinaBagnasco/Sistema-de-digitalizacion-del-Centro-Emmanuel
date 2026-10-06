@@ -5,6 +5,8 @@ import com.centroemmanuel.entity.DetalleVenta;
 import com.centroemmanuel.entity.Producto;
 import com.centroemmanuel.entity.Usuario;
 import com.centroemmanuel.entity.Venta;
+import com.centroemmanuel.enums.Categoria;
+import com.centroemmanuel.enums.DestinoLeche;
 import com.centroemmanuel.repository.ProductoRepository;
 import com.centroemmanuel.repository.UsuarioRepository;
 import com.centroemmanuel.repository.VentaRepository;
@@ -25,15 +27,18 @@ public class VentaService {
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
     private final StockService stockService;
+    private final InventarioLecheService inventarioLecheService;
 
     public VentaService(VentaRepository ventaRepository,
                         ProductoRepository productoRepository,
                         UsuarioRepository usuarioRepository,
-                        StockService stockService) {
+                        StockService stockService,
+                        InventarioLecheService inventarioLecheService) {
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
         this.usuarioRepository = usuarioRepository;
         this.stockService = stockService;
+        this.inventarioLecheService = inventarioLecheService;
     }
 
     @Transactional
@@ -48,6 +53,7 @@ public class VentaService {
 
         List<VentaPreparada> ventasPreparadas = new ArrayList<>();
         Map<Integer, BigDecimal> cantidadesPorProducto = new HashMap<>();
+        BigDecimal litrosLecheVendidos = BigDecimal.ZERO;
         for (int indice = 0; indice < request.getVentas().size(); indice++) {
             VentaRequest.VentaImportada fila = request.getVentas().get(indice);
             int numeroFila = indice + 2;
@@ -68,6 +74,9 @@ public class VentaService {
                         + "': " + idsProductos + ". Deje un solo producto con ese nombre antes de importar.");
                 }
                 Producto producto = productosEncontrados.get(0);
+                if (producto.getCategoria() == Categoria.LECHE) {
+                    litrosLecheVendidos = litrosLecheVendidos.add(fila.getCantidad());
+                }
 
             BigDecimal stockActual = producto.getStockActual() == null ? BigDecimal.ZERO : producto.getStockActual();
                 BigDecimal cantidadAcumulada = cantidadesPorProducto.merge(
@@ -78,6 +87,10 @@ public class VentaService {
             }
 
             ventasPreparadas.add(new VentaPreparada(fila, producto));
+        }
+
+        if (litrosLecheVendidos.signum() > 0) {
+            inventarioLecheService.validarUso(DestinoLeche.VENTA_DIRECTA, litrosLecheVendidos);
         }
 
         for (VentaPreparada preparada : ventasPreparadas) {
@@ -96,7 +109,13 @@ public class VentaService {
             detalle.setSubtotal(fila.getTotal());
             venta.setDetalleVenta(List.of(detalle));
 
-            stockService.descontar(producto, fila.getCantidad(), usuario, "Venta importada");
+            boolean esLeche = producto.getCategoria() == Categoria.LECHE;
+            stockService.descontar(
+                    producto,
+                    fila.getCantidad(),
+                    usuario,
+                    "Venta importada" + (esLeche ? " · destino: Venta directa" : ""),
+                    esLeche ? DestinoLeche.VENTA_DIRECTA : null);
             ventaRepository.save(venta);
         }
 

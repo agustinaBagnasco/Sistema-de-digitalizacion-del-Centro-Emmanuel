@@ -9,6 +9,7 @@ import "../../styles/global.css";
 function Permisos() {
 
 	const [permisos, setPermisos] = useState([]);
+	const [busquedaPermiso, setBusquedaPermiso] = useState("");
 	const [mostrarFormulario, setMostrarFormulario] = useState(false);
 	const [permisoEditando, setPermisoEditando] = useState(null);
 
@@ -124,6 +125,12 @@ function Permisos() {
 		}
 	};
 
+	const consultaPermiso = busquedaPermiso.trim().toLocaleLowerCase("es");
+	const permisosFiltrados = permisos.filter((permiso) =>
+		[permiso.nombrePermiso, permiso.descripcion]
+			.some((valor) => String(valor || "").toLocaleLowerCase("es").includes(consultaPermiso))
+	);
+
 	return (
 		<div className="pagina">
 			<Card title="· PERMISOS ·">
@@ -187,6 +194,17 @@ function Permisos() {
 
 				<br />
 
+				<div className="input-group" style={{ maxWidth: "420px", marginBottom: "16px" }}>
+					<label htmlFor="buscar-permiso">Buscar permiso</label>
+					<Input
+						id="buscar-permiso"
+						type="search"
+						value={busquedaPermiso}
+						onChange={(evento) => setBusquedaPermiso(evento.target.value)}
+						placeholder="Nombre o descripción"
+					/>
+				</div>
+
 				<div className="table-container">
 					<table className="table">
 						<thead style={{ backgroundColor: "#f2f2f2" }}>
@@ -199,12 +217,16 @@ function Permisos() {
 							</tr>
 						</thead>
 						<tbody>
-							{permisos.length === 0 ? (
+							{permisosFiltrados.length === 0 ? (
 								<tr>
-									<td colSpan="5">No hay permisos registrados.</td>
+									<td colSpan="5">
+										{permisos.length === 0
+											? "No hay permisos registrados."
+											: "No hay permisos que coincidan con la búsqueda."}
+									</td>
 								</tr>
 							) : (
-								permisos.map((permiso) => (
+								permisosFiltrados.map((permiso) => (
 									<tr key={permiso.idPermiso}>
 										<td>{permiso.idPermiso}</td>
 										<td>{permiso.nombrePermiso}</td>

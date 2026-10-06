@@ -74,7 +74,7 @@ public class ProductoController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
+    public ResponseEntity<?> eliminar(
             @PathVariable("id") Integer id) {
 
         Optional<Producto> producto =
@@ -84,7 +84,11 @@ public class ProductoController {
             return ResponseEntity.notFound().build();
         }
 
-        productoService.eliminar(id);
+        try {
+            productoService.eliminar(id);
+        } catch (IllegalStateException error) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("mensaje", error.getMessage()));
+        }
 
         return ResponseEntity.noContent().build();
     }
