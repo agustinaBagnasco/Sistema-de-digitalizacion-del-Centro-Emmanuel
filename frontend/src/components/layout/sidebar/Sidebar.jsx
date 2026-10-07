@@ -1,0 +1,215 @@
+// import { NavLink } from "react-router-dom";
+// import { menuItems } from "./menuItems";
+// import "./Sidebar.css";
+// import logo from "../../../assets/logo.png";
+// import { useState } from "react";
+
+
+// export default function Sidebar({ open, onClose }) {
+
+//   const [openMenu, setOpenMenu] = useState(null);
+
+
+//   return (
+//     <>
+//       {open && <div className="sidebar-overlay" onClick={onClose}></div>}
+
+//       <aside className={`sidebar ${open ? "open" : ""}`}>
+
+//         <div className="sidebar-header">
+//           <NavLink
+//             to="/"
+//             onClick={onClose}
+//             className="logo-link"
+//           >
+//             <img
+//               src={logo}
+//               alt="Centro Emmanuel"
+//               className="sidebar-logo"
+//             />
+//           </NavLink>
+ 
+
+//           <p>Sistema de Gestión</p>
+//         </div>
+
+//         <nav>
+//           {menuItems.map((item, index) => (
+//             <div key={index}>
+
+//               {item.children ? (
+//                 <>
+//                   <button
+//                     className="menu-item submenu-button"
+//                     onClick={() =>
+//                       setOpenMenu(openMenu === index ? null : index)
+//                     }
+//                   >
+//                     <span>{item.label}</span>
+//                     <span>{openMenu === index ? "▾" : "▸"}</span>
+//                   </button>
+
+//                   {openMenu === index && (
+//                     <div className="submenu">
+//                       {item.children.map((sub) => (
+//                         <NavLink
+//                           key={sub.path}
+//                           to={sub.path}
+//                           onClick={onClose}
+//                           className={({ isActive }) =>
+//                             isActive
+//                               ? "submenu-item active"
+//                               : "submenu-item"
+//                           }
+//                         >
+//                           {sub.label}
+//                         </NavLink>
+//                       ))}
+//                     </div>
+//                   )}
+//                 </>
+//               ) : (
+//                 <NavLink
+//                   to={item.path}
+//                   onClick={onClose}
+//                   className={({ isActive }) =>
+//                     isActive ? "menu-item active" : "menu-item"
+//                   }
+//                 >
+//                   {item.label}
+//                 </NavLink>
+//               )}
+
+//             </div>
+//           ))}
+//         </nav>
+//       </aside>
+//     </>
+//   );
+// }
+
+
+import { NavLink } from "react-router-dom";
+import { menuItems } from "./menuItems";
+import "./Sidebar.css";
+import logo from "../../../assets/logoCe.png";
+import { useState } from "react";
+import { obtenerUsuarioActual, tienePermisoParaPagina } from "../../../routes/permisoPagina";
+
+export default function Sidebar({ open, onClose }) {
+
+  const [openMenu, setOpenMenu] = useState(null);
+  const usuario = obtenerUsuarioActual();
+  const menuFiltrado = menuItems
+    .map((item) => item.children
+      ? { ...item, children: item.children.filter((sub) => tienePermisoParaPagina(usuario, sub.path)) }
+      : item)
+    .filter((item) => !item.children || item.children.length > 0);
+
+  const handleClose = () => {
+    setOpenMenu(null);
+    onClose();
+  };
+
+  return (
+    <>
+      {open && (
+        <div
+          className="sidebar-overlay"
+          onClick={handleClose}
+        />
+      )}
+
+      <aside className={`sidebar ${open ? "open" : ""}`}>
+
+        <div className="sidebar-header">
+
+          <NavLink
+            to="/"
+            onClick={handleClose}
+            className="logo-link"
+          >
+            <img
+              src={logo}
+              alt="Centro Emmanuel"
+              className="sidebar-logo"
+            />
+          </NavLink>
+
+          <p>Sistema de Gestión</p>
+
+        </div>
+
+        <nav>
+
+          {menuFiltrado.map((item, index) => (
+
+            <div key={index}>
+
+              {item.children ? (
+                <>
+                  <button
+                    className="menu-item submenu-button"
+                    onClick={() =>
+                      setOpenMenu(
+                        openMenu === index ? null : index
+                      )
+                    }
+                  >
+                    <span>{item.label}</span>
+
+                    <span>
+                      {openMenu === index ? "▾" : "▸"}
+                    </span>
+                  </button>
+
+                  {openMenu === index && (
+                    <div className="submenu">
+
+                      {item.children.map((sub) => (
+
+                        <NavLink
+                          key={sub.path}
+                          to={sub.path}
+                          onClick={handleClose}
+                          className={({ isActive }) =>
+                            isActive
+                              ? "submenu-item active"
+                              : "submenu-item"
+                          }
+                        >
+                          {sub.label}
+                        </NavLink>
+
+                      ))}
+
+                    </div>
+                  )}
+
+                </>
+              ) : (
+
+                <NavLink
+                  to={item.path}
+                  onClick={handleClose}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "menu-item active"
+                      : "menu-item"
+                  }
+                >
+                  {item.label}
+                </NavLink>
+
+              )}
+
+            </div>
+
+          ))}
+
+        </nav>
+
+      </aside>
+    </>
+  );
+}

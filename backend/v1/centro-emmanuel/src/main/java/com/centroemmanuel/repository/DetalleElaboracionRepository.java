@@ -1,0 +1,10 @@
+package com.centroemmanuel.repository;
+
+import com.centroemmanuel.entity.DetalleElaboracion;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DetalleElaboracionRepository extends JpaRepository<DetalleElaboracion, Integer> {
+    boolean existsByInsumoUtilizado_IdProducto(Integer idProducto);
+}

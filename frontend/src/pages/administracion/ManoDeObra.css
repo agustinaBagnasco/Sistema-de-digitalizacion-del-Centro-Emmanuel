@@ -1,0 +1,149 @@
+.mano-obra-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mano-obra-toolbar p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.mano-obra-toolbar .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.mano-obra-search {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 420px);
+  margin-bottom: 16px;
+}
+
+.mano-obra-search label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mano-obra-table {
+  min-width: 420px;
+  table-layout: fixed;
+}
+
+.mano-obra-table th:nth-child(1) {
+  width: 52%;
+}
+
+.mano-obra-table th:nth-child(2) {
+  width: 26%;
+}
+
+.mano-obra-table th:nth-child(3) {
+  width: 22%;
+}
+
+.mano-obra-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mano-obra-toggle:hover,
+.mano-obra-detail-link:hover {
+  color: var(--color-primary-dark);
+}
+
+.mano-obra-toggle:focus-visible,
+.mano-obra-detail-link:focus-visible {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 3px;
+}
+
+.mano-obra-total {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mano-obra-detail-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mano-obra-table tbody tr.mano-obra-detail-row:hover {
+  background: transparent;
+}
+
+.mano-obra-detail-row > td {
+  padding: 8px 24px 16px 44px;
+  background: #f7f9fa;
+}
+
+.mano-obra-breakdown {
+  max-width: 620px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mano-obra-breakdown li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mano-obra-breakdown li:last-child {
+  border-bottom: 0;
+}
+
+.mano-obra-breakdown strong {
+  white-space: nowrap;
+}
+
+.mano-obra-empty-detail,
+.mano-obra-message {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.mano-obra-message[role="alert"] {
+  color: var(--color-danger);
+}
+
+@media (max-width: 520px) {
+  .mano-obra-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mano-obra-table {
+    min-width: 390px;
+  }
+
+  .mano-obra-table th,
+  .mano-obra-table td {
+    padding: 12px 10px;
+  }
+
+  .mano-obra-detail-row > td {
+    padding-left: 24px;
+  }
+}

@@ -1,0 +1,31 @@
+.quesos-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quesos-tab {
+  margin-bottom: -1px;
+  padding: 12px 16px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quesos-tab:hover {
+  color: var(--color-primary-dark);
+}
+
+.quesos-tab--activo {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary-dark);
+}
+
+.quesos-tab:focus-visible {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
