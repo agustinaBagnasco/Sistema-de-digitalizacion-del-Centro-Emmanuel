@@ -28,8 +28,7 @@ backend/
 │   │   │       ├── repository/
 │   │   │       ├── entity/
 │   │   │       ├── dto/
-│   │   │       ├── config/
-│   │   │       └── security/
+│   │   │       ├── enums/
 │   │   └── resources/
 │   │       ├── application.properties
 │   │       └── data.sql
