@@ -687,14 +687,14 @@ ${form.comentario || ""}
 
           <div className="input-group">
 
-            <label>Azúcar</label>
+            <label>Insumos</label>
 
             <Select
               name="azucar"
               value={form.azucar}
               onChange={handleChange}
               options={opcionesAzucar}
-              placeholder="Seleccione azúcar"
+              placeholder="Seleccione insumo"
             />
 
           </div>
