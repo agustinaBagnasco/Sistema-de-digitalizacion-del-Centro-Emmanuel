@@ -65,3 +65,13 @@ Thumbs.db
 
 # macOS
 .DS_Store
+
+.env
+.env.*
+!.env.example
+
+application-local.properties
+
+target/
+node_modules/
+data/
